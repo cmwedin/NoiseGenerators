@@ -1,8 +1,8 @@
 {
-  "name" : "com.sadsapphicgames.InvalidName",
+  "name" : "com.sadsapphicgames.noisegenerators",
   "version" : "0.0.1",
-  "displayName" : "Invalid Name",
-  "description" : "this is a template description that needs to be updated",
+  "displayName" : "Noise Generators",
+  "description" : "This is a package of compute shaders to generate random noise textures of various types",
   "author" : {
     "name" : "Chris Wedin",
     "email" : "cmwedin@gmail.com",
