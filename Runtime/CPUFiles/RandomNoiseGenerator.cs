@@ -9,6 +9,7 @@ namespace SadSapphicGames.NoiseGenerators
         public ComputeShader randomNoiseShader;
         public RenderTexture noiseTexture;
         public MeshRenderer displayMeshRenderer;
+        public bool animate;
         public uint seed;
         public uint texWidth;
         public uint texHeight;
@@ -20,6 +21,10 @@ namespace SadSapphicGames.NoiseGenerators
 
         // Update is called once per frame
         void Update() {
+            if(animate) {
+                seed++;
+                GenerateTexture();
+            }
         }
 
         private void SetShaderParameters() {
