@@ -1,0 +1,16 @@
+{
+    "name": "com.sadsapphicgames.noisegenerators.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c8c0d52397a24cb40a54aa2bbc1c3633"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
