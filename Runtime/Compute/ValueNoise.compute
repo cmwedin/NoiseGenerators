@@ -21,7 +21,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 {
     if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
 
-    uint hash = pcg_hash(_Seed);
     float2 globalLatticePos = id.xy / float(_LatticeSize);
     float2 localLatticePos = frac(globalLatticePos);
     int2 latticeIndex = floor(globalLatticePos);
@@ -36,8 +35,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         localLatticePos.x
     );
     float4 fragCol = lerp(colA,colB,localLatticePos.y);
-    // _NoiseTexture[id.xy] = fragCol ;
-    _NoiseTexture[id.xy] = _LatticeTexture[latticeIndex] ;
+    _NoiseTexture[id.xy] = fragCol ;
+    // _NoiseTexture[id.xy] = _LatticeTexture[latticeIndex+1];
 }
 
 [numthreads(8,8,1)]
