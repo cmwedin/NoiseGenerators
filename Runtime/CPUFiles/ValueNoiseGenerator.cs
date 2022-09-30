@@ -29,7 +29,7 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         public RenderTexture noiseTexture;
-        private RenderTexture latticeTexture;
+        public RenderTexture latticeTexture;
         public MeshRenderer displayMeshRenderer;
         public uint seed;
         public uint texWidth;
@@ -53,7 +53,7 @@ namespace SadSapphicGames.NoiseGenerators
         private void SetShaderParameters()
         {
             valueNoiseShader.SetInt("_Seed", (int)seed);
-            valueNoiseShader.SetInt("_TexWidth", (int)texHeight);
+            valueNoiseShader.SetInt("_TexWidth", (int)texWidth);
             valueNoiseShader.SetInt("_TexHeight", (int)texHeight);
             valueNoiseShader.SetInt("_LatticeSize", (int)latticeSize);
             valueNoiseShader.SetInt("_LatticeTexWidth", latticeTexWidth);

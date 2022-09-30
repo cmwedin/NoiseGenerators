@@ -1,4 +1,3 @@
-#define UINTMAXVALUE 4294967295.0 
 
 uint pcg_hash(uint seed) {
     seed = seed * 747796405u + 2891336453u;

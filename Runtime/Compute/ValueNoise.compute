@@ -1,12 +1,13 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #include "/Includes/PRNG.compute"
+#define UINTMAXVALUE 4294967295.0 
 
 #pragma kernel CSMain
 #pragma kernel GenerateLattice
 
 
 RWTexture2D<float4> _NoiseTexture;
-RWTexture2D<uint4> _LatticeTexture; //? Stores the values of the random lattice
+RWTexture2D<float4> _LatticeTexture; //? Stores the values of the random lattice
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
@@ -21,8 +22,22 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
 
     uint hash = pcg_hash(_Seed);
-    uint3 latticeIndex = floor(id / _LatticeSize);
-    _NoiseTexture[id.xy] = _LatticeTexture[latticeIndex.xy] / UINTMAXVALUE;
+    float2 globalLatticePos = id.xy / float(_LatticeSize);
+    float2 localLatticePos = frac(globalLatticePos);
+    int2 latticeIndex = floor(globalLatticePos);
+    float4 colA = lerp(
+        _LatticeTexture[uint2(latticeIndex.x,latticeIndex.y)],
+        _LatticeTexture[uint2(latticeIndex.x+1,latticeIndex.y)],
+        localLatticePos.x
+    );
+    float4 colB = lerp(
+        _LatticeTexture[uint2(latticeIndex.x,latticeIndex.y+1)],
+        _LatticeTexture[uint2(latticeIndex.x+1,latticeIndex.y+1)],
+        localLatticePos.x
+    );
+    float4 fragCol = lerp(colA,colB,localLatticePos.y);
+    // _NoiseTexture[id.xy] = fragCol ;
+    _NoiseTexture[id.xy] = _LatticeTexture[latticeIndex] ;
 }
 
 [numthreads(8,8,1)]
@@ -30,5 +45,6 @@ void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
     if(id.x < 0 || id.x >= _LatticeTexWidth || id.y < 0 || id.y >= _LatticeTexHeight) {return;}
     
     uint hash = pcg_hash(_Seed);
-    _LatticeTexture[id.xy] = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
+    uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
+    _LatticeTexture[id.xy] = float4(hash4d) / UINTMAXVALUE;
 }
