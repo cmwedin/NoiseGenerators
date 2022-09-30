@@ -1,0 +1,34 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#include "/Includes/PRNG.compute"
+
+#pragma kernel CSMain
+#pragma kernel GenerateLattice
+
+
+RWTexture2D<float4> _NoiseTexture;
+RWTexture2D<uint4> _LatticeTexture; //? Stores the values of the random lattice
+uint _Seed; //? the value used to generate the random hash
+uint _TexWidth; //? the width of the generated texture in pixels
+uint _TexHeight; //? the height of the generated texture in pixels
+uint _LatticeSize; //? the seperation of the lattice used to generate the noise in pixels
+uint _LatticeTexWidth; //? Total width of the lattice texture
+uint _LatticeTexHeight; //? Total height of the lattice texture
+
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
+
+    uint hash = pcg_hash(_Seed);
+    uint3 latticeIndex = floor(id / _LatticeSize);
+    _NoiseTexture[id.xy] = _LatticeTexture[latticeIndex.xy] / UINTMAXVALUE;
+}
+
+[numthreads(8,8,1)]
+void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
+    if(id.x < 0 || id.x >= _LatticeTexWidth || id.y < 0 || id.y >= _LatticeTexHeight) {return;}
+    
+    uint hash = pcg_hash(_Seed);
+    _LatticeTexture[id.xy] = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
+}
