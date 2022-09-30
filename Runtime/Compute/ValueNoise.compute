@@ -24,6 +24,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float2 globalLatticePos = id.xy / float(_LatticeSize);
     float2 localLatticePos = frac(globalLatticePos);
     int2 latticeIndex = floor(globalLatticePos);
+    localLatticePos = localLatticePos * localLatticePos * (3.0 - 2.0 * localLatticePos); //?alternate cubic pos for smoother transitions
     float4 colA = lerp(
         _LatticeTexture[uint2(latticeIndex.x,latticeIndex.y)],
         _LatticeTexture[uint2(latticeIndex.x+1,latticeIndex.y)],
