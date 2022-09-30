@@ -5,9 +5,9 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> _NoiseTexture;
-uint _Seed;
-uint _TexWidth;
-uint _TexHeight;
+uint _Seed; //? the value used to generate the random hash
+uint _TexWidth; //? the width of the generated texture in pixels
+uint _TexHeight; //? the height of the generated texture in pixels
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -15,10 +15,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
 
     uint hash = pcg_hash(_Seed);
-    int pixelIndex = id.y * _TexHeight + id.x;
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
-    _NoiseTexture[id.xy] = hash4d / 4294967295.0;
+    _NoiseTexture[id.xy] = hash4d / UINTMAXVALUE;
     //? alternate coloration used to verify the hash method doesnt have patterns or repitions at large scales (each pixel becomes a sequental input into the hash function)
+    // int pixelIndex = id.y * _TexHeight + id.x;
     // uint althash = pcg_hash(pixelIndex);
     // _NoiseTexture[id.xy] = althash / 4294967295.0;
 }

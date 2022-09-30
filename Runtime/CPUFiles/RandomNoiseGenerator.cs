@@ -7,6 +7,14 @@ namespace SadSapphicGames.NoiseGenerators
     public class RandomNoiseGenerator : MonoBehaviour
     {
         public ComputeShader randomNoiseShader;
+        private Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
+        private Vector3Int texThreadGroupCount {
+            get => new Vector3Int(
+                Mathf.CeilToInt((float)noiseTexture.width/(float)threadGroupSize.x),
+                Mathf.CeilToInt((float)noiseTexture.height/(float)threadGroupSize.x),
+                1
+            );
+        }
         public RenderTexture noiseTexture;
         public MeshRenderer displayMeshRenderer;
         public bool animate;
@@ -16,7 +24,7 @@ namespace SadSapphicGames.NoiseGenerators
         // Start is called before the first frame update
         void Start()
         {
-            // GenerateTexture();
+            GenerateTexture();
         }
 
         // Update is called once per frame
@@ -39,8 +47,8 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
             SetShaderParameters();
-            randomNoiseShader.Dispatch(0, noiseTexture.width / 8, noiseTexture.height / 8, 1);
-            displayMeshRenderer.material.mainTexture = noiseTexture;
+            randomNoiseShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
+            displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
         }
         public void DisplayTexture() {
         }
