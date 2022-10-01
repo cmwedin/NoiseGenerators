@@ -89,10 +89,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 fragCol = lerp(colAD,colBC,smoothedLocalLatticePos.y);
     // //? Linear local position
     // float4 colAD = lerp(colA,colD,localLatticePos.x);
-    // float4 colBC = lerp(colB,colC,slocalLatticePos.x);
-    // float4 fragCol = lerp(colAD,colBC,slocalLatticePos.y);
+    // float4 colBC = lerp(colB,colC,localLatticePos.x);
+    // float4 fragCol = lerp(colAD,colBC,localLatticePos.y);
 
-    _NoiseTexture[id.xy] = fragCol;
+    _NoiseTexture[id.xy] = fragCol + 0.5;
 }
 
 [numthreads(8,8,1)]
