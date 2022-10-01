@@ -12,6 +12,8 @@ float2 RotateVec2(float2 vec, float radians) {
 
 RWTexture2D<float4> _NoiseTexture;
 RWTexture2D<float4> _LatticeTexture; //? Stores the values of the random lattice
+RWTexture2D<float2> gradientTexture[4];
+RWTexture2DArray<float2> gradientTextures;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
@@ -27,7 +29,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     //? Figure out where we are in the lattice
     float2 globalLatticePos = id.xy / float(_LatticeSize);
     float2 localLatticePos = frac(globalLatticePos);
-    int2 latticeIndex = floor(globalLatticePos);
+    // int2 latticeIndex = floor(globalLatticePos);
+    int2 latticeIndex = globalLatticePos - localLatticePos;
     float2 smoothedLocalLatticePos = localLatticePos * localLatticePos * (3.0 - 2.0 * localLatticePos); //?alternate cubic pos for smoother transitions
     
     //? Using the RGBA values of the surrounding pixels in the lattice texture rotate a unit vector by 4 different random radians
@@ -83,16 +86,49 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         dot(randomBR[2],localLatticePos - float2(1,0)),
         dot(randomBR[3],localLatticePos - float2(1,0))
     );
+
+    // float4 colA = float4 (
+    //     dot(gradientTextures[int3(latticeIndex.xy,0)],localLatticePos),
+    //     dot(gradientTextures[int3(latticeIndex.xy,1)],localLatticePos),
+    //     dot(gradientTextures[int3(latticeIndex.xy,2)],localLatticePos),
+    //     dot(gradientTextures[int3(latticeIndex.xy,3)],localLatticePos)
+    // );
+    // float4 colB = float4 (
+    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,0)],localLatticePos - float2(0,1)),
+    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,1)],localLatticePos - float2(0,1)),
+    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,2)],localLatticePos - float2(0,1)),
+    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,3)],localLatticePos - float2(0,1))
+    // );
+    // float4 colC = float4 (
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,0)],localLatticePos - float2(1,1)),
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,1)],localLatticePos - float2(1,1)),
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,2)],localLatticePos - float2(1,1)),
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,3)],localLatticePos - float2(1,1))
+    // );
+    // float4 colD = float4 (
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,0)],localLatticePos - float2(1,0)),
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,1)],localLatticePos - float2(1,0)),
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,2)],localLatticePos - float2(1,0)),
+    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,3)],localLatticePos - float2(1,0))
+    // );
+
     //? Smoothed local position
     float4 colAD = lerp(colA,colD,smoothedLocalLatticePos.x);
     float4 colBC = lerp(colB,colC,smoothedLocalLatticePos.x);
     float4 fragCol = lerp(colAD,colBC,smoothedLocalLatticePos.y);
+
     // //? Linear local position
     // float4 colAD = lerp(colA,colD,localLatticePos.x);
     // float4 colBC = lerp(colB,colC,localLatticePos.x);
     // float4 fragCol = lerp(colAD,colBC,localLatticePos.y);
 
-    _NoiseTexture[id.xy] = fragCol + 0.5;
+    fragCol = sqrt(2)/2*fragCol + .5; //? manipulation to get color components into [0,1] range
+    _NoiseTexture[id.xy] = fragCol;
+    // _NoiseTexture[id.xy] = fragCol - saturate(fragCol); //? test to verify colors components are <=1
+    // _NoiseTexture[id.xy] = saturate(fragCol) - fragCol; //? test to verify colors components are >=0
+
+    // _NoiseTexture[id.xy] = float4(gradientTextures[int3(latticeIndex.xy,3)],0,1);
+    // _NoiseTexture[id.xy] = .5*colA + .5;
 }
 
 [numthreads(8,8,1)]
@@ -102,5 +138,14 @@ void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
     uint hash = pcg_hash(_Seed);
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
     _LatticeTexture[id.xy] = float4(hash4d) / UINTMAXVALUE;
+    float2 baseVec = float2(1,0);
+    // gradientTexture[0][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].x*TAU);
+    // gradientTexture[1][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].y*TAU);
+    // gradientTexture[2][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].z*TAU);
+    // gradientTexture[3][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].w*TAU);
+    gradientTextures[int3(id.xy,0)] = RotateVec2(baseVec,_LatticeTexture[id.xy].x*TAU);
+    gradientTextures[int3(id.xy,1)] = RotateVec2(baseVec,_LatticeTexture[id.xy].y*TAU);
+    gradientTextures[int3(id.xy,2)] = RotateVec2(baseVec,_LatticeTexture[id.xy].z*TAU);
+    gradientTextures[int3(id.xy,3)] = RotateVec2(baseVec,_LatticeTexture[id.xy].w*TAU);
 }
 

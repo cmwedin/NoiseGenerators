@@ -18,6 +18,7 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         public RenderTexture latticeTexture;
+        [SerializeField] private RenderTexture gradientTextures;
         public uint latticeSize;
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
@@ -41,18 +42,36 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
             noiseGenShader.SetTexture(generateLatticeKernel, "_LatticeTexture", latticeTexture);
             noiseGenShader.SetTexture(generateTextureKernel, "_LatticeTexture", latticeTexture);
+            // for (int i = 0; i < 4; i++) {
+            //     noiseGenShader.SetTexture(generateLatticeKernel, $"gradientTexture[{i}]", gradientTextures[i]);
+            //     noiseGenShader.SetTexture(generateTextureKernel, $"gradientTexture[{i}]", gradientTextures[i]);
+            // }
+            noiseGenShader.SetTexture(generateLatticeKernel, "gradientTextures", gradientTextures);
+            noiseGenShader.SetTexture(generateTextureKernel, "gradientTextures", gradientTextures);
         }
-        public override void GenerateTexture() {
+        public override void GenerateTexture()
+        {
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             latticeTexture = new RenderTexture(latticeTexWidth, latticeTexHeight, 24);
+            // gradientTextures = new RenderTexture[4]{
+            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24),
+            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24),
+            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24),
+            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24)
+            // };
+            gradientTextures = new RenderTexture(latticeTexWidth,latticeTexHeight,24);
+            gradientTextures.dimension = UnityEngine.Rendering.TextureDimension.Tex2DArray;
+            gradientTextures.volumeDepth = 4;
             noiseTexture.enableRandomWrite = true;
             latticeTexture.enableRandomWrite = true;
+            gradientTextures.enableRandomWrite = true;
             noiseTexture.Create();
             latticeTexture.Create();
+            gradientTextures.Create();
             SetShaderParameters();
             noiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
-            displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
+            DisplayTexture();
         }
     }
 }
