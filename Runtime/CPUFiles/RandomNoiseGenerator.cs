@@ -4,23 +4,10 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public class RandomNoiseGenerator : MonoBehaviour
+    public class RandomNoiseGenerator : AbstractNoiseGenerator
     {
-        public ComputeShader randomNoiseShader;
-        private Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
-        private Vector3Int texThreadGroupCount {
-            get => new Vector3Int(
-                Mathf.CeilToInt((float)noiseTexture.width/(float)threadGroupSize.x),
-                Mathf.CeilToInt((float)noiseTexture.height/(float)threadGroupSize.x),
-                1
-            );
-        }
-        public RenderTexture noiseTexture;
-        public MeshRenderer displayMeshRenderer;
-        public bool animate;
-        public uint seed;
-        public uint texWidth;
-        public uint texHeight;
+        protected override int generateTextureKernel => noiseGenShader.FindKernel("CSMain");
+
         // Start is called before the first frame update
         void Start()
         {
@@ -29,35 +16,15 @@ namespace SadSapphicGames.NoiseGenerators
 
         // Update is called once per frame
         void Update() {
-            if(animate) {
-                seed++;
-                GenerateTexture();
-            }
         }
 
-        private void SetShaderParameters() {
-            randomNoiseShader.SetInt("_Seed", (int)seed);
-            randomNoiseShader.SetInt("_TexWidth", (int)texWidth);
-            randomNoiseShader.SetInt("_TexHeight", (int)texHeight);
-            randomNoiseShader.SetTexture(0, "_NoiseTexture", noiseTexture);
-        }
-
-        public void GenerateTexture() {
+        public override void GenerateTexture() {
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
             SetShaderParameters();
-            randomNoiseShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
-            displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
+            noiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
+            DisplayTexture();
         }
-        public void DisplayTexture() {
-        }
-        private void OnPreRender() {
-            Camera.main.targetTexture = noiseTexture;
-        }
-        private void OnPostRender() {
-            Graphics.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), noiseTexture);
-            Camera.main.targetTexture = null;
-        }        
     }
 }

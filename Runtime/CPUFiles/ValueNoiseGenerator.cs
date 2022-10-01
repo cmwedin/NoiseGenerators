@@ -4,23 +4,10 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public class ValueNoiseGenerator : MonoBehaviour
-    {
-        public ComputeShader valueNoiseShader;
-        private Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
-
-        int GenerateTextureKernel { get => valueNoiseShader.FindKernel("CSMain"); }
-        private Vector3Int texThreadGroupCount
-        {
-            get => new Vector3Int(
-                Mathf.CeilToInt((float)noiseTexture.width / (float)threadGroupSize.x),
-                Mathf.CeilToInt((float)noiseTexture.height / (float)threadGroupSize.x),
-                1
-            );
-        }
-        int GenerateLatticeKernel { get => valueNoiseShader.FindKernel("GenerateLattice"); }
-        private Vector3Int latticeThreadGroupCount
-        {
+    public class ValueNoiseGenerator : AbstractNoiseGenerator {
+        protected override int generateTextureKernel { get => noiseGenShader.FindKernel("CSMain"); }
+        int generateLatticeKernel { get => noiseGenShader.FindKernel("GenerateLattice"); }
+        private Vector3Int latticeThreadGroupCount {
             get => new Vector3Int(
                 Mathf.CeilToInt((float)latticeTexture.width / (float)threadGroupSize.x),
                 Mathf.CeilToInt((float)latticeTexture.height / (float)threadGroupSize.x),
@@ -28,12 +15,7 @@ namespace SadSapphicGames.NoiseGenerators
             );
         }
 
-        public RenderTexture noiseTexture;
         public RenderTexture latticeTexture;
-        public MeshRenderer displayMeshRenderer;
-        public uint seed;
-        public uint texWidth;
-        public uint texHeight;
         public uint latticeSize;
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
@@ -50,20 +32,17 @@ namespace SadSapphicGames.NoiseGenerators
 
         }
 
-        private void SetShaderParameters()
+        protected override void SetShaderParameters()
         {
-            valueNoiseShader.SetInt("_Seed", (int)seed);
-            valueNoiseShader.SetInt("_TexWidth", (int)texWidth);
-            valueNoiseShader.SetInt("_TexHeight", (int)texHeight);
-            valueNoiseShader.SetInt("_LatticeSize", (int)latticeSize);
-            valueNoiseShader.SetInt("_LatticeTexWidth", latticeTexWidth);
-            valueNoiseShader.SetInt("_LatticeTexHeight", latticeTexHeight);
-            valueNoiseShader.SetTexture(GenerateTextureKernel, "_NoiseTexture", noiseTexture);
-            valueNoiseShader.SetTexture(GenerateLatticeKernel, "_LatticeTexture", latticeTexture);
-            valueNoiseShader.SetTexture(GenerateTextureKernel, "_LatticeTexture", latticeTexture);
+            base.SetShaderParameters();
+            noiseGenShader.SetInt("_LatticeSize", (int)latticeSize);
+            noiseGenShader.SetInt("_LatticeTexWidth", latticeTexWidth);
+            noiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
+            noiseGenShader.SetTexture(generateLatticeKernel, "_LatticeTexture", latticeTexture);
+            noiseGenShader.SetTexture(generateTextureKernel, "_LatticeTexture", latticeTexture);
         }
 
-        public void GenerateTexture()
+        public override void GenerateTexture()
         {
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             latticeTexture = new RenderTexture(latticeTexWidth, latticeTexHeight, 24);
@@ -72,8 +51,8 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture.Create();
             latticeTexture.Create();
             SetShaderParameters();
-            valueNoiseShader.Dispatch(GenerateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
-            valueNoiseShader.Dispatch(GenerateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            noiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
+            noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
         }
     }
