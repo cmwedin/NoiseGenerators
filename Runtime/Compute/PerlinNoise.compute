@@ -20,6 +20,7 @@ uint _TexHeight; //? the height of the generated texture in pixels
 uint _LatticeSize; //? the seperation of the lattice used to generate the noise in pixels
 uint _LatticeTexWidth; //? Total width of the lattice texture
 uint _LatticeTexHeight; //? Total height of the lattice texture
+bool _UseOptimizedCode;
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -32,86 +33,92 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     // int2 latticeIndex = floor(globalLatticePos);
     int2 latticeIndex = globalLatticePos - localLatticePos;
     float2 smoothedLocalLatticePos = localLatticePos * localLatticePos * (3.0 - 2.0 * localLatticePos); //?alternate cubic pos for smoother transitions
+    float4 colA;
+    float4 colB;
+    float4 colC;
+    float4 colD;
     
     //? Using the RGBA values of the surrounding pixels in the lattice texture rotate a unit vector by 4 different random radians
     //? Potential target for optimization as redunat work will be preformed for each pixel in the lattice cell
     //? But these calculations should be fast enough for this not to be needed
-    float2 baseVec = float2(1,0); 
-    float2 randomBL[4] = {
-        RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].x*TAU),
-        RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].y*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].z*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].w*TAU)
-    }; 
-    float2 randomTL[4] = {
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].x*TAU),
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].y*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].z*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].w*TAU)
-    };
-    float2 randomTR[4] = {
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].x*TAU),
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].y*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].z*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].w*TAU)
-    }; 
-    float2 randomBR[4] = {
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].x*TAU),
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].y*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].z*TAU), 
-        RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].w*TAU)
-    };
+    if(!_UseOptimizedCode) {
+        float2 baseVec = float2(1,0); 
+        float2 randomBL[4] = {
+            RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].x*TAU),
+            RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].y*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].z*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[latticeIndex.xy].w*TAU)
+        }; 
+        float2 randomTL[4] = {
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].x*TAU),
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].y*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].z*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x,latticeIndex.y+1)].w*TAU)
+        };
+        float2 randomTR[4] = {
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].x*TAU),
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].y*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].z*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y+1)].w*TAU)
+        }; 
+        float2 randomBR[4] = {
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].x*TAU),
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].y*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].z*TAU), 
+            RotateVec2(baseVec,_LatticeTexture[int2(latticeIndex.x+1,latticeIndex.y)].w*TAU)
+        };
 
-    float4 colA = float4 (
-        dot(randomBL[0],localLatticePos),
-        dot(randomBL[1],localLatticePos),
-        dot(randomBL[2],localLatticePos),
-        dot(randomBL[3],localLatticePos)
-    );
-    float4 colB = float4 (
-        dot(randomTL[0],localLatticePos - float2(0,1)),
-        dot(randomTL[1],localLatticePos - float2(0,1)),
-        dot(randomTL[2],localLatticePos - float2(0,1)),
-        dot(randomTL[3],localLatticePos - float2(0,1))
-    );
-    float4 colC = float4 (
-        dot(randomTR[0],localLatticePos - float2(1,1)),
-        dot(randomTR[1],localLatticePos - float2(1,1)),
-        dot(randomTR[2],localLatticePos - float2(1,1)),
-        dot(randomTR[3],localLatticePos - float2(1,1))
-    );
-    float4 colD = float4 (
-        dot(randomBR[0],localLatticePos - float2(1,0)),
-        dot(randomBR[1],localLatticePos - float2(1,0)),
-        dot(randomBR[2],localLatticePos - float2(1,0)),
-        dot(randomBR[3],localLatticePos - float2(1,0))
-    );
-
-    // float4 colA = float4 (
-    //     dot(gradientTextures[int3(latticeIndex.xy,0)],localLatticePos),
-    //     dot(gradientTextures[int3(latticeIndex.xy,1)],localLatticePos),
-    //     dot(gradientTextures[int3(latticeIndex.xy,2)],localLatticePos),
-    //     dot(gradientTextures[int3(latticeIndex.xy,3)],localLatticePos)
-    // );
-    // float4 colB = float4 (
-    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,0)],localLatticePos - float2(0,1)),
-    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,1)],localLatticePos - float2(0,1)),
-    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,2)],localLatticePos - float2(0,1)),
-    //     dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,3)],localLatticePos - float2(0,1))
-    // );
-    // float4 colC = float4 (
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,0)],localLatticePos - float2(1,1)),
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,1)],localLatticePos - float2(1,1)),
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,2)],localLatticePos - float2(1,1)),
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,3)],localLatticePos - float2(1,1))
-    // );
-    // float4 colD = float4 (
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,0)],localLatticePos - float2(1,0)),
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,1)],localLatticePos - float2(1,0)),
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,2)],localLatticePos - float2(1,0)),
-    //     dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,3)],localLatticePos - float2(1,0))
-    // );
-
+        colA = float4 (
+            dot(randomBL[0],localLatticePos),
+            dot(randomBL[1],localLatticePos),
+            dot(randomBL[2],localLatticePos),
+            dot(randomBL[3],localLatticePos)
+        );
+        colB = float4 (
+            dot(randomTL[0],localLatticePos - float2(0,1)),
+            dot(randomTL[1],localLatticePos - float2(0,1)),
+            dot(randomTL[2],localLatticePos - float2(0,1)),
+            dot(randomTL[3],localLatticePos - float2(0,1))
+        );
+        colC = float4 (
+            dot(randomTR[0],localLatticePos - float2(1,1)),
+            dot(randomTR[1],localLatticePos - float2(1,1)),
+            dot(randomTR[2],localLatticePos - float2(1,1)),
+            dot(randomTR[3],localLatticePos - float2(1,1))
+        );
+        colD = float4 (
+            dot(randomBR[0],localLatticePos - float2(1,0)),
+            dot(randomBR[1],localLatticePos - float2(1,0)),
+            dot(randomBR[2],localLatticePos - float2(1,0)),
+            dot(randomBR[3],localLatticePos - float2(1,0))
+        );
+    } else {
+        colA = float4 (
+            dot(gradientTextures[int3(latticeIndex.xy,0)],localLatticePos),
+            dot(gradientTextures[int3(latticeIndex.xy,1)],localLatticePos),
+            dot(gradientTextures[int3(latticeIndex.xy,2)],localLatticePos),
+            dot(gradientTextures[int3(latticeIndex.xy,3)],localLatticePos)
+        );
+        colB = float4 (
+            dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,0)],localLatticePos - float2(0,1)),
+            dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,1)],localLatticePos - float2(0,1)),
+            dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,2)],localLatticePos - float2(0,1)),
+            dot(gradientTextures[int3(latticeIndex.x,latticeIndex.y+1,3)],localLatticePos - float2(0,1))
+        );
+        colC = float4 (
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,0)],localLatticePos - float2(1,1)),
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,1)],localLatticePos - float2(1,1)),
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,2)],localLatticePos - float2(1,1)),
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y+1,3)],localLatticePos - float2(1,1))
+        );
+        colD = float4 (
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,0)],localLatticePos - float2(1,0)),
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,1)],localLatticePos - float2(1,0)),
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,2)],localLatticePos - float2(1,0)),
+            dot(gradientTextures[int3(latticeIndex.x+1,latticeIndex.y,3)],localLatticePos - float2(1,0))
+        );
+    }
+    
     //? Smoothed local position
     float4 colAD = lerp(colA,colD,smoothedLocalLatticePos.x);
     float4 colBC = lerp(colB,colC,smoothedLocalLatticePos.x);
@@ -123,6 +130,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     // float4 fragCol = lerp(colAD,colBC,localLatticePos.y);
 
     fragCol = sqrt(2)/2*fragCol + .5; //? manipulation to get color components into [0,1] range
+    //? sus cols
+    //? colB
+    //? colC
+    //? colD
     _NoiseTexture[id.xy] = fragCol;
     // _NoiseTexture[id.xy] = fragCol - saturate(fragCol); //? test to verify colors components are <=1
     // _NoiseTexture[id.xy] = saturate(fragCol) - fragCol; //? test to verify colors components are >=0
@@ -138,14 +149,16 @@ void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
     uint hash = pcg_hash(_Seed);
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
     _LatticeTexture[id.xy] = float4(hash4d) / UINTMAXVALUE;
-    float2 baseVec = float2(1,0);
-    // gradientTexture[0][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].x*TAU);
-    // gradientTexture[1][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].y*TAU);
-    // gradientTexture[2][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].z*TAU);
-    // gradientTexture[3][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].w*TAU);
-    gradientTextures[int3(id.xy,0)] = RotateVec2(baseVec,_LatticeTexture[id.xy].x*TAU);
-    gradientTextures[int3(id.xy,1)] = RotateVec2(baseVec,_LatticeTexture[id.xy].y*TAU);
-    gradientTextures[int3(id.xy,2)] = RotateVec2(baseVec,_LatticeTexture[id.xy].z*TAU);
-    gradientTextures[int3(id.xy,3)] = RotateVec2(baseVec,_LatticeTexture[id.xy].w*TAU);
+    if(_UseOptimizedCode) {
+        float2 baseVec = float2(1,0);
+        // gradientTexture[0][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].x*TAU);
+        // gradientTexture[1][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].y*TAU);
+        // gradientTexture[2][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].z*TAU);
+        // gradientTexture[3][id.xy] = RotateVec2(baseVec,_LatticeTexture[id.xy].w*TAU);
+        gradientTextures[int3(id.xy,0)] = RotateVec2(baseVec,_LatticeTexture[id.xy].x*TAU);
+        gradientTextures[int3(id.xy,1)] = RotateVec2(baseVec,_LatticeTexture[id.xy].y*TAU);
+        gradientTextures[int3(id.xy,2)] = RotateVec2(baseVec,_LatticeTexture[id.xy].z*TAU);
+        gradientTextures[int3(id.xy,3)] = RotateVec2(baseVec,_LatticeTexture[id.xy].w*TAU);
+    }
 }
 
