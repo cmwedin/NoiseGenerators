@@ -129,9 +129,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     // float4 colBC = lerp(colB,colC,localLatticePos.x);
     // float4 fragCol = lerp(colAD,colBC,localLatticePos.y);
 
-    fragCol = sqrt(2)/2*colB + .5; //? manipulation to get color components into [0,1] range
+    fragCol = sqrt(2)/2*fragCol + .5; //? manipulation to get color components into [0,1] range
     //? sus cols
     //? colB
+    //? colC
+    //? colD
     _NoiseTexture[id.xy] = fragCol;
     // _NoiseTexture[id.xy] = fragCol - saturate(fragCol); //? test to verify colors components are <=1
     // _NoiseTexture[id.xy] = saturate(fragCol) - fragCol; //? test to verify colors components are >=0

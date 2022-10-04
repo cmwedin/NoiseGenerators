@@ -31,7 +31,11 @@ namespace SadSapphicGames.NoiseGenerators
         {
 
         }
-
+        protected override void CleanUpOldTextures()
+        {
+            base.CleanUpOldTextures();
+            latticeTexture?.Release();
+        }
         protected override void SetShaderParameters()
         {
             base.SetShaderParameters();
@@ -44,6 +48,7 @@ namespace SadSapphicGames.NoiseGenerators
 
         public override void GenerateTexture()
         {
+            CleanUpOldTextures();
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             latticeTexture = new RenderTexture(latticeTexWidth, latticeTexHeight, 24);
             noiseTexture.enableRandomWrite = true;

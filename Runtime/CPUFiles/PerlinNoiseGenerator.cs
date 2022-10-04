@@ -35,6 +35,12 @@ namespace SadSapphicGames.NoiseGenerators
         {
 
         }
+        protected override void CleanUpOldTextures()
+        {
+            base.CleanUpOldTextures();
+            latticeTexture?.Release();
+            gradientTextures?.Release();
+        }
 
         protected override void SetShaderParameters() {
             base.SetShaderParameters();

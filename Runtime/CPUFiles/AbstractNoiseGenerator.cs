@@ -43,6 +43,9 @@ namespace SadSapphicGames.NoiseGenerators
         protected void DisplayTexture() {
             displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
         }
+        protected virtual void CleanUpOldTextures() {
+            noiseTexture?.Release();
+        }
         public abstract void GenerateTexture();
     }
 }

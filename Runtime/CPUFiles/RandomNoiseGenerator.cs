@@ -19,6 +19,7 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         public override void GenerateTexture() {
+            CleanUpOldTextures();
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
