@@ -59,6 +59,7 @@ namespace SadSapphicGames.NoiseGenerators
         }
         public override void GenerateTexture()
         {
+            CleanUpOldTextures();
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             latticeTexture = new RenderTexture(latticeTexWidth, latticeTexHeight, 24);
             // gradientTextures = new RenderTexture[4]{
