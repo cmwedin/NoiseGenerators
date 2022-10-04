@@ -39,7 +39,9 @@ namespace SadSapphicGames.NoiseGenerators
         {
             base.CleanUpOldTextures();
             latticeTexture?.Release();
+            DestroyImmediate(latticeTexture);
             gradientTextures?.Release();
+            DestroyImmediate(gradientTextures);
         }
 
         protected override void SetShaderParameters() {
@@ -62,12 +64,6 @@ namespace SadSapphicGames.NoiseGenerators
             CleanUpOldTextures();
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             latticeTexture = new RenderTexture(latticeTexWidth, latticeTexHeight, 24);
-            // gradientTextures = new RenderTexture[4]{
-            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24),
-            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24),
-            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24),
-            //     new RenderTexture(latticeTexWidth, latticeTexHeight, 24)
-            // };
             gradientTextures = new RenderTexture(latticeTexWidth,latticeTexHeight,24);
             gradientTextures.dimension = UnityEngine.Rendering.TextureDimension.Tex2DArray;
             gradientTextures.volumeDepth = 4;

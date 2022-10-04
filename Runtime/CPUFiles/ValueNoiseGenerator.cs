@@ -35,6 +35,7 @@ namespace SadSapphicGames.NoiseGenerators
         {
             base.CleanUpOldTextures();
             latticeTexture?.Release();
+            DestroyImmediate(latticeTexture);
         }
         protected override void SetShaderParameters()
         {

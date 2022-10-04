@@ -45,6 +45,7 @@ namespace SadSapphicGames.NoiseGenerators
         }
         protected virtual void CleanUpOldTextures() {
             noiseTexture?.Release();
+            DestroyImmediate(noiseTexture);
         }
         public abstract void GenerateTexture();
     }
