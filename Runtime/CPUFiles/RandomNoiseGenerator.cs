@@ -8,15 +8,6 @@ namespace SadSapphicGames.NoiseGenerators
     {
         protected override int generateTextureKernel => noiseGenShader.FindKernel("CSMain");
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            GenerateTexture();
-        }
-
-        // Update is called once per frame
-        void Update() {
-        }
 
         public override void GenerateTexture() {
             CleanUpOldTextures();

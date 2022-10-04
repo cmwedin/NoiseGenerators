@@ -29,12 +29,6 @@ namespace SadSapphicGames.NoiseGenerators
         {
 
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
         protected override void CleanUpOldTextures()
         {
             base.CleanUpOldTextures();

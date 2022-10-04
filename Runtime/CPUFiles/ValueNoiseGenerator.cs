@@ -20,17 +20,6 @@ namespace SadSapphicGames.NoiseGenerators
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            GenerateTexture();
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
         protected override void CleanUpOldTextures()
         {
             base.CleanUpOldTextures();
