@@ -22,6 +22,7 @@ namespace SadSapphicGames.NoiseGenerators
         public uint latticeSize;
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
+        public bool useOptimizedCode;
 
         // Start is called before the first frame update
         void Start()
@@ -40,6 +41,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_LatticeSize", (int)latticeSize);
             noiseGenShader.SetInt("_LatticeTexWidth", latticeTexWidth);
             noiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
+            noiseGenShader.SetBool("_UseOptimizedCode",useOptimizedCode);
             noiseGenShader.SetTexture(generateLatticeKernel, "_LatticeTexture", latticeTexture);
             noiseGenShader.SetTexture(generateTextureKernel, "_LatticeTexture", latticeTexture);
             // for (int i = 0; i < 4; i++) {
