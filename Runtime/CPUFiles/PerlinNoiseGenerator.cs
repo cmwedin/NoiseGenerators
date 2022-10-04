@@ -19,6 +19,7 @@ namespace SadSapphicGames.NoiseGenerators
 
         public RenderTexture latticeTexture;
         [SerializeField] private RenderTexture gradientTextures;
+        private ComputeBuffer gradientBuffer;
         public uint latticeSize;
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
@@ -36,6 +37,7 @@ namespace SadSapphicGames.NoiseGenerators
             DestroyImmediate(latticeTexture);
             gradientTextures?.Release();
             DestroyImmediate(gradientTextures);
+            gradientBuffer?.Release();
         }
 
         protected override void SetShaderParameters() {
@@ -46,10 +48,8 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetBool("_UseOptimizedCode",useOptimizedCode);
             noiseGenShader.SetTexture(generateLatticeKernel, "_LatticeTexture", latticeTexture);
             noiseGenShader.SetTexture(generateTextureKernel, "_LatticeTexture", latticeTexture);
-            // for (int i = 0; i < 4; i++) {
-            //     noiseGenShader.SetTexture(generateLatticeKernel, $"gradientTexture[{i}]", gradientTextures[i]);
-            //     noiseGenShader.SetTexture(generateTextureKernel, $"gradientTexture[{i}]", gradientTextures[i]);
-            // }
+            noiseGenShader.SetBuffer(generateLatticeKernel, "_GradientBuffer", gradientBuffer);
+            noiseGenShader.SetBuffer(generateTextureKernel, "_GradientBuffer", gradientBuffer);
             noiseGenShader.SetTexture(generateLatticeKernel, "gradientTextures", gradientTextures);
             noiseGenShader.SetTexture(generateTextureKernel, "gradientTextures", gradientTextures);
         }
@@ -64,6 +64,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture.enableRandomWrite = true;
             latticeTexture.enableRandomWrite = true;
             gradientTextures.enableRandomWrite = true;
+            gradientBuffer = new ComputeBuffer(latticeTexWidth * latticeTexHeight, 8 * sizeof(float));
             noiseTexture.Create();
             latticeTexture.Create();
             gradientTextures.Create();
