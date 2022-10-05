@@ -20,13 +20,46 @@ uint CellToBufferIndex(uint2 CellIndex) {
     return CellIndex.x + CellIndex.y*_CellXCount; 
 }
 
+static const int2 cellOffsets[9] = {
+    int2(0,0),
+    int2(1,0),
+    int2(1,1),
+    int2(0,1),
+    int2(-1,1),
+    int2(-1,0),
+    int2(-1,-1),
+    int2(0,-1),
+    int2(1,-1)
+};
+
+float Worley(float2 pos, int2 cellIndex) {
+    float minSqrDist = 1;
+    for(int offsetIndex = 0; offsetIndex < 9; offsetIndex++) {
+        int2 adjID = cellIndex + cellOffsets[offsetIndex];
+        if(adjID.x < 0 || adjID.y < 0 || adjID.x >= int(_CellXCount) || adjID.y >= int(_CellYCount)) {
+            continue;
+        } else {
+            float2 pointOffset = _PointsBuffer[CellToBufferIndex(adjID)] - pos;            
+            minSqrDist = min(minSqrDist,dot(pointOffset,pointOffset));
+        }
+    }
+    return sqrt(minSqrDist);
+}
+
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    // TODO: insert actual code here!
+    if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
 
-    _NoiseTexture[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    int2 cellIndex = int2(floor(id.x / _PointCellWidth),floor(id.y / _PointCellHeight));
+    if(cellIndex.x >= int(_CellXCount)) {cellIndex.x = int(_CellXCount) - 1;}
+    if(cellIndex.y >= int(_CellYCount)) {cellIndex.y = int(_CellYCount) - 1;}
+    float2 pos = float2(id.x/float(_TexWidth),id.y/float(_TexHeight));
+    float result = Worley(pos,cellIndex);
+    _NoiseTexture[id.xy] = result;
 }
+
+
 
 [numthreads(8,8,1)]
 void GeneratePoints (uint3 id : SV_DISPATCHTHREADID) {
@@ -36,9 +69,10 @@ void GeneratePoints (uint3 id : SV_DISPATCHTHREADID) {
     uint3 hash3d = pcg3d_hash(uint3(id.xy,hash));
 
     float2 cellPos = hash3d.xy / UINTMAXVALUE;
-    float2 pointPos = float2(
+    uint2 pointPos = uint2(
         (id.x + cellPos.x) * _PointCellWidth,
         (id.y + cellPos.y) * _PointCellHeight
     );
-    _PointsBuffer[CellToBufferIndex(id.xy)] = pointPos;
+    float2 pointPos01 = float2(pointPos.x / float(_TexWidth),pointPos.y / float(_TexHeight));
+    _PointsBuffer[CellToBufferIndex(id.xy)] = pointPos01;
 }
