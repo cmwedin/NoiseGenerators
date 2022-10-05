@@ -4,6 +4,7 @@
 
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel GeneratePoints
 
 RWTexture2D<float4> _NoiseTexture;
 RWStructuredBuffer<float2> _PointsBuffer;
