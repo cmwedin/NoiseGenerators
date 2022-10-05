@@ -1,0 +1,44 @@
+#include "/Includes/PRNG.compute"
+#define UINTMAXVALUE 4294967295.0 
+#define TAU 6.283185307179586
+
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+RWTexture2D<float4> _NoiseTexture;
+RWStructuredBuffer<float2> _PointsBuffer;
+uint _Seed; //? the value used to generate the random hash
+uint _TexWidth; //? the width of the generated texture in pixels
+uint _TexHeight; //? the height of the generated texture in pixels
+uint _PointCount; //? the number of points to use when generating the texture
+uint _PointCellWidth; //? the width of each cell per point, derived from texture size and number of points in dispatcher
+uint _PointCellHeight; //? the height of each cell per point, derived from texture size and number of points in dispatcher
+uint _CellXCount;
+uint _CellYCount;
+
+uint CellToBufferIndex(uint2 CellIndex) {
+    return CellIndex.x + CellIndex.y*_CellXCount; 
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    _NoiseTexture[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}
+
+[numthreads(8,8,1)]
+void GeneratePoints (uint3 id : SV_DISPATCHTHREADID) {
+    if(id.x < 0 || id.x >= _CellXCount || id.y < 0 || id.y >= _CellYCount) {return;}
+
+    uint hash = pcg_hash(_Seed);
+    uint3 hash3d = pcg3d_hash(uint3(id.xy,hash));
+
+    float2 cellPos = hash3d.xy / UINTMAXVALUE;
+    float2 pointPos = float2(
+        (id.x + cellPos.x) * _PointCellWidth,
+        (id.y + cellPos.y) * _PointCellHeight
+    );
+    _PointsBuffer[CellToBufferIndex(id.xy)] = pointPos;
+}

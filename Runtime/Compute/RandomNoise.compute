@@ -3,10 +3,6 @@
 #include "/Includes/PRNG.compute"
 #define UINTMAXVALUE 4294967295.0 
 
-
-
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
 RWTexture2D<float4> _NoiseTexture;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
