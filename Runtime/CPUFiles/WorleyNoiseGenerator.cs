@@ -8,6 +8,9 @@ namespace SadSapphicGames.NoiseGenerators
     {
         protected override int generateTextureKernel => noiseGenShader.FindKernel("CSMain");
         private int GeneratePointsKernel => noiseGenShader.FindKernel("GeneratePoints");
+        protected int NormalizeTextureKernel => noiseGenShader.FindKernel("NormalizeTexture");
+
+        
         [SerializeField] private int pointCount;
         private Vector2Int cellCounts;
         private Vector3Int PointThreadGroupCount { get => new Vector3Int(
@@ -16,11 +19,13 @@ namespace SadSapphicGames.NoiseGenerators
             1
         );}
         private ComputeBuffer pointsBuffer;
+        private ComputeBuffer minMaxBuffer;
 
         protected override void CleanUpOldTextures()
         {
             base.CleanUpOldTextures();
             pointsBuffer?.Release();
+            minMaxBuffer?.Release();
         }
 
         protected override void SetShaderParameters()
@@ -33,7 +38,11 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_PointCellHeight", Mathf.FloorToInt(texHeight/cellCounts.y));
             noiseGenShader.SetBuffer(generateTextureKernel, "_PointsBuffer", pointsBuffer);
             noiseGenShader.SetBuffer(GeneratePointsKernel, "_PointsBuffer", pointsBuffer);
+            noiseGenShader.SetBuffer(generateTextureKernel, "_MinMaxBuffer", minMaxBuffer);
+            noiseGenShader.SetBuffer(NormalizeTextureKernel, "_MinMaxBuffer", minMaxBuffer);
+            noiseGenShader.SetTexture(NormalizeTextureKernel, "_NoiseTexture", noiseTexture);
         }
+
         public override void GenerateTexture()
         {
             CleanUpOldTextures();
@@ -42,11 +51,15 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
             pointsBuffer = new ComputeBuffer(pointCount, 2 * sizeof(float));
+            minMaxBuffer = new ComputeBuffer(2, sizeof(uint));
+            minMaxBuffer.SetData(new int[] { int.MaxValue, 0 });
             SetShaderParameters();
             noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
             noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             DisplayTexture();
             pointsBuffer.Release();
+            minMaxBuffer.Release();
         }
     }
 }

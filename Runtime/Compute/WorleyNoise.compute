@@ -5,9 +5,11 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 #pragma kernel GeneratePoints
+#pragma kernel NormalizeTexture
 
 RWTexture2D<float4> _NoiseTexture;
 RWStructuredBuffer<float2> _PointsBuffer;
+RWStructuredBuffer<uint> _MinMaxBuffer;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
@@ -21,6 +23,8 @@ uint CellToBufferIndex(uint2 CellIndex) {
     return CellIndex.x + CellIndex.y*_CellXCount; 
 }
 
+//?Constants
+static const int minMaxAccuracy = 10000000;
 static const int2 cellOffsets[9] = {
     int2(0,0),
     int2(1,0),
@@ -56,11 +60,16 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     if(cellIndex.x >= int(_CellXCount)) {cellIndex.x = int(_CellXCount) - 1;}
     if(cellIndex.y >= int(_CellYCount)) {cellIndex.y = int(_CellYCount) - 1;}
     float2 pos = float2(id.x/float(_TexWidth),id.y/float(_TexHeight));
+    
     float result = Worley(pos,cellIndex);
+    //? Tracks the minium and maximum values generated for normalization
+    uint val = uint(result*minMaxAccuracy);
+    InterlockedMin(_MinMaxBuffer[0],val);
+    InterlockedMax(_MinMaxBuffer[1],val);
+
+    //? Records the result on the texture
     _NoiseTexture[id.xy] = result;
 }
-
-
 
 [numthreads(8,8,1)]
 void GeneratePoints (uint3 id : SV_DISPATCHTHREADID) {
@@ -76,4 +85,12 @@ void GeneratePoints (uint3 id : SV_DISPATCHTHREADID) {
     );
     float2 pointPos01 = float2(pointPos.x / float(_TexWidth),pointPos.y / float(_TexHeight));
     _PointsBuffer[CellToBufferIndex(id.xy)] = pointPos01;
+}
+
+[numthreads(8,8,1)]
+void NormalizeTexture(uint3 id : SV_DISPATCHTHREADID) {
+    float minVal = float(_MinMaxBuffer[0]/float(minMaxAccuracy));
+    float maxVal = float(_MinMaxBuffer[1]/float(minMaxAccuracy));
+    float4 normalizedCol = (_NoiseTexture[id.xy] - minVal)/(maxVal - minVal);
+    _NoiseTexture[id.xy] = normalizedCol;
 }
