@@ -48,8 +48,11 @@ namespace SadSapphicGames.NoiseGenerators
             displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
         }
         protected virtual void CleanUpOldTextures() {
-            noiseTexture?.Release();
-            DestroyImmediate(noiseTexture);
+            // noiseTexture?.Release();
+            if (noiseTexture != null) {
+                noiseTexture.Release();
+                DestroyImmediate(noiseTexture); 
+            }
         }
         public abstract void GenerateTexture();
         private void OnDestroy() {
