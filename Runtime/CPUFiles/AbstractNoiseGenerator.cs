@@ -44,7 +44,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_TexHeight", (int)texHeight);
             noiseGenShader.SetTexture(generateTextureKernel, "_NoiseTexture", noiseTexture);
         }
-        protected void DisplayTexture() {
+        protected virtual void DisplayTexture() {
             displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
         }
         protected virtual void CleanUpOldTextures() {

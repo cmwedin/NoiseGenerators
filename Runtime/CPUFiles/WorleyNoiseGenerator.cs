@@ -12,6 +12,7 @@ namespace SadSapphicGames.NoiseGenerators
 
         
         [SerializeField] private int pointCount;
+        [SerializeField] private bool requireTiling;
         private Vector2Int cellCounts;
         private Vector3Int PointThreadGroupCount { get => new Vector3Int(
             Mathf.CeilToInt((float)cellCounts.x/threadGroupSize.x),
@@ -36,6 +37,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_CellYCount", cellCounts.y);
             noiseGenShader.SetInt("_PointCellWidth", Mathf.FloorToInt(texWidth/cellCounts.x));
             noiseGenShader.SetInt("_PointCellHeight", Mathf.FloorToInt(texHeight/cellCounts.y));
+            noiseGenShader.SetBool("_Tiling", requireTiling);
             noiseGenShader.SetBuffer(generateTextureKernel, "_PointsBuffer", pointsBuffer);
             noiseGenShader.SetBuffer(GeneratePointsKernel, "_PointsBuffer", pointsBuffer);
             noiseGenShader.SetBuffer(generateTextureKernel, "_MinMaxBuffer", minMaxBuffer);
@@ -49,6 +51,7 @@ namespace SadSapphicGames.NoiseGenerators
             cellCounts = HelperMethods.PartitionTexture((int)texWidth, (int)texHeight, pointCount);
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             noiseTexture.enableRandomWrite = true;
+            noiseTexture.wrapMode = TextureWrapMode.Repeat;
             noiseTexture.Create();
             pointsBuffer = new ComputeBuffer(pointCount, 2 * sizeof(float));
             minMaxBuffer = new ComputeBuffer(2, sizeof(uint));
@@ -60,6 +63,11 @@ namespace SadSapphicGames.NoiseGenerators
             DisplayTexture();
             pointsBuffer.Release();
             minMaxBuffer.Release();
+        }
+
+        protected override void DisplayTexture()
+        {
+            base.DisplayTexture();
         }
     }
 }
