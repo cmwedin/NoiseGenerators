@@ -18,6 +18,7 @@ uint _PointCellWidth; //? the width of each cell per point, derived from texture
 uint _PointCellHeight; //? the height of each cell per point, derived from texture size and number of points in dispatcher
 uint _CellXCount;
 uint _CellYCount;
+bool _Tiling;
 
 uint CellToBufferIndex(uint2 CellIndex) {
     return CellIndex.x + CellIndex.y*_CellXCount; 
@@ -41,10 +42,22 @@ float Worley(float2 pos, int2 cellIndex) {
     float minSqrDist = 1;
     for(int offsetIndex = 0; offsetIndex < 9; offsetIndex++) {
         int2 adjID = cellIndex + cellOffsets[offsetIndex];
+        float2 pointOffset = float2(1,0);
         if(adjID.x < 0 || adjID.y < 0 || adjID.x >= int(_CellXCount) || adjID.y >= int(_CellYCount)) {
-            continue;
+            if(_Tiling) {
+                int2 wrappedID = int2(
+                    (adjID.x + _CellXCount) % uint(_CellXCount),
+                    (adjID.y + _CellYCount) % uint(_CellYCount)
+                );
+                for(int wrapOffsetIndex = 0; wrapOffsetIndex < 9; wrapOffsetIndex++) {
+                    pointOffset = (_PointsBuffer[CellToBufferIndex(wrappedID)] + cellOffsets[wrapOffsetIndex]) - pos;
+                    minSqrDist = min(minSqrDist,dot(pointOffset,pointOffset));
+                }
+            } else {
+                continue;
+            }
         } else {
-            float2 pointOffset = _PointsBuffer[CellToBufferIndex(adjID)] - pos;            
+            pointOffset = _PointsBuffer[CellToBufferIndex(adjID)] - pos;     
             minSqrDist = min(minSqrDist,dot(pointOffset,pointOffset));
         }
     }
