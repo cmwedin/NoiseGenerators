@@ -13,6 +13,8 @@ namespace SadSapphicGames.NoiseGenerators
         
         [SerializeField] private int pointCount;
         [SerializeField] private bool requireTiling;
+        [SerializeField] private bool invertTexture;
+
         private Vector2Int cellCounts;
         private Vector3Int PointThreadGroupCount { get => new Vector3Int(
             Mathf.CeilToInt((float)cellCounts.x/threadGroupSize.x),
@@ -38,6 +40,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_PointCellWidth", Mathf.FloorToInt(texWidth/cellCounts.x));
             noiseGenShader.SetInt("_PointCellHeight", Mathf.FloorToInt(texHeight/cellCounts.y));
             noiseGenShader.SetBool("_Tiling", requireTiling);
+            noiseGenShader.SetBool("_Invert", invertTexture);
             noiseGenShader.SetBuffer(generateTextureKernel, "_PointsBuffer", pointsBuffer);
             noiseGenShader.SetBuffer(GeneratePointsKernel, "_PointsBuffer", pointsBuffer);
             noiseGenShader.SetBuffer(generateTextureKernel, "_MinMaxBuffer", minMaxBuffer);
