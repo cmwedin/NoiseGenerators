@@ -13,12 +13,13 @@ RWStructuredBuffer<uint> _MinMaxBuffer;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
-uint _PointCount; //? the number of points to use when generating the texture
 uint _PointCellWidth; //? the width of each cell per point, derived from texture size and number of points in dispatcher
 uint _PointCellHeight; //? the height of each cell per point, derived from texture size and number of points in dispatcher
 uint _CellXCount;
 uint _CellYCount;
 bool _Tiling;
+bool _Invert;
+
 
 uint CellToBufferIndex(uint2 CellIndex) {
     return CellIndex.x + CellIndex.y*_CellXCount; 
@@ -75,6 +76,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float2 pos = float2(id.x/float(_TexWidth),id.y/float(_TexHeight));
     
     float result = Worley(pos,cellIndex);
+    if(_Invert) {
+        result = 1 - result;
+    }
     //? Tracks the minium and maximum values generated for normalization
     uint val = uint(result*minMaxAccuracy);
     InterlockedMin(_MinMaxBuffer[0],val);
