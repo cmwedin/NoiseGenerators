@@ -13,7 +13,6 @@ RWStructuredBuffer<uint> _MinMaxBuffer;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
-uint _PointCount; //? the number of points to use when generating the texture
 uint _PointCellWidth; //? the width of each cell per point, derived from texture size and number of points in dispatcher
 uint _PointCellHeight; //? the height of each cell per point, derived from texture size and number of points in dispatcher
 uint _CellXCount;
