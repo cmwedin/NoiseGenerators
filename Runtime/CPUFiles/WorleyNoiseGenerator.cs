@@ -10,7 +10,7 @@ namespace SadSapphicGames.NoiseGenerators
         private int GeneratePointsKernel => noiseGenShader.FindKernel("GeneratePoints");
         protected int NormalizeTextureKernel => noiseGenShader.FindKernel("NormalizeTexture");
 
-        enum TextureChannel {All,R,G,B,A}
+        enum TextureChannel {R,G,B,A,All}
         [SerializeField] private TextureChannel activeChannel;
         private Vector4 channelMask {
             get => new Vector4(
@@ -83,9 +83,21 @@ namespace SadSapphicGames.NoiseGenerators
             }catch (System.Exception){
                 throw;
             }
-            noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
-            noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
-            noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            if(activeChannel == TextureChannel.All) {
+                for (int i = 0; i < 4; i++)
+                {
+                    activeChannel = (TextureChannel)i;
+                    SetShaderParameters();
+                    noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
+                    noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                    noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                }
+                activeChannel = TextureChannel.All;
+            } else {
+                noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
+                noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            }
             DisplayTexture();
             pointsBuffer.Release();
             minMaxBuffer.Release();
