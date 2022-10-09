@@ -10,7 +10,7 @@ namespace SadSapphicGames.NoiseGenerators
         private int GeneratePointsKernel => noiseGenShader.FindKernel("GeneratePoints");
         protected int NormalizeTextureKernel => noiseGenShader.FindKernel("NormalizeTexture");
 
-        enum TextureChannel {R,G,B,A}
+        enum TextureChannel {All,R,G,B,A}
         [SerializeField] private TextureChannel activeChannel;
         private Vector4 channelMask {
             get => new Vector4(
@@ -20,6 +20,7 @@ namespace SadSapphicGames.NoiseGenerators
                     activeChannel == TextureChannel.A ? 1 : 0
                 );
         }
+        private int binChannelMask { get => (int)(channelMask.x * (2 ^ 0) + channelMask.y * (2 ^ 1) + channelMask.z * (2 ^ 2) + channelMask.w * (2 ^ 3)); }
         [SerializeField] private bool requireTiling;
         [SerializeField] private bool invertTexture;
 
@@ -44,6 +45,7 @@ namespace SadSapphicGames.NoiseGenerators
         {
             if (cellCounts.x <= 0 || cellCounts.y <= 0) { throw new System.ArgumentException("the number of cells along each axis must be greater than 0"); }
             base.SetShaderParameters();
+            noiseGenShader.SetInt("_Seed",(int)(seed << binChannelMask));
             noiseGenShader.SetInt("_CellXCount", cellCounts.x);
             noiseGenShader.SetInt("_CellYCount", cellCounts.y);
             noiseGenShader.SetInt("_PointCellWidth", Mathf.FloorToInt(texWidth/cellCounts.x));
