@@ -10,8 +10,17 @@ namespace SadSapphicGames.NoiseGenerators
         private int GeneratePointsKernel => noiseGenShader.FindKernel("GeneratePoints");
         protected int NormalizeTextureKernel => noiseGenShader.FindKernel("NormalizeTexture");
 
-        
-        // [SerializeField] private int pointCount;
+        enum TextureChannel {R,G,B,A,All}
+        [SerializeField] private TextureChannel activeChannel;
+        private Vector4 channelMask {
+            get => new Vector4(
+                    activeChannel == TextureChannel.R ? 1 : 0, 
+                    activeChannel == TextureChannel.G ? 1 : 0, 
+                    activeChannel == TextureChannel.B ? 1 : 0, 
+                    activeChannel == TextureChannel.A ? 1 : 0
+                );
+        }
+        private int binChannelMask { get => (int)(channelMask.x * (2 ^ 0) + channelMask.y * (2 ^ 1) + channelMask.z * (2 ^ 2) + channelMask.w * (2 ^ 3)); }
         [SerializeField] private bool requireTiling;
         [SerializeField] private bool invertTexture;
 
@@ -36,10 +45,12 @@ namespace SadSapphicGames.NoiseGenerators
         {
             if (cellCounts.x <= 0 || cellCounts.y <= 0) { throw new System.ArgumentException("the number of cells along each axis must be greater than 0"); }
             base.SetShaderParameters();
+            noiseGenShader.SetInt("_Seed",(int)(seed << binChannelMask));
             noiseGenShader.SetInt("_CellXCount", cellCounts.x);
             noiseGenShader.SetInt("_CellYCount", cellCounts.y);
             noiseGenShader.SetInt("_PointCellWidth", Mathf.FloorToInt(texWidth/cellCounts.x));
             noiseGenShader.SetInt("_PointCellHeight", Mathf.FloorToInt(texHeight/cellCounts.y));
+            noiseGenShader.SetVector("_ChannelMask", channelMask);
             noiseGenShader.SetBool("_Tiling", requireTiling);
             noiseGenShader.SetBool("_Invert", invertTexture);
             noiseGenShader.SetBuffer(generateTextureKernel, "_PointsBuffer", pointsBuffer);
@@ -72,9 +83,21 @@ namespace SadSapphicGames.NoiseGenerators
             }catch (System.Exception){
                 throw;
             }
-            noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
-            noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
-            noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            if(activeChannel == TextureChannel.All) {
+                for (int i = 0; i < 4; i++)
+                {
+                    activeChannel = (TextureChannel)i;
+                    SetShaderParameters();
+                    noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
+                    noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                    noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                }
+                activeChannel = TextureChannel.All;
+            } else {
+                noiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
+                noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                noiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            }
             DisplayTexture();
             pointsBuffer.Release();
             minMaxBuffer.Release();

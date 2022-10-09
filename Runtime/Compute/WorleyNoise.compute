@@ -15,12 +15,18 @@ uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
 uint _PointCellWidth; //? the width of each cell per point, derived from texture size and number of points in dispatcher
 uint _PointCellHeight; //? the height of each cell per point, derived from texture size and number of points in dispatcher
-uint _CellXCount;
-uint _CellYCount;
-bool _Tiling;
-bool _Invert;
+uint _CellXCount; //? the number of cells along the x axis
+uint _CellYCount; //? the number of cells along the y axis
+bool _Tiling; //? if the texture should be required to tile seamlessly
+bool _Invert; //? if the values of the texture should be inverted
+float4 _ChannelMask; //? the channel to store the generated noise in
 
-
+float4 MaskValue(float invalue) {
+    return (1-_ChannelMask)+invalue*_ChannelMask;
+}
+float4 MaskValue(float4 invalue) {
+    return (1-_ChannelMask)+invalue*_ChannelMask;
+}
 uint CellToBufferIndex(uint2 CellIndex) {
     return CellIndex.x + CellIndex.y*_CellXCount; 
 }
@@ -85,7 +91,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     InterlockedMax(_MinMaxBuffer[1],val);
 
     //? Records the result on the texture
-    _NoiseTexture[id.xy] = result;
+    // _NoiseTexture[id.xy] = MaskValue(result);
+    _NoiseTexture[id.xy] = _NoiseTexture[id.xy] * (1-_ChannelMask) + result * _ChannelMask;
 }
 
 [numthreads(8,8,1)]
@@ -109,5 +116,6 @@ void NormalizeTexture(uint3 id : SV_DISPATCHTHREADID) {
     float minVal = float(_MinMaxBuffer[0]/float(minMaxAccuracy));
     float maxVal = float(_MinMaxBuffer[1]/float(minMaxAccuracy));
     float4 normalizedCol = (_NoiseTexture[id.xy] - minVal)/(maxVal - minVal);
-    _NoiseTexture[id.xy] = normalizedCol;
+    // _NoiseTexture[id.xy] = MaskValue(normalizedCol);
+    _NoiseTexture[id.xy] = _NoiseTexture[id.xy] * (1-_ChannelMask) + normalizedCol * _ChannelMask;
 }
