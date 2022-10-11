@@ -3,11 +3,15 @@
 #define TAU 6.283185307179586
 
 #pragma kernel CSMain
+#pragma kernel NormalizeTexture
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> _InNoiseTexture;
 RWTexture2D<float4> _OutNoiseTexture;
+RWStructuredBuffer<uint> _MinMaxBuffer;
+static const int minMaxAccuracy = 10000000;
+
 uint _Octaves; //? Number of octaves of noise to add onto itself
 float _Lacunarity; //? The factor the coordinates of the texture should be scaled by each octave
 float _Gain; //? The factor the value should be scaled by each octave
@@ -18,18 +22,18 @@ float4 SampleScaledTexture(uint2 coords,float frequency) {
     float2 scaledCoords = coords / frequency;
     uint2 intCoords = floor(scaledCoords);
     float2 fractCoords = frac(scaledCoords);
-    // float4 bottomMix = lerp(
-    //     _InNoiseTexture[intCoords],
-    //     _InNoiseTexture[uint2(intCoords.x+1, intCoords.y)],
-    //     fractCoords.x
-    // );
-    // float4 topMix = lerp(
-    //     _InNoiseTexture[uint2(intCoords.x, intCoords.y + 1)],
-    //     _InNoiseTexture[intCoords + 1],
-    //     fractCoords.x
-    // );
-    // return lerp(bottomMix,topMix,fractCoords.y);
-    return _InNoiseTexture[intCoords];
+    float4 bottomMix = lerp(
+        _InNoiseTexture[intCoords],
+        _InNoiseTexture[uint2(intCoords.x+1, intCoords.y)],
+        fractCoords.x
+    );
+    float4 topMix = lerp(
+        _InNoiseTexture[uint2(intCoords.x, intCoords.y + 1)],
+        _InNoiseTexture[intCoords + 1],
+        fractCoords.x
+    );
+    return lerp(bottomMix,topMix,fractCoords.y);
+    // return _InNoiseTexture[intCoords];
 }
 
 [numthreads(8,8,1)]
@@ -38,12 +42,46 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 value = 0;
     float amplitude = 0.5;
     float frequency = 1.0;
+    float normalizeFactor = 0;
+
     
     for(uint i = 0; i < _Octaves; i++) {
         value += amplitude * SampleScaledTexture(id.xy,frequency);
+        normalizeFactor +=  amplitude;
         amplitude *= _Gain;
         frequency *= _Lacunarity;
     }
-    _OutNoiseTexture[id.xy] = value;
+    value /= normalizeFactor;
 
+    uint4 val = uint4(value*minMaxAccuracy);
+    InterlockedMin(_MinMaxBuffer[0],val.x);
+    InterlockedMin(_MinMaxBuffer[1],val.y);
+    InterlockedMin(_MinMaxBuffer[2],val.z);
+    InterlockedMin(_MinMaxBuffer[3],val.w);
+
+    InterlockedMax(_MinMaxBuffer[4],val.x);
+    InterlockedMax(_MinMaxBuffer[5],val.y);
+    InterlockedMax(_MinMaxBuffer[6],val.z);
+    InterlockedMax(_MinMaxBuffer[7],val.w);
+
+
+    _OutNoiseTexture[id.xy] = value;
+}
+
+[numthreads(8,8,1)]
+void NormalizeTexture(uint3 id : SV_DISPATCHTHREADID) {
+    float4 minVal = float4(
+        _MinMaxBuffer[0]/float(minMaxAccuracy),
+        _MinMaxBuffer[1]/float(minMaxAccuracy),
+        _MinMaxBuffer[2]/float(minMaxAccuracy),
+        _MinMaxBuffer[3]/float(minMaxAccuracy)    
+    );
+    float4 maxVal = float4(
+        _MinMaxBuffer[4]/float(minMaxAccuracy),
+        _MinMaxBuffer[5]/float(minMaxAccuracy),
+        _MinMaxBuffer[6]/float(minMaxAccuracy),
+        _MinMaxBuffer[7]/float(minMaxAccuracy)    
+    );
+    float4 normalizedCol = (_OutNoiseTexture[id.xy] - minVal)/(maxVal - minVal);
+    _OutNoiseTexture[id.xy] = normalizedCol; 
 }
