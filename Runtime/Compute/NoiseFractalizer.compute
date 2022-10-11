@@ -15,7 +15,22 @@ float _Gain; //? The factor the value should be scaled by each octave
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
 
-uint2 ScaleCoordiantes(uint2 finalTexCoords,float frequency) {
+float4 SampleScaledTexture(uint2 coords,float frequency) {
+    float2 scaledCoords = coords / frequency;
+    uint2 intCoords = floor(scaledCoords);
+    float2 fractCoords = frac(scaledCoords);
+    // float4 bottomMix = lerp(
+    //     _InNoiseTexture[intCoords],
+    //     _InNoiseTexture[uint2(intCoords.x+1, intCoords.y)],
+    //     fractCoords.x
+    // );
+    // float4 topMix = lerp(
+    //     _InNoiseTexture[uint2(intCoords.x, intCoords.y + 1)],
+    //     _InNoiseTexture[intCoords + 1],
+    //     fractCoords.x
+    // );
+    // return lerp(bottomMix,topMix,fractCoords.y);
+    return _InNoiseTexture[intCoords];
 }
 
 [numthreads(8,8,1)]
@@ -25,11 +40,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float amplitude = 0.5;
     float frequency = 1.0;
     
-    for(int i = 0; i < _Octaves; i++) {
-        value += amplitude * _InNoiseTexture[ScaleCoordiantes(id.xy,frequency)];
+    for(uint i = 0; i < _Octaves; i++) {
+        value += amplitude * SampleScaledTexture(id.xy,frequency);
         amplitude *= _Gain;
         frequency *= _Lacunarity;
     }
-    OutNoiseTexture[id.xy] = value;
+    _OutNoiseTexture[id.xy] = value;
 
 }
