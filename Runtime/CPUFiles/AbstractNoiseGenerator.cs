@@ -23,7 +23,10 @@ namespace SadSapphicGames.NoiseGenerators
         // [SerializeField] protected bool animate;
         [SerializeField] protected uint seed;
         [SerializeField] protected uint texWidth;
+        public uint TexWidth { get => texWidth; }
         [SerializeField] protected uint texHeight;
+        public uint TexHeight { get => texHeight; }
+
         [SerializeField,Tooltip("increments the seed and regenerates the texture every frame to test generation speed and memory uses")] protected bool cycleTextureSeed;
         // Start is called before the first frame update
         void Start()
@@ -46,7 +49,9 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetTexture(generateTextureKernel, "_NoiseTexture", noiseTexture);
         }
         protected virtual void DisplayTexture() {
-            displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
+            if (displayMeshRenderer != null) {
+                displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
+            }
         }
         protected virtual void CleanUpOldTextures() {
             // noiseTexture?.Release();

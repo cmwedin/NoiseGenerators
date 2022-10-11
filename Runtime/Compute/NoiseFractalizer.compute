@@ -8,7 +8,6 @@
 // with cs.SetTexture
 RWTexture2D<float4> _InNoiseTexture;
 RWTexture2D<float4> _OutNoiseTexture;
-uint _Seed; //? the value used to generate the random hash
 uint _Octaves; //? Number of octaves of noise to add onto itself
 float _Lacunarity; //? The factor the coordinates of the texture should be scaled by each octave
 float _Gain; //? The factor the value should be scaled by each octave
