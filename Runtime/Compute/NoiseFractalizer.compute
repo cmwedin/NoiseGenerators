@@ -19,21 +19,21 @@ uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
 
 float4 SampleScaledTexture(uint2 coords,float frequency) {
-    float2 scaledCoords = coords / frequency;
-    uint2 intCoords = floor(scaledCoords);
-    float2 fractCoords = frac(scaledCoords);
-    float4 bottomMix = lerp(
-        _InNoiseTexture[intCoords],
-        _InNoiseTexture[uint2(intCoords.x+1, intCoords.y)],
-        fractCoords.x
-    );
-    float4 topMix = lerp(
-        _InNoiseTexture[uint2(intCoords.x, intCoords.y + 1)],
-        _InNoiseTexture[intCoords + 1],
-        fractCoords.x
-    );
-    return lerp(bottomMix,topMix,fractCoords.y);
-    // return _InNoiseTexture[intCoords];
+    float2 scaledCoords = coords * frequency;
+    uint2 intCoords = uint2(scaledCoords.x % _TexWidth,scaledCoords.y % _TexHeight);
+    // float2 fractCoords = frac(scaledCoords);
+    // float4 bottomMix = lerp(
+    //     _InNoiseTexture[intCoords],
+    //     _InNoiseTexture[uint2(intCoords.x+1, intCoords.y)],
+    //     fractCoords.x
+    // );
+    // float4 topMix = lerp(
+    //     _InNoiseTexture[uint2(intCoords.x, intCoords.y + 1)],
+    //     _InNoiseTexture[intCoords + 1],
+    //     fractCoords.x
+    // );
+    // return lerp(bottomMix,topMix,fractCoords.y);
+    return _InNoiseTexture[intCoords];
 }
 
 [numthreads(8,8,1)]
