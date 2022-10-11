@@ -1,0 +1,35 @@
+#include "/Includes/PRNG.compute"
+#define UINTMAXVALUE 4294967295.0 
+#define TAU 6.283185307179586
+
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> _InNoiseTexture;
+RWTexture2D<float4> _OutNoiseTexture;
+uint _Seed; //? the value used to generate the random hash
+uint _Octaves; //? Number of octaves of noise to add onto itself
+float _Lacunarity; //? The factor the coordinates of the texture should be scaled by each octave
+float _Gain; //? The factor the value should be scaled by each octave
+uint _TexWidth; //? the width of the generated texture in pixels
+uint _TexHeight; //? the height of the generated texture in pixels
+
+uint2 ScaleCoordiantes(uint2 finalTexCoords,float frequency) {
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 value = 0;
+    float amplitude = 0.5;
+    float frequency = 1.0;
+    
+    for(int i = 0; i < _Octaves; i++) {
+        value += amplitude * _InNoiseTexture[ScaleCoordiantes(id.xy,frequency)];
+        amplitude *= _Gain;
+        frequency *= _Lacunarity;
+    }
+    OutNoiseTexture[id.xy] = value;
+
+}
