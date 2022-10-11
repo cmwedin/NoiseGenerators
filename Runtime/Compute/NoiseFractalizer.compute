@@ -14,7 +14,9 @@ static const int minMaxAccuracy = 10000000;
 
 uint _Octaves; //? Number of octaves of noise to add onto itself
 float _Lacunarity; //? The factor the coordinates of the texture should be scaled by each octave
+float _Frequency;
 float _Gain; //? The factor the value should be scaled by each octave
+float _Amplitude;
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
 
@@ -40,8 +42,8 @@ float4 SampleScaledTexture(uint2 coords,float frequency) {
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     float4 value = 0;
-    float amplitude = 0.5;
-    float frequency = 1.0;
+    float amplitude = _Amplitude;
+    float frequency = _Frequency;
     float normalizeFactor = 0;
 
     
