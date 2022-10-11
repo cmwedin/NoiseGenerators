@@ -18,6 +18,7 @@ namespace SadSapphicGames.NoiseGenerators
             );
         }
         [SerializeField] protected RenderTexture noiseTexture;
+        public RenderTexture GetNoiseTexture() => noiseTexture;
         [SerializeField] protected MeshRenderer displayMeshRenderer;
         // [SerializeField] protected bool animate;
         [SerializeField] protected uint seed;
