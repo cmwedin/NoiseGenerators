@@ -35,11 +35,12 @@ namespace SadSapphicGames.NoiseGenerators
             );
         }
         [SerializeField] private uint octaves;
-        [SerializeField] private float lacunarity;
-        [SerializeField] private float frequency;
+        [SerializeField] private float lacunarity = 2;
+        [SerializeField] private float frequency = 2;
 
-        [SerializeField] private float gain;
-        [SerializeField] private float amplitude;
+        [SerializeField] private float gain = .5f;
+        [SerializeField] private float amplitude = .5f;
+        [SerializeField] private bool normalizeAmplitude = true;
 
         private uint texWidth { get => baseNoiseGenerator.TexWidth; }
         private uint texHeight { get => baseNoiseGenerator.TexHeight; }
@@ -59,6 +60,7 @@ namespace SadSapphicGames.NoiseGenerators
             fractalizeShader.SetFloat("_Frequency", frequency);
             fractalizeShader.SetFloat("_Gain",gain);
             fractalizeShader.SetFloat("_Amplitude", amplitude);
+            fractalizeShader.SetBool("_NormalizeAmplitude", normalizeAmplitude);
             fractalizeShader.SetInt("_TexWidth",(int)texWidth);
             fractalizeShader.SetInt("_TexHeight",(int)texHeight);
             fractalizeShader.SetBuffer(generateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
