@@ -8,7 +8,6 @@ namespace SadSapphicGames.NoiseGenerators
     {
         protected override int generateTextureKernel => noiseGenShader.FindKernel("CSMain");
 
-
         public override void GenerateTexture() {
             CleanUpOldTextures();
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);

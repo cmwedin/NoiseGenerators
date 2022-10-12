@@ -48,7 +48,7 @@ namespace SadSapphicGames.NoiseGenerators
             SetShaderParameters();
             noiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
-            displayMeshRenderer.sharedMaterial.mainTexture = noiseTexture;
+            DisplayTexture();
         }
     }
 }
