@@ -7,7 +7,7 @@
 
 
 RWTexture2D<float4> _NoiseTexture;
-RWTexture2D<float4> _LatticeTexture; //? Stores the values of the random lattice
+RWStructuredBuffer<float4> _LatticeBuffer; //? Stores the values of the random lattice
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
@@ -15,6 +15,9 @@ uint _LatticeSize; //? the seperation of the lattice used to generate the noise 
 uint _LatticeTexWidth; //? Total width of the lattice texture
 uint _LatticeTexHeight; //? Total height of the lattice texture
 
+uint LatticeToBufferIndex(uint2 latticeIndex) {
+    return latticeIndex.x + latticeIndex.y*_LatticeTexWidth; 
+}
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -26,13 +29,13 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     int2 latticeIndex = floor(globalLatticePos);
     localLatticePos = localLatticePos * localLatticePos * (3.0 - 2.0 * localLatticePos); //?alternate cubic pos for smoother transitions
     float4 colA = lerp(
-        _LatticeTexture[uint2(latticeIndex.x,latticeIndex.y)],
-        _LatticeTexture[uint2(latticeIndex.x+1,latticeIndex.y)],
+        _LatticeBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y))],
+        _LatticeBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))],
         localLatticePos.x
     );
     float4 colB = lerp(
-        _LatticeTexture[uint2(latticeIndex.x,latticeIndex.y+1)],
-        _LatticeTexture[uint2(latticeIndex.x+1,latticeIndex.y+1)],
+        _LatticeBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))],
+        _LatticeBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))],
         localLatticePos.x
     );
     float4 fragCol = lerp(colA,colB,localLatticePos.y);
@@ -46,5 +49,5 @@ void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
     
     uint hash = pcg_hash(_Seed);
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
-    _LatticeTexture[id.xy] = float4(hash4d) / UINTMAXVALUE;
+    _LatticeBuffer[LatticeToBufferIndex(id.xy)] = float4(hash4d) / UINTMAXVALUE;
 }

@@ -9,13 +9,13 @@ namespace SadSapphicGames.NoiseGenerators
         int generateLatticeKernel { get => noiseGenShader.FindKernel("GenerateLattice"); }
         private Vector3Int latticeThreadGroupCount {
             get => new Vector3Int(
-                Mathf.CeilToInt((float)latticeTexture.width / (float)threadGroupSize.x),
-                Mathf.CeilToInt((float)latticeTexture.height / (float)threadGroupSize.x),
+                Mathf.CeilToInt((float)latticeTexWidth / (float)threadGroupSize.x),
+                Mathf.CeilToInt((float)latticeTexHeight / (float)threadGroupSize.y),
                 1
             );
         }
 
-        public RenderTexture latticeTexture;
+        private ComputeBuffer latticeBuffer;
         public uint latticeSize;
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
@@ -23,8 +23,7 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void CleanUpOldTextures()
         {
             base.CleanUpOldTextures();
-            latticeTexture?.Release();
-            DestroyImmediate(latticeTexture);
+            latticeBuffer?.Release();
         }
         protected override void SetShaderParameters()
         {
@@ -32,19 +31,17 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_LatticeSize", (int)latticeSize);
             noiseGenShader.SetInt("_LatticeTexWidth", latticeTexWidth);
             noiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
-            noiseGenShader.SetTexture(generateLatticeKernel, "_LatticeTexture", latticeTexture);
-            noiseGenShader.SetTexture(generateTextureKernel, "_LatticeTexture", latticeTexture);
+            noiseGenShader.SetBuffer(generateLatticeKernel, "_LatticeBuffer", latticeBuffer);
+            noiseGenShader.SetBuffer(generateTextureKernel, "_LatticeBuffer", latticeBuffer);
         }
 
         public override void GenerateTexture()
         {
             CleanUpOldTextures();
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
-            latticeTexture = new RenderTexture(latticeTexWidth, latticeTexHeight, 24);
             noiseTexture.enableRandomWrite = true;
-            latticeTexture.enableRandomWrite = true;
             noiseTexture.Create();
-            latticeTexture.Create();
+            latticeBuffer = new ComputeBuffer(latticeTexWidth * latticeTexHeight, 4 * sizeof(float));
             SetShaderParameters();
             noiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
