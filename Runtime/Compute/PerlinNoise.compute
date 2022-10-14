@@ -43,65 +43,30 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     bool onYEdge = uint(latticeIndex.y) == (_LatticeTexHeight - 1);
     float2 smoothedLocalLatticePos = localLatticePos * localLatticePos * (3.0 - 2.0 * localLatticePos); //?alternate cubic pos for smoother transitions
     float4 colA = 1; float4 colB = 1; float4 colC = 1; float4 colD = 1;
-    if(_TileTexture) {
-        if(false) {
-
-        } else if(false) {
-            
-        } else if(false) {
-
-        } else {
-            colA = float4 (
-                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[0],localLatticePos),
-                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[1],localLatticePos),
-                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[2],localLatticePos),
-                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[3],localLatticePos)
-            );
-            colB = float4 (
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[0],localLatticePos - float2(0,1)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[1],localLatticePos - float2(0,1)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[2],localLatticePos - float2(0,1)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[3],localLatticePos - float2(0,1))
-            );
-            colC = float4 (
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[0],localLatticePos - float2(1,1)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[1],localLatticePos - float2(1,1)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[2],localLatticePos - float2(1,1)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[3],localLatticePos - float2(1,1))
-            );
-            colD = float4 (
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[0],localLatticePos - float2(1,0)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[1],localLatticePos - float2(1,0)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[2],localLatticePos - float2(1,0)),
-                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[3],localLatticePos - float2(1,0))
-            );
-        }
-    } else {
-        colA = float4 (
-            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[0],localLatticePos),
-            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[1],localLatticePos),
-            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[2],localLatticePos),
-            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[3],localLatticePos)
-        );
-        colB = float4 (
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[0],localLatticePos - float2(0,1)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[1],localLatticePos - float2(0,1)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[2],localLatticePos - float2(0,1)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[3],localLatticePos - float2(0,1))
-        );
-        colC = float4 (
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[0],localLatticePos - float2(1,1)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[1],localLatticePos - float2(1,1)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[2],localLatticePos - float2(1,1)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[3],localLatticePos - float2(1,1))
-        );
-        colD = float4 (
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[0],localLatticePos - float2(1,0)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[1],localLatticePos - float2(1,0)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[2],localLatticePos - float2(1,0)),
-            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[3],localLatticePos - float2(1,0))
-        );
-    }
+    colA = float4 (
+        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[0],localLatticePos),
+        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[1],localLatticePos),
+        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[2],localLatticePos),
+        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[3],localLatticePos)
+    );
+    colB = float4 (
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[0],localLatticePos - float2(0,1)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[1],localLatticePos - float2(0,1)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[2],localLatticePos - float2(0,1)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[3],localLatticePos - float2(0,1))
+    );
+    colC = float4 (
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[0],localLatticePos - float2(1,1)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[1],localLatticePos - float2(1,1)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[2],localLatticePos - float2(1,1)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[3],localLatticePos - float2(1,1))
+    );
+    colD = float4 (
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[0],localLatticePos - float2(1,0)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[1],localLatticePos - float2(1,0)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[2],localLatticePos - float2(1,0)),
+        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[3],localLatticePos - float2(1,0))
+    );
     //? Smoothed local position
     float4 colAD = lerp(colA,colD,smoothedLocalLatticePos.x);
     float4 colBC = lerp(colB,colC,smoothedLocalLatticePos.x);
@@ -125,8 +90,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 [numthreads(8,8,1)]
 void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
     if(id.x < 0 || id.x >= _LatticeTexWidth || id.y < 0 || id.y >= _LatticeTexHeight) {return;}
-    bool onXEdge = id.x == (_LatticeTexWidth - 1);
-    bool onYEdge = id.y == (_LatticeTexHeight - 1);
 
     uint hash = pcg_hash(_Seed);
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));

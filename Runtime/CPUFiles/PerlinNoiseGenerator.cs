@@ -82,16 +82,6 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             DisplayTexture();
             gradientBuffer?.Release();
-
-        }
-        protected override void DisplayTexture()
-        {
-            base.DisplayTexture();
-            if (tileTexture)
-            {
-                displayMeshRenderer.sharedMaterial.mainTexture.wrapMode = TextureWrapMode.Repeat;
-                displayMeshRenderer.sharedMaterial.mainTextureScale = new Vector2(2, 2);
-            }
         }
     }
 }
