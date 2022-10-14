@@ -17,7 +17,8 @@ bool _TileTexture;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
-uint _LatticeSize; //? the seperation of the lattice used to generate the noise in pixels
+uint _LatticeSizeX; //? the horizontal seperation of the lattice used to generate the noise in pixels
+uint _LatticeSizeY; //? the vertical seperation of the lattice used to generate the noise in pixels
 uint _LatticeTexWidth; //? Total width of the lattice texture
 uint _LatticeTexHeight; //? Total height of the lattice texture
 
@@ -34,7 +35,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
     
     //? Figure out where we are in the lattice
-    float2 globalLatticePos = id.xy / float(_LatticeSize);
+    float2 globalLatticePos = id.xy / float2(_LatticeSizeX,_LatticeSizeY);
     float2 localLatticePos = frac(globalLatticePos);
     // int2 latticeIndex = floor(globalLatticePos);
     int2 latticeIndex = globalLatticePos - localLatticePos;

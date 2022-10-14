@@ -21,6 +21,44 @@ namespace SadSapphicGames.NoiseGenerators
             }
             return factors;
         }
+        public static int FindClosestFactor(int n, int t) {
+            int max = (int)Math.Sqrt(n);
+            int bestResult = 1;
+            int bestDist = t - 1;
+
+            bool compareDecreasing = true;
+            bool compareIncreasing = true;
+            for (int i = 1; i <= max; i++)
+            {
+                if (n % i == 0) {
+                    if(compareIncreasing) {
+                        int dist = Math.Abs(t - i);
+                        if(dist < bestDist) {
+                            bestResult = i;
+                            bestDist = dist;
+                        }
+                        if( i >= t) {
+                            compareIncreasing = false;
+                        }
+                    } 
+                    if(compareDecreasing) {
+                        int j = n / i;
+                        int dist = Math.Abs(t - j);
+                        if(dist < bestDist) {
+                            bestResult = j;
+                            bestDist = dist;
+                        } 
+                        if( j <= t) {
+                            compareDecreasing = false;
+                        }
+                    }
+                }
+                if(!compareIncreasing && ! compareDecreasing) {
+                    break;
+                }
+            }
+            return bestResult;
+        }
         public static Vector2Int PartitionTexture(int textureWidth, int textureHeight, int partitionCount) {
             var factors = Factor(partitionCount);
             int xCount;
