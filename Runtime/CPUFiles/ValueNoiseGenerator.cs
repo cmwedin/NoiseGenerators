@@ -14,11 +14,29 @@ namespace SadSapphicGames.NoiseGenerators
                 1
             );
         }
-
+        [SerializeField] private bool tileTexture;
         private ComputeBuffer latticeBuffer;
-        public uint latticeSize;
-        private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)latticeSize)+1; }
-        private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)latticeSize)+1; }
+        [SerializeField] private Vector2Int latticeSize;
+        public Vector2Int LatticeSize {
+            get {
+                if(TexWidth % latticeSize.x != 0) {
+                    Debug.LogWarning("Horizontal lattice size not set to factor of texture width, adjusting value to closest factor");
+                    latticeSize = new Vector2Int(
+                        HelperMethods.FindClosestFactor((int)TexWidth,latticeSize.x),
+                        latticeSize.y
+                    );
+                } if (TexHeight % latticeSize.y != 0) {
+                    Debug.LogWarning("Vertical lattice size not set to factor of texture height, adjusting value to closest factor");
+                    latticeSize = new Vector2Int(
+                        latticeSize.x,
+                        HelperMethods.FindClosestFactor((int)TexHeight,latticeSize.y)
+                    );
+                }
+                return latticeSize; 
+            }
+        }
+        private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)LatticeSize.x)+1; }
+        private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)LatticeSize.y)+1; }
 
         protected override void CleanUpOldTextures()
         {
@@ -28,7 +46,8 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void SetShaderParameters()
         {
             base.SetShaderParameters();
-            noiseGenShader.SetInt("_LatticeSize", (int)latticeSize);
+            noiseGenShader.SetInt("_LatticeSizeX", (int)LatticeSize.x);
+            noiseGenShader.SetInt("_LatticeSizeY", (int)LatticeSize.y);
             noiseGenShader.SetInt("_LatticeTexWidth", latticeTexWidth);
             noiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
             noiseGenShader.SetBuffer(generateLatticeKernel, "_LatticeBuffer", latticeBuffer);
