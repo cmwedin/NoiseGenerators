@@ -4,6 +4,7 @@
 
 #pragma kernel CSMain
 #pragma kernel GenerateLattice
+#pragma kernel WrapLattice
 
 
 struct GradientData {
@@ -12,6 +13,7 @@ struct GradientData {
 
 RWTexture2D<float4> _NoiseTexture;
 RWStructuredBuffer<GradientData> _GradientBuffer;
+bool _TileTexture;
 uint _Seed; //? the value used to generate the random hash
 uint _TexWidth; //? the width of the generated texture in pixels
 uint _TexHeight; //? the height of the generated texture in pixels
@@ -36,33 +38,69 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float2 localLatticePos = frac(globalLatticePos);
     // int2 latticeIndex = floor(globalLatticePos);
     int2 latticeIndex = globalLatticePos - localLatticePos;
+    bool onXEdge = uint(latticeIndex.x) == (_LatticeTexWidth - 1);
+    bool onYEdge = uint(latticeIndex.y) == (_LatticeTexHeight - 1);
     float2 smoothedLocalLatticePos = localLatticePos * localLatticePos * (3.0 - 2.0 * localLatticePos); //?alternate cubic pos for smoother transitions
+    float4 colA = 1; float4 colB = 1; float4 colC = 1; float4 colD = 1;
+    if(_TileTexture) {
+        if(false) {
 
-    float4 colA = float4 (
-        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[0],localLatticePos),
-        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[1],localLatticePos),
-        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[2],localLatticePos),
-        dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[3],localLatticePos)
-    );
-    float4 colB = float4 (
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[0],localLatticePos - float2(0,1)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[1],localLatticePos - float2(0,1)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[2],localLatticePos - float2(0,1)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[3],localLatticePos - float2(0,1))
-    );
-    float4 colC = float4 (
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[0],localLatticePos - float2(1,1)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[1],localLatticePos - float2(1,1)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[2],localLatticePos - float2(1,1)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[3],localLatticePos - float2(1,1))
-    );
-    float4 colD = float4 (
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[0],localLatticePos - float2(1,0)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[1],localLatticePos - float2(1,0)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[2],localLatticePos - float2(1,0)),
-        dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[3],localLatticePos - float2(1,0))
-    );
-    
+        } else if(false) {
+            
+        } else if(false) {
+
+        } else {
+            colA = float4 (
+                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[0],localLatticePos),
+                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[1],localLatticePos),
+                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[2],localLatticePos),
+                dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[3],localLatticePos)
+            );
+            colB = float4 (
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[0],localLatticePos - float2(0,1)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[1],localLatticePos - float2(0,1)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[2],localLatticePos - float2(0,1)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[3],localLatticePos - float2(0,1))
+            );
+            colC = float4 (
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[0],localLatticePos - float2(1,1)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[1],localLatticePos - float2(1,1)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[2],localLatticePos - float2(1,1)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[3],localLatticePos - float2(1,1))
+            );
+            colD = float4 (
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[0],localLatticePos - float2(1,0)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[1],localLatticePos - float2(1,0)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[2],localLatticePos - float2(1,0)),
+                dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[3],localLatticePos - float2(1,0))
+            );
+        }
+    } else {
+        colA = float4 (
+            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[0],localLatticePos),
+            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[1],localLatticePos),
+            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[2],localLatticePos),
+            dot(_GradientBuffer[LatticeToBufferIndex(latticeIndex.xy)].vectors[3],localLatticePos)
+        );
+        colB = float4 (
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[0],localLatticePos - float2(0,1)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[1],localLatticePos - float2(0,1)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[2],localLatticePos - float2(0,1)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x,latticeIndex.y+1))].vectors[3],localLatticePos - float2(0,1))
+        );
+        colC = float4 (
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[0],localLatticePos - float2(1,1)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[1],localLatticePos - float2(1,1)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[2],localLatticePos - float2(1,1)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y+1))].vectors[3],localLatticePos - float2(1,1))
+        );
+        colD = float4 (
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[0],localLatticePos - float2(1,0)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[1],localLatticePos - float2(1,0)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[2],localLatticePos - float2(1,0)),
+            dot(_GradientBuffer[LatticeToBufferIndex(uint2(latticeIndex.x+1,latticeIndex.y))].vectors[3],localLatticePos - float2(1,0))
+        );
+    }
     //? Smoothed local position
     float4 colAD = lerp(colA,colD,smoothedLocalLatticePos.x);
     float4 colBC = lerp(colB,colC,smoothedLocalLatticePos.x);
@@ -86,14 +124,30 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 [numthreads(8,8,1)]
 void GenerateLattice(uint3 id : SV_DISPATCHTHREADID) {
     if(id.x < 0 || id.x >= _LatticeTexWidth || id.y < 0 || id.y >= _LatticeTexHeight) {return;}
-    
+    bool onXEdge = id.x == (_LatticeTexWidth - 1);
+    bool onYEdge = id.y == (_LatticeTexHeight - 1);
+
     uint hash = pcg_hash(_Seed);
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
     float4 randCol = float4(hash4d) / UINTMAXVALUE;
-    float2 baseVec = float2(1,0);
+    float2 baseVec = float2(1,0); 
     _GradientBuffer[LatticeToBufferIndex(id.xy)].vectors[0] = RotateVec2(baseVec,randCol.x*TAU);
     _GradientBuffer[LatticeToBufferIndex(id.xy)].vectors[1] = RotateVec2(baseVec,randCol.y*TAU);
     _GradientBuffer[LatticeToBufferIndex(id.xy)].vectors[2] = RotateVec2(baseVec,randCol.z*TAU);
     _GradientBuffer[LatticeToBufferIndex(id.xy)].vectors[3] = RotateVec2(baseVec,randCol.w*TAU);
+}
+[numthreads(8,8,1)] 
+void WrapLattice(uint3 id : SV_DISPATCHTHREADID) {
+    bool onXEdge = id.x >= (_LatticeTexWidth - 1);
+    bool onYEdge = id.y >= (_LatticeTexHeight - 1);
+    if((!onXEdge && !onYEdge) || (id.x >= _LatticeTexWidth || id.y >= _LatticeTexHeight)) { 
+        return;
+    } else if (onXEdge && onYEdge) {
+        _GradientBuffer[LatticeToBufferIndex(id.xy)] = _GradientBuffer[LatticeToBufferIndex(uint2(0,0))];
+    } else if (onXEdge && !onYEdge) {
+        _GradientBuffer[LatticeToBufferIndex(id.xy)] = _GradientBuffer[LatticeToBufferIndex(uint2(0,id.y))];
+    } else if (!onXEdge && onYEdge) {
+        _GradientBuffer[LatticeToBufferIndex(id.xy)] = _GradientBuffer[LatticeToBufferIndex(uint2(id.x,0))];
+    }
 }
 
