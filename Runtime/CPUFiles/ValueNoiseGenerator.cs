@@ -7,6 +7,8 @@ namespace SadSapphicGames.NoiseGenerators
     public class ValueNoiseGenerator : AbstractNoiseGenerator {
         protected override int generateTextureKernel { get => noiseGenShader.FindKernel("CSMain"); }
         int generateLatticeKernel { get => noiseGenShader.FindKernel("GenerateLattice"); }
+        int wrapLatticeKernel { get => noiseGenShader.FindKernel("WrapLattice"); }
+
         private Vector3Int latticeThreadGroupCount {
             get => new Vector3Int(
                 Mathf.CeilToInt((float)latticeTexWidth / (float)threadGroupSize.x),
@@ -51,6 +53,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGenShader.SetInt("_LatticeTexWidth", latticeTexWidth);
             noiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
             noiseGenShader.SetBuffer(generateLatticeKernel, "_LatticeBuffer", latticeBuffer);
+            noiseGenShader.SetBuffer(wrapLatticeKernel, "_LatticeBuffer", latticeBuffer);
             noiseGenShader.SetBuffer(generateTextureKernel, "_LatticeBuffer", latticeBuffer);
         }
 
@@ -63,8 +66,12 @@ namespace SadSapphicGames.NoiseGenerators
             latticeBuffer = new ComputeBuffer(latticeTexWidth * latticeTexHeight, 4 * sizeof(float));
             SetShaderParameters();
             noiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
+            if(tileTexture) {
+                noiseGenShader.Dispatch(wrapLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
+            }
             noiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             DisplayTexture();
+            latticeBuffer?.Release();
         }
     }
 }
