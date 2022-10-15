@@ -16,7 +16,7 @@ namespace SadSapphicGames.NoiseGenerators
         private Vector3Int latticeThreadGroupCount
         {
             get => new Vector3Int(
-                Mathf.CeilToInt((latticeTexWidth / (float)threadGroupSize.x)),
+                Mathf.CeilToInt(latticeTexWidth / (float)threadGroupSize.x),
                 Mathf.CeilToInt(latticeTexHeight / (float)threadGroupSize.y),
                 1
             );
@@ -43,7 +43,6 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
-
         private int latticeTexWidth { get => Mathf.CeilToInt((float)texWidth / (float)LatticeSize.x)+1; }
         private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)LatticeSize.y)+1; }
 
@@ -61,12 +60,11 @@ namespace SadSapphicGames.NoiseGenerators
             base.SetShaderParameters();
             NoiseGenShader.SetInt("_LatticeSizeX", (int)LatticeSize.x);
             NoiseGenShader.SetInt("_LatticeSizeY", (int)LatticeSize.y);
-            NoiseGenShader.SetBool("_TileTexture", tileTexture);
             NoiseGenShader.SetInt("_LatticeTexWidth", latticeTexWidth);
             NoiseGenShader.SetInt("_LatticeTexHeight", latticeTexHeight);
-            NoiseGenShader.SetBuffer(generateLatticeKernel, "_GradientBuffer", gradientBuffer);
-            NoiseGenShader.SetBuffer(generateTextureKernel, "_GradientBuffer", gradientBuffer);
-            NoiseGenShader.SetBuffer(wrapLatticeKernel, "_GradientBuffer", gradientBuffer);
+            NoiseGenShader.SetBuffer(generateLatticeKernel, "_LatticeBuffer", gradientBuffer);
+            NoiseGenShader.SetBuffer(generateTextureKernel, "_LatticeBuffer", gradientBuffer);
+            NoiseGenShader.SetBuffer(wrapLatticeKernel, "_LatticeBuffer", gradientBuffer);
         }
 
         public override void GenerateTexture()
