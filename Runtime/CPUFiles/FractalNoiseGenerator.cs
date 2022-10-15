@@ -19,9 +19,16 @@ namespace SadSapphicGames.NoiseGenerators
         [SerializeField] private MeshRenderer textureDisplay;
 
 
-        [SerializeField] private ComputeShader fractalizeShader;
-        protected int generateTextureKernel => fractalizeShader.FindKernel("CSMain");
-        protected int normalizeTextureKernel => fractalizeShader.FindKernel("NormalizeTexture");
+        private ComputeShader fractalizeShader;
+        public ComputeShader FractalizeShader { get {
+            if(fractalizeShader == null) {
+                fractalizeShader = Resources.Load<ComputeShader>("Compute/NoiseFractalizer");
+            }
+            return fractalizeShader;
+        }}
+
+        protected int generateTextureKernel => FractalizeShader.FindKernel("CSMain");
+        protected int normalizeTextureKernel => FractalizeShader.FindKernel("NormalizeTexture");
 
         private ComputeBuffer minMaxBuffer;
 
@@ -45,7 +52,6 @@ namespace SadSapphicGames.NoiseGenerators
         private uint texWidth { get => baseNoiseGenerator.TexWidth; }
         private uint texHeight { get => baseNoiseGenerator.TexHeight; }
 
-
         protected virtual void CleanUpOldTextures() {
             if (noiseTexture != null) {
                 noiseTexture.Release();
@@ -55,19 +61,19 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         private void SetShaderParameters() {
-            fractalizeShader.SetInt("_Octaves", (int)octaves);
-            fractalizeShader.SetFloat("_Lacunarity", lacunarity);
-            fractalizeShader.SetFloat("_Frequency", frequency);
-            fractalizeShader.SetFloat("_Gain",gain);
-            fractalizeShader.SetFloat("_Amplitude", amplitude);
-            fractalizeShader.SetBool("_NormalizeAmplitude", normalizeAmplitude);
-            fractalizeShader.SetInt("_TexWidth",(int)texWidth);
-            fractalizeShader.SetInt("_TexHeight",(int)texHeight);
-            fractalizeShader.SetBuffer(generateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
-            fractalizeShader.SetTexture(generateTextureKernel, "_InNoiseTexture", inputTexture);
-            fractalizeShader.SetTexture(generateTextureKernel, "_OutNoiseTexture", noiseTexture);
-            fractalizeShader.SetBuffer(normalizeTextureKernel,"_MinMaxBuffer", minMaxBuffer);
-            fractalizeShader.SetTexture(normalizeTextureKernel, "_OutNoiseTexture", noiseTexture);
+            FractalizeShader.SetInt("_Octaves", (int)octaves);
+            FractalizeShader.SetFloat("_Lacunarity", lacunarity);
+            FractalizeShader.SetFloat("_Frequency", frequency);
+            FractalizeShader.SetFloat("_Gain",gain);
+            FractalizeShader.SetFloat("_Amplitude", amplitude);
+            FractalizeShader.SetBool("_NormalizeAmplitude", normalizeAmplitude);
+            FractalizeShader.SetInt("_TexWidth",(int)texWidth);
+            FractalizeShader.SetInt("_TexHeight",(int)texHeight);
+            FractalizeShader.SetBuffer(generateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
+            FractalizeShader.SetTexture(generateTextureKernel, "_InNoiseTexture", inputTexture);
+            FractalizeShader.SetTexture(generateTextureKernel, "_OutNoiseTexture", noiseTexture);
+            FractalizeShader.SetBuffer(normalizeTextureKernel,"_MinMaxBuffer", minMaxBuffer);
+            FractalizeShader.SetTexture(normalizeTextureKernel, "_OutNoiseTexture", noiseTexture);
         }
 
         public void GenerateTexture()
@@ -79,8 +85,8 @@ namespace SadSapphicGames.NoiseGenerators
             minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
             minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
             SetShaderParameters();
-            fractalizeShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
-            fractalizeShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            FractalizeShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            FractalizeShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             textureDisplay.sharedMaterial.mainTexture = noiseTexture;
             minMaxBuffer.Dispose();
         }

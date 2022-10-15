@@ -6,7 +6,9 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class RandomNoiseGenerator : AbstractNoiseGenerator
     {
-        protected override int generateTextureKernel => noiseGenShader.FindKernel("CSMain");
+        protected override string ComputeShaderPath => "Compute/RandomNoise";
+        
+        protected override int generateTextureKernel => NoiseGenShader.FindKernel("CSMain");
 
         public override void GenerateTexture() {
             CleanUpOldTextures();
@@ -14,7 +16,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
             SetShaderParameters();
-            noiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
+            NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
             DisplayTexture();
         }
     }

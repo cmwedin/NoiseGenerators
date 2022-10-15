@@ -6,7 +6,15 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public abstract class AbstractNoiseGenerator : MonoBehaviour
     {
-        [SerializeField] protected ComputeShader noiseGenShader;
+        private ComputeShader noiseGenShader;
+        protected ComputeShader NoiseGenShader { get {
+            if(noiseGenShader == null) {
+                noiseGenShader = Resources.Load<ComputeShader>(ComputeShaderPath);
+            }
+            return noiseGenShader;
+        }}
+        protected abstract string ComputeShaderPath { get; }
+
         protected abstract int generateTextureKernel { get; }
         protected Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
         protected Vector3Int texThreadGroupCount
@@ -43,10 +51,10 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
         protected virtual void SetShaderParameters() {
-            noiseGenShader.SetInt("_Seed", (int)seed);
-            noiseGenShader.SetInt("_TexWidth", (int)texWidth);
-            noiseGenShader.SetInt("_TexHeight", (int)texHeight);
-            noiseGenShader.SetTexture(generateTextureKernel, "_NoiseTexture", noiseTexture);
+            NoiseGenShader.SetInt("_Seed", (int)seed);
+            NoiseGenShader.SetInt("_TexWidth", (int)texWidth);
+            NoiseGenShader.SetInt("_TexHeight", (int)texHeight);
+            NoiseGenShader.SetTexture(generateTextureKernel, "_NoiseTexture", noiseTexture);
         }
         protected virtual void DisplayTexture() {
             if (displayMeshRenderer != null) {
