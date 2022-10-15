@@ -7,19 +7,20 @@ namespace SadSapphicGames.NoiseGenerators
     {
 
         protected AbstractNoiseGenerator(
-            uint texWidth,
-            uint texHeight,
-            uint seed
+            uint _texWidth,
+            uint _texHeight,
+            uint _seed
         ) {
-            this.texWidth = texWidth;
-            this.texHeight = texHeight;
-            Seed = seed;
+            this.texWidth = _texWidth;
+            this.texHeight = _texHeight;
+            Seed = _seed;
             noiseTexture = new RenderTexture((int)TexWidth, (int)TexHeight, 24);
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
         }
 
 //? compute shader fields
+    //? Shader reference
         private ComputeShader noiseGenShader;
         protected ComputeShader NoiseGenShader { get {
             if(noiseGenShader == null) {
@@ -29,6 +30,7 @@ namespace SadSapphicGames.NoiseGenerators
         }}
         protected abstract string ComputeShaderPath { get; }
 
+    //? Kernel and thread group info
         protected int generateTextureKernel { get => NoiseGenShader.FindKernel("CSMain"); }
         protected Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
         protected Vector3Int texThreadGroupCount
@@ -42,10 +44,22 @@ namespace SadSapphicGames.NoiseGenerators
 
 //? texture parameters
         public bool RegenerateTextureOnParamChange { get; set; }
+        private bool requireSeamlessTiling = true;
+        public bool RequireSeamlessTiling {
+            get => requireSeamlessTiling;
+            set {
+                requireSeamlessTiling = value;
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            }
+
+        }
         private uint texWidth = 256;
         public uint TexWidth { 
             get => texWidth; 
-            set { 
+            set {
+                if(value == 0) {value++;}
                 texWidth = value;
                 noiseTexture.width = (int)texWidth;
                 if(RegenerateTextureOnParamChange) {
@@ -57,6 +71,7 @@ namespace SadSapphicGames.NoiseGenerators
         public uint TexHeight { 
             get => texHeight; 
             set { 
+                if(value == 0) {value++;}
                 texHeight = value;
                 noiseTexture.height = (int)texHeight;
                 if(RegenerateTextureOnParamChange) {
