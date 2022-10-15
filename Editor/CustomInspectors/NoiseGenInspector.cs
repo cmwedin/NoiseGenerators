@@ -6,10 +6,10 @@ using SadSapphicGames.NoiseGenerators;
 
 namespace SadSapphicGames.NoiseGeneratorsEditor
 {
-    [CustomEditor(typeof(AbstractNoiseGenerator),true)]
+    [CustomEditor(typeof(AbstractNoiseGeneratorComponent),true)]
     public class NoiseGenInspector : Editor
     {
-        AbstractNoiseGenerator targetGenerator { get => (AbstractNoiseGenerator)target; }
+        AbstractNoiseGeneratorComponent targetGenerator { get => (AbstractNoiseGeneratorComponent)target; }
         public override void OnInspectorGUI()
         {
             if(GUILayout.Button("Generate Texture")){

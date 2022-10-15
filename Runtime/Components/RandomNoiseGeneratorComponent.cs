@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public class RandomNoiseGenerator : AbstractNoiseGenerator
+    public class RandomNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         protected override string ComputeShaderPath => "Compute/RandomNoise";
         

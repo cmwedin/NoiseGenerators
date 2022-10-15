@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public abstract class AbstractNoiseGenerator : MonoBehaviour
+    public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour
     {
         private ComputeShader noiseGenShader;
         protected ComputeShader NoiseGenShader { get {

@@ -6,10 +6,10 @@ using SadSapphicGames.NoiseGenerators;
 
 namespace SadSapphicGames.NoiseGeneratorsEditor
 {
-    [CustomEditor(typeof(FractalNoiseGenerator))]
+    [CustomEditor(typeof(FractalNoiseGeneratorComponent))]
     public class FractalizerInspector : Editor
     {
-        FractalNoiseGenerator targetGenerator { get => (FractalNoiseGenerator)target; }
+        FractalNoiseGeneratorComponent targetGenerator { get => (FractalNoiseGeneratorComponent)target; }
         public override void OnInspectorGUI()
         {
             if(GUILayout.Button("Generate Texture")){

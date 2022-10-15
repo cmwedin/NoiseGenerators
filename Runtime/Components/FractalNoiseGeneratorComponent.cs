@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public class FractalNoiseGenerator : MonoBehaviour
+    public class FractalNoiseGeneratorComponent : MonoBehaviour
     {
-        [SerializeField] private AbstractNoiseGenerator baseNoiseGenerator;
+        [SerializeField] private AbstractNoiseGeneratorComponent baseNoiseGenerator;
         private RenderTexture inputTexture
         {
             get

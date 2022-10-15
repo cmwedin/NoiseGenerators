@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public class WorleyNoiseGenerator : AbstractNoiseGenerator
+    public class WorleyNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         protected override string ComputeShaderPath => "Compute/WorleyNoise";
         protected override int generateTextureKernel => NoiseGenShader.FindKernel("CSMain");
