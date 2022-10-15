@@ -6,6 +6,19 @@ namespace SadSapphicGames.NoiseGenerators
     public abstract class AbstractNoiseGenerator : IDisposable
     {
 
+        protected AbstractNoiseGenerator(
+            uint texWidth,
+            uint texHeight,
+            uint seed
+        ) {
+            this.texWidth = texWidth;
+            this.texHeight = texHeight;
+            Seed = seed;
+            noiseTexture = new RenderTexture((int)TexWidth, (int)TexHeight, 24);
+            noiseTexture.enableRandomWrite = true;
+            noiseTexture.Create();
+        }
+
 //? compute shader fields
         private ComputeShader noiseGenShader;
         protected ComputeShader NoiseGenShader { get {
@@ -28,12 +41,38 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
 //? texture parameters
-        protected uint texWidth = 256;
-        public uint TexWidth { get => texWidth; set => texWidth = value; }
-        protected uint texHeight = 256;
-        public uint TexHeight { get => texHeight; set => texHeight = value; }
-        protected uint seed;
-        public uint Seed { get => seed; set => seed = value; }
+        public bool RegenerateTextureOnParamChange { get; set; }
+        private uint texWidth = 256;
+        public uint TexWidth { 
+            get => texWidth; 
+            set { 
+                texWidth = value;
+                noiseTexture.width = (int)texWidth;
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            }
+        }
+        private uint texHeight = 256;
+        public uint TexHeight { 
+            get => texHeight; 
+            set { 
+                texHeight = value;
+                noiseTexture.height = (int)texHeight;
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            } }
+        private uint seed;
+        public uint Seed { 
+            get => seed;
+            set { 
+                seed = value; 
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            }
+        }
         protected RenderTexture noiseTexture;
 
         protected virtual void SetShaderParameters() {
