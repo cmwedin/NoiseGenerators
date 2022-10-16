@@ -18,9 +18,9 @@ namespace SadSapphicGames.NoiseGenerators
         }
 //? Compute shader fields
     //? Kernel and thread group info
-        int generateLatticeKernel { get => NoiseGenShader.FindKernel("GenerateLattice"); }
-        int wrapLatticeKernel { get => NoiseGenShader.FindKernel("WrapLattice"); }
-        private Vector3Int latticeThreadGroupCount
+        protected int generateLatticeKernel { get => NoiseGenShader.FindKernel("GenerateLattice"); }
+        protected int wrapLatticeKernel { get => NoiseGenShader.FindKernel("WrapLattice"); }
+        protected Vector3Int latticeThreadGroupCount
         {
             get => new Vector3Int(
                 Mathf.CeilToInt(latticeWidth / (float)threadGroupSize.x),
