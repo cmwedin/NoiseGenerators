@@ -62,7 +62,7 @@ namespace SadSapphicGames.NoiseGenerators
             set {
                 if(value == 0) {value++;}
                 texWidth = value;
-                noiseTexture.width = (int)texWidth;
+                noiseTexture.Resize((int)TexWidth,(int)TexHeight);
                 if(RegenerateTextureOnParamChange) {
                     GenerateTexture();
                 }
@@ -74,7 +74,7 @@ namespace SadSapphicGames.NoiseGenerators
             set { 
                 if(value == 0) {value++;}
                 texHeight = value;
-                noiseTexture.height = (int)texHeight;
+                noiseTexture.Resize((int)TexWidth,(int)TexHeight);
                 if(RegenerateTextureOnParamChange) {
                     GenerateTexture();
                 }
@@ -90,6 +90,7 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
         protected RenderTexture noiseTexture;
+        public RenderTexture NoiseTexture { get => noiseTexture; }
 
         protected virtual void SetShaderParameters() {
             NoiseGenShader.SetInt("_Seed", (int)Seed);
