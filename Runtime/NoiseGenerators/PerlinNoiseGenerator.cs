@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public class ValueNoiseGenerator : AbstractLatticeNoiseGenerator
+    public class PerlinNoiseGenerator : AbstractLatticeNoiseGenerator
     {
-        public ValueNoiseGenerator(
+        public PerlinNoiseGenerator(
             uint _texWidth,
             uint _texHeight,
             uint _seed,
@@ -15,9 +13,9 @@ namespace SadSapphicGames.NoiseGenerators
         ) : base(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells) {
         }
 
-        protected override int LatticeBufferStride => 4*sizeof(float);
+        protected override int LatticeBufferStride => 8 * sizeof(float);
 
-        protected override string ComputeShaderPath => "Compute/ValueNoise";
+        protected override string ComputeShaderPath => "Compute/PerlinNoise";
 
         public override void GenerateTexture()
         {
