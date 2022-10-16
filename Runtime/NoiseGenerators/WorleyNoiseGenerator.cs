@@ -104,7 +104,7 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    // TODO: dispose managed state 
                 }
 
                 pointsBuffer?.Release();

@@ -6,18 +6,18 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class RandomNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
-        protected override string ComputeShaderPath => "Compute/RandomNoise";
-        
-        protected override int generateTextureKernel => NoiseGenShader.FindKernel("CSMain");
+        private RandomNoiseGenerator noiseGeneratorObject;
+        protected override AbstractNoiseGenerator NoiseGeneratorObject { get { 
+            if(noiseGeneratorObject == null) {
+                    CreateGeneratorObject();
+                }
+            return noiseGeneratorObject; 
+        } }
 
-        public override void GenerateTexture() {
-            CleanUpOldTextures();
-            noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
-            noiseTexture.enableRandomWrite = true;
-            noiseTexture.Create();
-            SetShaderParameters();
-            NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
-            DisplayTexture();
+        protected override void CreateGeneratorObject()
+        {
+            noiseGeneratorObject = new RandomNoiseGenerator(TexWidth, TexHeight, seed);
+            disposedValue = false;
         }
     }
 }

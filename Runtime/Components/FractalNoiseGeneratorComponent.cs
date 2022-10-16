@@ -12,7 +12,7 @@ namespace SadSapphicGames.NoiseGenerators
             get
             {
                 baseNoiseGenerator.GenerateTexture();
-                return baseNoiseGenerator.GetNoiseTexture();
+                return baseNoiseGenerator.NoiseTexture;
             }
         }
         [SerializeField] private RenderTexture noiseTexture;

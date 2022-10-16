@@ -18,6 +18,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
             noiseTexture.wrapMode = TextureWrapMode.Repeat;
+            RegenerateTextureOnParamChange = false;
         }
 
 //? compute shader fields
@@ -93,6 +94,7 @@ namespace SadSapphicGames.NoiseGenerators
         public RenderTexture NoiseTexture { get => noiseTexture; }
 
         protected virtual void SetShaderParameters() {
+            // Debug.Log("Setting Shader Parameters");
             NoiseGenShader.SetInt("_Seed", (int)Seed);
             NoiseGenShader.SetInt("_TexWidth", (int)TexWidth);
             NoiseGenShader.SetInt("_TexHeight", (int)TexHeight);

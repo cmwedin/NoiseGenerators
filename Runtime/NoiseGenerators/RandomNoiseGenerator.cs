@@ -13,6 +13,7 @@ namespace SadSapphicGames.NoiseGenerators
 
         public override void GenerateTexture() {
             SetShaderParameters();
+            // Debug.Log("Dispatching NoiseGen compute shader");
             NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
         }
     }
