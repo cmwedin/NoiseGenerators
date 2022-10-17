@@ -76,5 +76,11 @@ namespace SadSapphicGames.NoiseGenerators
             }
             return new Vector2Int(xCount,yCount);
         }
+        public static void Resize(this RenderTexture renderTexture, int newTexWidth, int newTexHeight) {
+            renderTexture.Release();
+            renderTexture.width = newTexWidth;
+            renderTexture.height = newTexHeight;
+            renderTexture.Create();
+        }
     }
 }
