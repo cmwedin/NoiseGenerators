@@ -12,6 +12,7 @@ namespace SadSapphicGames.NoiseGenerators
                 CreateGeneratorObject();
             }
             return noiseGeneratorObject;
+            
         }}
 
         [SerializeField] bool tileTexture;
@@ -44,15 +45,36 @@ namespace SadSapphicGames.NoiseGenerators
         // Start is called before the first frame update
         protected override void CreateGeneratorObject()
         {
+            if(noiseGeneratorObject != null) {
+                noiseGeneratorObject.Dispose();
+            }
             noiseGeneratorObject = new PerlinNoiseGenerator(TexWidth, TexHeight, seed, latticeSize);
             NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             disposedValue = false;
         }
-        protected override void OnValidate()
+        // protected override void OnValidate()
+        // {
+        //     base.OnValidate();
+        //     noiseGeneratorObject.LatticeCellSize = latticeSize;
+        //     NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+        // }
+        protected override void OnDisable()
         {
-            base.OnValidate();
-            noiseGeneratorObject.LatticeCellSize = latticeSize;
-            NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+            base.OnDisable();
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                Debug.Log("Disposing noise generator");
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                noiseGeneratorObject.Dispose();
+                disposedValue = true;
+            }
         }
     }
 }

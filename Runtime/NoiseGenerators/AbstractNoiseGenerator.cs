@@ -115,8 +115,8 @@ namespace SadSapphicGames.NoiseGenerators
                     // TODO: dispose managed state (managed objects)
                 }
 
-                noiseTexture?.Release();
-                noiseTexture = null;
+                // noiseTexture?.Release();
+                // noiseTexture = null;
                 disposedValue = true;
             }
         }

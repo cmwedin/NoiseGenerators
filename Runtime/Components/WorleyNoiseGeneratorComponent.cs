@@ -22,18 +22,25 @@ namespace SadSapphicGames.NoiseGenerators
         private Vector2Int cellCounts;
 
         protected override void CreateGeneratorObject() {
+            if(noiseGeneratorObject != null) {
+                noiseGeneratorObject.Dispose();
+            }
             noiseGeneratorObject = new WorleyNoiseGenerator(TexWidth, TexHeight, seed, cellCounts, activeChannel);
             noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             noiseGeneratorObject.InvertTexture = invertTexture;
             disposedValue = false;
         }
-        protected override void OnValidate()
+        protected override void OnDisable()
         {
-            base.OnValidate();
-            noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-            noiseGeneratorObject.InvertTexture = invertTexture;
-            noiseGeneratorObject.CellCounts = cellCounts;
+            base.OnDisable();
         }
+        // protected override void OnValidate()
+        // {
+        //     base.OnValidate();
+        //     noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+        //     noiseGeneratorObject.InvertTexture = invertTexture;
+        //     noiseGeneratorObject.CellCounts = cellCounts;
+        // }
 
     }
 }

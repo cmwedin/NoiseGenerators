@@ -9,7 +9,8 @@ namespace SadSapphicGames.NoiseGenerators
     {
         protected abstract AbstractNoiseGenerator NoiseGeneratorObject { get; }
         protected abstract void CreateGeneratorObject();
-        public RenderTexture NoiseTexture => NoiseGeneratorObject.NoiseTexture;
+        [SerializeField] RenderTexture noiseTexture;
+        public RenderTexture NoiseTexture => noiseTexture;
         [SerializeField] protected MeshRenderer displayMeshRenderer;
         [SerializeField] protected uint seed;
         [SerializeField] protected uint texWidth;
@@ -30,11 +31,11 @@ namespace SadSapphicGames.NoiseGenerators
                 GenerateTexture();
             }
         }
-        protected virtual void OnValidate() {
-            NoiseGeneratorObject.TexHeight = TexHeight;
-            NoiseGeneratorObject.TexWidth = TexWidth;
-            NoiseGeneratorObject.Seed = seed;
-        }
+        // protected virtual void OnValidate() {
+        //     NoiseGeneratorObject.TexHeight = TexHeight;
+        //     NoiseGeneratorObject.TexWidth = TexWidth;
+        //     NoiseGeneratorObject.Seed = seed;
+        // }
 
         protected virtual void DisplayTexture() {
             if (displayMeshRenderer != null) {
@@ -43,28 +44,34 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         public void GenerateTexture() {
+            noiseTexture?.Release();
+            CreateGeneratorObject();
             // Debug.Log("Generating texure");
             NoiseGeneratorObject.GenerateTexture();
+            noiseTexture = NoiseGeneratorObject.NoiseTexture;
             // Debug.Log("Texture generation complete");
             DisplayTexture();
+            NoiseGeneratorObject.Dispose();
         }
 
         private void OnDestroy() {
             this.Dispose();
         }
-        private void OnDisable() {
+        protected virtual void OnDisable() {
             this.Dispose();
         }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
+                // Debug.Log("Disposing noise generator");
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
                 }
 
                 NoiseGeneratorObject.Dispose();
+                noiseTexture?.Release();
                 disposedValue = true;
             }
         }

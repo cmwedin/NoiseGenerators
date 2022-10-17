@@ -40,15 +40,22 @@ namespace SadSapphicGames.NoiseGenerators
         // private int latticeTexHeight { get => Mathf.CeilToInt((float)texHeight / (float)LatticeSize.y)+1; }
 
         protected override void CreateGeneratorObject() {
+            if(noiseGeneratorObject != null) {
+                noiseGeneratorObject.Dispose();
+            }
             noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
             NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             disposedValue = false;
         }
-        protected override void OnValidate()
+        protected override void OnDisable()
         {
-            base.OnValidate();
-            NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-            noiseGeneratorObject.LatticeCellSize = latticeCellSize;
+            base.OnDisable();
         }
+        // protected override void OnValidate()
+        // {
+        //     base.OnValidate();
+        //     NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+        //     noiseGeneratorObject.LatticeCellSize = latticeCellSize;
+        // }
     }
 }
