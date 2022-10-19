@@ -6,6 +6,12 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class RandomNoiseGenerator : AbstractNoiseGenerator
     {
+        /// <summary>
+        /// Constructs a RandomNoiseGenerator
+        /// </summary>
+        /// <param name="texWidth">The width of the generated texture</param>
+        /// <param name="texHeight">The height of the generated texture</param>
+        /// <param name="seed">The seed of the pseudo-random number generation</param>
         public RandomNoiseGenerator(uint texWidth, uint texHeight, uint seed) : base(texWidth, texHeight, seed) {
         }
 
