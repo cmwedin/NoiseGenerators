@@ -12,7 +12,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <param name="_texWidth">The width of the generated texture</param>
         /// <param name="_texHeight">The height of the generated texture</param>
         /// <param name="_seed">The seed for the pseudo-random number generation</param>
-        /// <param name="_latticeCellSize">The size in pixel </param>
+        /// <param name="_latticeCellSize">The size in pixels of a single cell in the lattice </param>
         /// <param name="_allowPartialCells">If the texture should be allowed to cut off lattice cells along the edge, defaults to false</param>
         public ValueNoiseGenerator(
             uint _texWidth,
