@@ -15,6 +15,9 @@ namespace SadSapphicGames.NoiseGenerators
             Vector2Int _latticeCellSize,
             bool _allowPartialCells = false
         ) : base(_texWidth, _texHeight, _seed) {
+            if(_allowPartialCells == true) {
+                RequireSeamlessTiling = false;
+            }
             AllowPartialCells = _allowPartialCells;
             LatticeCellSize = _latticeCellSize;
             latticeBuffer = new ComputeBuffer(latticeHeight * latticeWidth, LatticeBufferStride);
@@ -70,7 +73,24 @@ namespace SadSapphicGames.NoiseGenerators
                 } else {
                     allowPartialCells = value;
                 }
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
             } 
+        }
+        public override bool RequireSeamlessTiling { 
+            get => base.RequireSeamlessTiling;
+            set {
+                if(AllowPartialCells == true && value == true) {
+                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, set AllowPartialCells to false first");
+                    base.RequireSeamlessTiling = false;
+                } else {
+                    base.RequireSeamlessTiling = value;
+                }
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            }
         }
         private bool allowPartialCells;
         /// <summary>

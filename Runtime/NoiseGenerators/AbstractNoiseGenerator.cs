@@ -73,7 +73,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// If the texture should be required to tile seamlessly, defaults to true
         /// </summary>
-        public bool RequireSeamlessTiling {
+        public virtual bool RequireSeamlessTiling {
             get => requireSeamlessTiling;
             set {
                 requireSeamlessTiling = value;
