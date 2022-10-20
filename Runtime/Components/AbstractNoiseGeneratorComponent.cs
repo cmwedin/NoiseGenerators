@@ -81,12 +81,12 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGeneratorObject.Dispose();
         }
 
-        private void OnDestroy() {
-            this.Dispose();
-        }
-        protected virtual void OnDisable() {
-            this.Dispose();
-        }
+        // private void OnDestroy() {
+        //     this.Dispose();
+        // }
+        // protected virtual void OnDisable() {
+        //     this.Dispose();
+        // }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
