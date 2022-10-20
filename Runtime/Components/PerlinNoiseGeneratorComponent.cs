@@ -35,25 +35,5 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             disposedValue = false;
         }
-        // protected override void OnValidate()
-        // {
-        //     base.OnValidate();
-        //     noiseGeneratorObject.LatticeCellSize = latticeSize;
-        //     NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-        // }
-        // protected override void Dispose(bool disposing)
-        // {
-        //     if (!disposedValue)
-        //     {
-        //         Debug.Log("Disposing noise generator");
-        //         if (disposing)
-        //         {
-        //             // TODO: dispose managed state (managed objects)
-        //         }
-
-        //         noiseGeneratorObject.Dispose();
-        //         disposedValue = true;
-        //     }
-        // }
     }
 }

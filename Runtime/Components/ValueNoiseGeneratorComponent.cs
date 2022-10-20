@@ -32,15 +32,5 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             disposedValue = false;
         }
-        // protected override void OnDisable()
-        // {
-        //     base.OnDisable();
-        // }
-        // protected override void OnValidate()
-        // {
-        //     base.OnValidate();
-        //     NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-        //     noiseGeneratorObject.LatticeCellSize = latticeCellSize;
-        // }
     }
 }

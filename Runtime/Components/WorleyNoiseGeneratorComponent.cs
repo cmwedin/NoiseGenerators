@@ -45,17 +45,5 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGeneratorObject.InvertTexture = invertTexture;
             disposedValue = false;
         }
-        // protected override void OnDisable()
-        // {
-        //     base.OnDisable();
-        // }
-        // protected override void OnValidate()
-        // {
-        //     base.OnValidate();
-        //     noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-        //     noiseGeneratorObject.InvertTexture = invertTexture;
-        //     noiseGeneratorObject.CellCounts = cellCounts;
-        // }
-
     }
 }

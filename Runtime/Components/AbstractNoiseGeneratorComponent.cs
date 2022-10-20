@@ -52,11 +52,6 @@ namespace SadSapphicGames.NoiseGenerators
             //     GenerateTexture();
             // }
         }
-        // protected virtual void OnValidate() {
-        //     NoiseGeneratorObject.TexHeight = TexHeight;
-        //     NoiseGeneratorObject.TexWidth = TexWidth;
-        //     NoiseGeneratorObject.Seed = seed;
-        // }
 
         /// <summary>
         /// Displays the generated texture on the displayMeshRenderer if it is set
@@ -81,12 +76,6 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGeneratorObject.Dispose();
         }
 
-        // private void OnDestroy() {
-        //     this.Dispose();
-        // }
-        // protected virtual void OnDisable() {
-        //     this.Dispose();
-        // }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -110,7 +99,7 @@ namespace SadSapphicGames.NoiseGenerators
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: false);
         }
-
+// 
         /// <summary>
         /// Disposes the NoiseGeneratorObject used to create the noise texture and the texture itself. Do not invoke this until done using the texture
         /// </summary>
