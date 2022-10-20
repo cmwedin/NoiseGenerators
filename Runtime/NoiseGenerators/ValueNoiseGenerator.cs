@@ -6,6 +6,14 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class ValueNoiseGenerator : AbstractLatticeNoiseGenerator
     {
+        /// <summary>
+        /// Constructs a ValueNoiseGenerator
+        /// </summary>
+        /// <param name="_texWidth">The width of the generated texture</param>
+        /// <param name="_texHeight">The height of the generated texture</param>
+        /// <param name="_seed">The seed for the pseudo-random number generation</param>
+        /// <param name="_latticeCellSize">The size in pixels of a single cell in the lattice </param>
+        /// <param name="_allowPartialCells">If the texture should be allowed to cut off lattice cells along the edge, defaults to false</param>
         public ValueNoiseGenerator(
             uint _texWidth,
             uint _texHeight,
@@ -15,6 +23,9 @@ namespace SadSapphicGames.NoiseGenerators
         ) : base(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells) {
         }
 
+        /// <summary>
+        /// The memory size of an entry in the lattice buffer (four floats)
+        /// </summary>
         protected override int LatticeBufferStride => 4*sizeof(float);
 
         protected override string ComputeShaderPath => "Compute/ValueNoise";

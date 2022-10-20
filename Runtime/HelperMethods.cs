@@ -7,6 +7,11 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public static class HelperMethods
     {
+        /// <summary>
+        /// Calculates a the factors of a number O(sqrt(n)) time
+        /// </summary>
+        /// <param name="n">the number to calculate the factors of</param>
+        /// <returns>A list of the factors of n</returns>
         public static List<int> Factor(int n) {
             int max = (int)Math.Sqrt(n);
             List<int> factors = new List<int>();
@@ -14,13 +19,19 @@ namespace SadSapphicGames.NoiseGenerators
             for (int i = 1; i <= max; i++) {
                 if(n % i == 0) {
                     factors.Add(i);
-                    if(i != n/i) {
+                    if(i != max) {
                         factors.Add(n / i);
                     }
                 }
             }
             return factors;
         }
+        /// <summary>
+        /// Finds the closest factor of a number to a target number, up to O(sqrt(n)) time
+        /// </summary>
+        /// <param name="n">the number to find a factor of</param>
+        /// <param name="t">the target number to find a factor close to</param>
+        /// <returns>the closest factor of n to t</returns>
         public static int FindClosestFactor(int n, int t) {
             int max = (int)Math.Sqrt(n);
             int bestResult = 1;
@@ -59,23 +70,29 @@ namespace SadSapphicGames.NoiseGenerators
             }
             return bestResult;
         }
-        public static Vector2Int PartitionTexture(int textureWidth, int textureHeight, int partitionCount) {
-            var factors = Factor(partitionCount);
-            int xCount;
-            int yCount;
-            if(factors.Count % 2 != 0) { //? The partition count has an integer square root
-                xCount = yCount = factors[^1];
-            } else {
-                if(textureWidth >= textureHeight) {
-                    xCount = factors[^1];
-                    yCount = factors[^2];
-                } else {
-                    xCount = factors[^2];
-                    yCount = factors[^1];
-                }
-            }
-            return new Vector2Int(xCount,yCount);
-        }
+        // public static Vector2Int PartitionTexture(int textureWidth, int textureHeight, int partitionCount) {
+        //     var factors = Factor(partitionCount);
+        //     int xCount;
+        //     int yCount;
+        //     if(factors.Count % 2 != 0) { //? The partition count has an integer square root
+        //         xCount = yCount = factors[^1];
+        //     } else {
+        //         if(textureWidth >= textureHeight) {
+        //             xCount = factors[^1];
+        //             yCount = factors[^2];
+        //         } else {
+        //             xCount = factors[^2];
+        //             yCount = factors[^1];
+        //         }
+        //     }
+        //     return new Vector2Int(xCount,yCount);
+        // }
+        /// <summary>
+        /// Releases the resources of a render texture an recreates it with a new size
+        /// </summary>
+        /// <param name="renderTexture">the render texture to resize</param>
+        /// <param name="newTexWidth">the new width to use for the texture</param>
+        /// <param name="newTexHeight">the new height of the texture</param>
         public static void Resize(this RenderTexture renderTexture, int newTexWidth, int newTexHeight) {
             renderTexture.Release();
             renderTexture.width = newTexWidth;

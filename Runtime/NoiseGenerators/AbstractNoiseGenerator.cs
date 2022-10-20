@@ -3,9 +3,11 @@ using System;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// Base abstract class used for noise generators
+    /// </summary>
     public abstract class AbstractNoiseGenerator : IDisposable
     {
-
         protected AbstractNoiseGenerator(
             uint _texWidth,
             uint _texHeight,
@@ -23,18 +25,36 @@ namespace SadSapphicGames.NoiseGenerators
 
 //? compute shader fields
     //? Shader reference
+        /// <summary>
+        /// The compute shader used to generate the noise
+        /// </summary>
         private ComputeShader noiseGenShader;
+        /// <summary>
+        /// If the compute shader reference has never been set for this object loads it from the resource folder
+        /// </summary>
         protected ComputeShader NoiseGenShader { get {
             if(noiseGenShader == null) {
                 noiseGenShader = Resources.Load<ComputeShader>(ComputeShaderPath);
             }
             return noiseGenShader;
         }}
+        /// <summary>
+        /// The path in the resource folder to the compute shader
+        /// </summary>
         protected abstract string ComputeShaderPath { get; }
 
     //? Kernel and thread group info
+        /// <summary>
+        /// The kernel of the method to generate the texture in the compute shader
+        /// </summary>
         protected int generateTextureKernel { get => NoiseGenShader.FindKernel("CSMain"); }
+        /// <summary>
+        /// The number of threads per group in the compute shader
+        /// </summary>
         protected Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
+        /// <summary>
+        /// The number of thread groups used to generate the noise texture
+        /// </summary>
         protected Vector3Int texThreadGroupCount
         {
             get => new Vector3Int(
@@ -45,9 +65,15 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
 //? texture parameters
+        /// <summary>
+        /// If GenerateTexture() should be invoked every time a parameter is changed, defaults to false
+        /// </summary>
         public bool RegenerateTextureOnParamChange { get; set; }
-        private bool requireSeamlessTiling = true;
-        public bool RequireSeamlessTiling {
+
+        /// <summary>
+        /// If the texture should be required to tile seamlessly, defaults to true
+        /// </summary>
+        public virtual bool RequireSeamlessTiling {
             get => requireSeamlessTiling;
             set {
                 requireSeamlessTiling = value;
@@ -55,9 +81,12 @@ namespace SadSapphicGames.NoiseGenerators
                     GenerateTexture();
                 }
             }
-
         }
-        private uint texWidth = 256;
+        private bool requireSeamlessTiling = true;
+
+        /// <summary>
+        /// The pixel width of the texture
+        /// </summary>
         public uint TexWidth { 
             get => texWidth; 
             set {
@@ -69,7 +98,11 @@ namespace SadSapphicGames.NoiseGenerators
                 }
             }
         }
-        private uint texHeight = 256;
+        private uint texWidth = 256;
+
+        /// <summary>
+        /// The pixel height of the texture
+        /// </summary>
         public uint TexHeight { 
             get => texHeight; 
             set { 
@@ -79,8 +112,13 @@ namespace SadSapphicGames.NoiseGenerators
                 if(RegenerateTextureOnParamChange) {
                     GenerateTexture();
                 }
-            } }
-        private uint seed;
+            } 
+        }
+        private uint texHeight = 256;
+
+        /// <summary>
+        /// The seed for the pseudo-random number generator
+        /// </summary>
         public uint Seed { 
             get => seed;
             set { 
@@ -90,9 +128,17 @@ namespace SadSapphicGames.NoiseGenerators
                 }
             }
         }
-        protected RenderTexture noiseTexture;
-        public RenderTexture NoiseTexture { get => noiseTexture; }
+        private uint seed;
 
+        /// <summary>
+        /// The generated noise texture
+        /// </summary>
+        public RenderTexture NoiseTexture { get => noiseTexture; }
+        protected RenderTexture noiseTexture;
+
+        /// <summary>
+        /// Sets the parameters of the compute shader
+        /// </summary>
         protected virtual void SetShaderParameters() {
             // Debug.Log("Setting Shader Parameters");
             NoiseGenShader.SetInt("_Seed", (int)Seed);
@@ -100,6 +146,10 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGenShader.SetInt("_TexHeight", (int)TexHeight);
             NoiseGenShader.SetTexture(generateTextureKernel, "_NoiseTexture", noiseTexture);
         }
+
+        /// <summary>
+        /// Generates the texture
+        /// </summary>
         public abstract void GenerateTexture();
 
 
@@ -128,6 +178,9 @@ namespace SadSapphicGames.NoiseGenerators
             Dispose(disposing: false);
         }
 
+        /// <summary>
+        /// Disposes the resources used to generate the texture, but not the texture itself. Remember to dispose of that through its Release() method when finished using it
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

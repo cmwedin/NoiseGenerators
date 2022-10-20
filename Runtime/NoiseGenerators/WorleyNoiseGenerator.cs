@@ -3,10 +3,17 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    public enum TextureChannel {R,G,B,A,All}
 
     public class WorleyNoiseGenerator : AbstractNoiseGenerator
     {
+        /// <summary>
+        /// Constructs a WorleyNoiseGenerator
+        /// </summary>
+        /// <param name="_texWidth">The width of the generated texture</param>
+        /// <param name="_texHeight">The height of the generated texture</param>
+        /// <param name="_seed">The seed of the pseudo-random number generation</param>
+        /// <param name="_cellCount">The number of cells along each axis to place a point int</param>
+        /// <param name="_activeChannel">The channel to place the generated noise in, if TextureChannel.All generated a separate texture for each channel</param>
         public WorleyNoiseGenerator(
             uint _texWidth,
             uint _texHeight,
@@ -22,19 +29,41 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         protected override string ComputeShaderPath => "Compute/WorleyNoise";
+        /// <summary>
+        /// The kernel for the method to place the control points in the compute shader
+        /// </summary>
         private int GeneratePointsKernel => NoiseGenShader.FindKernel("GeneratePoints");
+        /// <summary>
+        /// The number of thread groups to use when placing the points
+        /// </summary>
         private Vector3Int PointThreadGroupCount { get => new Vector3Int(
             Mathf.CeilToInt((float)CellCounts.x/threadGroupSize.x),
             Mathf.CeilToInt((float)CellCounts.y/threadGroupSize.y),
             1
         );}
 
+        /// <summary>
+        /// The kernel for normalizing the values of the final texture
+        /// </summary>
         protected int NormalizeTextureKernel => NoiseGenShader.FindKernel("NormalizeTexture");
+        /// <summary>
+        /// The compute buffer for the positions of the control points
+        /// </summary>
         private ComputeBuffer pointsBuffer;
+        /// <summary>
+        /// The compute buffer for the minimum and maximum values placed on the texture (used in normalization)
+        /// </summary>
         private ComputeBuffer minMaxBuffer;
 
 //? Texture Parameters
+        /// <summary>
+        /// The channel the noise is being stored in
+        /// </summary>
         private TextureChannel activeChannel;
+
+        /// <summary>
+        /// converts the active channel into a vector4 with 1 in the active channel and 0 elsewhere
+        /// </summary>
         private Vector4 channelMask {
             get => new Vector4(
                     activeChannel == TextureChannel.R ? 1 : 0, 
@@ -43,9 +72,19 @@ namespace SadSapphicGames.NoiseGenerators
                     activeChannel == TextureChannel.A ? 1 : 0
                 );
         }
+        /// <summary>
+        /// Converts the channel mask into a number to bit-shift the seed by  
+        /// </summary>
         private int binChannelMask { get => (int)(channelMask.x * (2 ^ 0) + channelMask.y * (2 ^ 1) + channelMask.z * (2 ^ 2) + channelMask.w * (2 ^ 3)); }
+        
+        /// <summary>
+        /// If the values of the texture should be inverted so the are brighter close to the control points and dark far
+        /// </summary>
         public bool InvertTexture { get; set; }
-        private Vector2Int cellCounts;
+
+        /// <summary>
+        /// The number of cells along each axis to place a control point in
+        /// </summary>
         public Vector2Int CellCounts {
             get => cellCounts;
             set {
@@ -56,6 +95,8 @@ namespace SadSapphicGames.NoiseGenerators
                 cellCounts = value;
             }
         }
+        private Vector2Int cellCounts;
+
 
         protected override void SetShaderParameters()
         {

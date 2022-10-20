@@ -3,6 +3,9 @@ using System;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// Base abstract class used for noise generators that specifically use lattice based algorithms
+    /// </summary>
     public abstract class AbstractLatticeNoiseGenerator : AbstractNoiseGenerator
     {
         protected AbstractLatticeNoiseGenerator(
@@ -12,14 +15,26 @@ namespace SadSapphicGames.NoiseGenerators
             Vector2Int _latticeCellSize,
             bool _allowPartialCells = false
         ) : base(_texWidth, _texHeight, _seed) {
+            if(_allowPartialCells == true) {
+                RequireSeamlessTiling = false;
+            }
             AllowPartialCells = _allowPartialCells;
             LatticeCellSize = _latticeCellSize;
             latticeBuffer = new ComputeBuffer(latticeHeight * latticeWidth, LatticeBufferStride);
         }
 //? Compute shader fields
     //? Kernel and thread group info
+        /// <summary>
+        /// The kernel for the method in the compute shader to generate the lattice used for creating the noise texture
+        /// </summary>
         protected int generateLatticeKernel { get => NoiseGenShader.FindKernel("GenerateLattice"); }
+        /// <summary>
+        /// The kernel for the method in the compute shader to wrap the edges of the lattice around to each other to ensure seamless tiling
+        /// </summary>
         protected int wrapLatticeKernel { get => NoiseGenShader.FindKernel("WrapLattice"); }
+        /// <summary>
+        /// The number of thread groups to use when generating the lattice
+        /// </summary>
         protected Vector3Int latticeThreadGroupCount
         {
             get => new Vector3Int(
@@ -30,12 +45,57 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         //? Lattice Parameters
+        /// <summary>
+        /// The compute buffer the lattice is stored in
+        /// </summary>
         private ComputeBuffer latticeBuffer;
+        /// <summary>
+        /// The memory size of a single entry in the lattice buffer
+        /// </summary>
         protected abstract int LatticeBufferStride { get; }
+        /// <summary>
+        /// The number of points wide the lattice is
+        /// </summary>
         private int latticeWidth { get => Mathf.CeilToInt((float)TexWidth / (float)LatticeCellSize.x)+1; }
+        /// <summary>
+        /// The number of points tall the lattice is
+        /// </summary>
         private int latticeHeight { get => Mathf.CeilToInt((float)TexHeight / (float)LatticeCellSize.y)+1; }
-        public bool AllowPartialCells { get; set; }
-        private Vector2Int latticeCellSize;
+        /// <summary>
+        /// If the texture should be allowed to cut off the lattice cells along the edges, cannot be set to true if RequireSeamlessTiling is
+        /// </summary>
+        public bool AllowPartialCells { 
+            get => allowPartialCells; 
+            set {
+                if(RequireSeamlessTiling == true && value == true) {
+                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, set RequireSeamlessTiling to false first");
+                    allowPartialCells = false;
+                } else {
+                    allowPartialCells = value;
+                }
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            } 
+        }
+        public override bool RequireSeamlessTiling { 
+            get => base.RequireSeamlessTiling;
+            set {
+                if(AllowPartialCells == true && value == true) {
+                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, set AllowPartialCells to false first");
+                    base.RequireSeamlessTiling = false;
+                } else {
+                    base.RequireSeamlessTiling = value;
+                }
+                if(RegenerateTextureOnParamChange) {
+                    GenerateTexture();
+                }
+            }
+        }
+        private bool allowPartialCells;
+        /// <summary>
+        ///  The size in pixels of a single lattice cells, unless AllowPartialCells is set to true must be a factor of the texture size (the value will be adjust to the nearest factor automatically)
+        /// </summary>
         public Vector2Int LatticeCellSize {
             get => latticeCellSize;
             set {
@@ -67,6 +127,8 @@ namespace SadSapphicGames.NoiseGenerators
                 }
             }
         }
+        private Vector2Int latticeCellSize;
+
 
 //? Overrides 
     //? Compute Shader Methods

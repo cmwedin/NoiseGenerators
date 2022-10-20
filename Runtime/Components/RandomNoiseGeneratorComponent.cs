@@ -14,6 +14,9 @@ namespace SadSapphicGames.NoiseGenerators
             return noiseGeneratorObject; 
         } }
 
+        /// <summary>
+        /// Constructs a RandomNoiseGenerator object
+        /// </summary>
         protected override void CreateGeneratorObject()
         {
             if(noiseGeneratorObject != null) {
@@ -21,10 +24,6 @@ namespace SadSapphicGames.NoiseGenerators
             }
             noiseGeneratorObject = new RandomNoiseGenerator(TexWidth, TexHeight, seed);
             disposedValue = false;
-        }
-        protected override void OnDisable()
-        {
-            base.OnDisable();
         }
     }
 }
