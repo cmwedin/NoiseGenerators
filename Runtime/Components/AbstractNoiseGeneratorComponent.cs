@@ -7,18 +7,39 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour, IDisposable
     {
+        /// <summary>
+        /// The object that generates the noise texture
+        /// </summary>
         protected abstract AbstractNoiseGenerator NoiseGeneratorObject { get; }
+        /// <summary>
+        /// Constructs the generator object and sets its parameters
+        /// </summary>
         protected abstract void CreateGeneratorObject();
-        [SerializeField] RenderTexture noiseTexture;
+        /// <summary>
+        /// The noise texture created by the generator
+        /// </summary>
         public RenderTexture NoiseTexture => noiseTexture;
-        [SerializeField] protected MeshRenderer displayMeshRenderer;
-        [SerializeField] protected uint seed;
-        [SerializeField] protected uint texWidth;
+        [SerializeField, Tooltip("The noise texture created by the generator")] RenderTexture noiseTexture;
+        /// <summary>
+        /// The MeshRenderer the texture will optionally be displayed on
+        /// </summary>
+        [SerializeField,Tooltip("The MeshRenderer the texture will optionally be displayed on (can be left empty)")] protected MeshRenderer displayMeshRenderer;
+        /// <summary>
+        /// The seed that will be used in the pseudo-random number generation
+        /// </summary>
+        [SerializeField,Tooltip("The seed that will be used in the pseudo-random number generation")] protected uint seed;
+        /// <summary>
+        /// The Width of the generated texture
+        /// </summary>
         public uint TexWidth { get => texWidth; }
-        [SerializeField] protected uint texHeight;
+        [SerializeField,Tooltip("The Width of the generated texture")] protected uint texWidth;
+        /// <summary>
+        /// The height of the generated texture
+        /// </summary>
         public uint TexHeight { get => texHeight; }
+        [SerializeField, Tooltip("The height of the generated texture")] protected uint texHeight;
 
-        [SerializeField,Tooltip("increments the seed and regenerates the texture every frame to test generation speed and memory uses")] protected bool cycleTextureSeed;
+        // [SerializeField,Tooltip("increments the seed and regenerates the texture every frame to test generation speed and memory uses")] protected bool cycleTextureSeed;
         protected bool disposedValue;
 
         // Start is called before the first frame update
@@ -26,10 +47,10 @@ namespace SadSapphicGames.NoiseGenerators
         // Update is called once per frame
         void Update()
         {
-            if(cycleTextureSeed) {
-                seed++;
-                GenerateTexture();
-            }
+            // if(cycleTextureSeed) {
+            //     seed++;
+            //     GenerateTexture();
+            // }
         }
         // protected virtual void OnValidate() {
         //     NoiseGeneratorObject.TexHeight = TexHeight;
@@ -37,12 +58,18 @@ namespace SadSapphicGames.NoiseGenerators
         //     NoiseGeneratorObject.Seed = seed;
         // }
 
+        /// <summary>
+        /// Displays the generated texture on the displayMeshRenderer if it is set
+        /// </summary>
         protected virtual void DisplayTexture() {
             if (displayMeshRenderer != null) {
                 displayMeshRenderer.sharedMaterial.mainTexture = NoiseTexture;
             }
         }
 
+        /// <summary>
+        /// Generates the noise texture
+        /// </summary>
         public void GenerateTexture() {
             noiseTexture?.Release();
             CreateGeneratorObject();
@@ -72,6 +99,7 @@ namespace SadSapphicGames.NoiseGenerators
 
                 NoiseGeneratorObject.Dispose();
                 noiseTexture?.Release();
+                noiseTexture = null;
                 disposedValue = true;
             }
         }
@@ -83,6 +111,9 @@ namespace SadSapphicGames.NoiseGenerators
             Dispose(disposing: false);
         }
 
+        /// <summary>
+        /// Disposes the NoiseGeneratorObject used to create the noise texture and the texture itself. Do not invoke this until done using the texture
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
