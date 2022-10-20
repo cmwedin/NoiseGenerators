@@ -21,6 +21,9 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         [SerializeField,Tooltip("The pixel size of a single lattice cell")] private Vector2Int latticeCellSize;
 
+        /// <summary>
+        /// Creates a ValueNoiseGeneratorObject and sets its RequireSeamlessTiling property
+        /// </summary>
         protected override void CreateGeneratorObject() {
             if(noiseGeneratorObject != null) {
                 noiseGeneratorObject.Dispose();
