@@ -11,9 +11,10 @@ namespace SadSapphicGames.NoiseGenerators {
         private AbstractNoiseGenerator baseNoiseGenerator;
         protected int normalizeTextureKernel => NoiseGenShader.FindKernel("NormalizeTexture");
         private ComputeBuffer minMaxBuffer;
+        private bool usePreGeneratedTexture = false;
 
-//? Texture Parameters
-    //? override
+        //? Texture Parameters
+        //? override
         public override bool RequireSeamlessTiling {
             get => true;
             set { 
@@ -21,11 +22,29 @@ namespace SadSapphicGames.NoiseGenerators {
                     Debug.LogWarning("Fractal noise textures must tile seamlessly");
                     value = true;
                 }
-                baseNoiseGenerator.RequireSeamlessTiling = value; 
+                base.RequireSeamlessTiling = value; 
             }
         }
 
         //? fractal noise parameters
+        private RenderTexture inputTexture;
+        private RenderTexture InputTexture {
+            get {
+                if(inputTexture == null) {
+                    if (!usePreGeneratedTexture)
+                    {
+                        baseNoiseGenerator.GenerateTexture();
+                        inputTexture = baseNoiseGenerator.NoiseTexture;
+                    } else {
+                        throw new MissingReferenceException("This generator is supposed to be using a pregenerated texture however its input texture is null");
+                    }
+                }
+                return inputTexture;
+            } set {
+                inputTexture = value;
+            }
+        }
+
         private uint octaves;
         public uint Octaves { get => octaves; set => octaves = value; }
 
@@ -72,6 +91,30 @@ namespace SadSapphicGames.NoiseGenerators {
                 Amplitude = _amplitude;
             }
         }
+        public FractalNoiseGenerator(
+            uint _octaves,
+            RenderTexture _inputTexture,
+            float _lacunarity = 2,
+            float _frequency = 1,
+            float _gain = .5f,
+            float _amplitude = .5f
+        ) : base((uint)_inputTexture.width, (uint)_inputTexture.height,0) {
+            usePreGeneratedTexture = true;
+            InputTexture = _inputTexture;
+            RequireSeamlessTiling = true;
+            minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
+            minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
+            Octaves = _octaves;
+            Lacunarity = _lacunarity;
+            Frequency = _frequency;
+            Gain = _gain;
+            if(_amplitude != .5f) { //? if they want to use a non-standard amplitude set NormalizeAmplitude to false so its affect is apparent;
+                amplitude = _amplitude;
+            } else {
+                NormalizeAmplitude = false;
+                Amplitude = _amplitude;
+            }
+        }
 
         protected override void SetShaderParameters()
         {
@@ -83,7 +126,7 @@ namespace SadSapphicGames.NoiseGenerators {
             NoiseGenShader.SetFloat("_Amplitude", amplitude);
             NoiseGenShader.SetBool("_NormalizeAmplitude", NormalizeAmplitude);
             NoiseGenShader.SetBuffer(generateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
-            NoiseGenShader.SetTexture(generateTextureKernel, "_InNoiseTexture", baseNoiseGenerator.NoiseTexture);
+            NoiseGenShader.SetTexture(generateTextureKernel, "_InNoiseTexture", InputTexture);
             NoiseGenShader.SetTexture(generateTextureKernel, "_OutNoiseTexture", noiseTexture);
             NoiseGenShader.SetBuffer(normalizeTextureKernel,"_MinMaxBuffer", minMaxBuffer);
             NoiseGenShader.SetTexture(normalizeTextureKernel, "_OutNoiseTexture", noiseTexture);
@@ -91,7 +134,6 @@ namespace SadSapphicGames.NoiseGenerators {
 
         public override void GenerateTexture()
         {
-            baseNoiseGenerator.GenerateTexture();
             SetShaderParameters();
             NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             NoiseGenShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
@@ -100,7 +142,7 @@ namespace SadSapphicGames.NoiseGenerators {
 
         protected override void Dispose(bool disposing)
         {
-            baseNoiseGenerator.Dispose();
+            baseNoiseGenerator?.Dispose();
             minMaxBuffer?.Dispose();
             minMaxBuffer = null;
             base.Dispose(disposing);
