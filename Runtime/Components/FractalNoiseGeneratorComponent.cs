@@ -6,20 +6,42 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class FractalNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
+        /// <summary>
+        /// The base noise generator for creating the input texture to the fractal noise generator
+        /// </summary>
         [SerializeField] private AbstractNoiseGeneratorComponent baseNoiseGenerator;
 
-        // [SerializeField] private MeshRenderer textureDisplay;
-
-        private FractalNoiseGenerator noiseGeneratorObject;
+        /// <summary>
+        /// The object that generates the fractal noise texture
+        /// </summary>
         protected override AbstractNoiseGenerator NoiseGeneratorObject => noiseGeneratorObject;
+        private FractalNoiseGenerator noiseGeneratorObject;
 
-        [SerializeField] private uint octaves;
-        [SerializeField] private float lacunarity = 2;
-        [SerializeField] private float frequency = 2;
+        /// <summary>
+        /// The number of times detail should be added onto the noise texture
+        /// </summary>
+        [SerializeField,Tooltip("The number of times detail should be added onto the noise texture")] private uint octaves;
+        /// <summary>
+        /// The factor by which the frequency should increase with each octave
+        /// </summary>
+        [SerializeField,Tooltip("The factor by which the frequency should increase with each octave")] private float lacunarity = 2;
+        /// <summary>
+        /// The initial frequency in the first octave
+        /// </summary>
+        [SerializeField,Tooltip("The initial frequency in the first octave")] private float frequency = 2;
 
-        [SerializeField] private float gain = .5f;
+        /// <summary>
+        /// The factor by which the amplitude should decrease each octave
+        /// </summary>
+        [SerializeField,Tooltip("The factor by which the amplitude should decrease each octave")] private float gain = .5f;
+        /// <summary>
+        /// The initial amplitude in the first octaves, changing this has no affect is normalizeAmplitude is true
+        /// </summary>
         [SerializeField] private float amplitude = .5f;
-        [SerializeField] private bool normalizeAmplitude = true;
+        /// <summary>
+        /// If the affect of the initial amplitude should be normalized out of the final value
+        /// </summary>
+        [SerializeField,Tooltip("If the affect of the initial amplitude should be normalized out of the final value")] private bool normalizeAmplitude = true;
 
         protected override void CreateGeneratorObject()
         {
