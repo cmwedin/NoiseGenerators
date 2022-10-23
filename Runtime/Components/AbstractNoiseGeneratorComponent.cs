@@ -18,7 +18,13 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The noise texture created by the generator
         /// </summary>
-        public RenderTexture NoiseTexture => noiseTexture;
+        public RenderTexture NoiseTexture  { get {
+                if( noiseTexture == null) {
+                    GenerateTexture();
+                }
+                return noiseTexture;
+            }
+        }
         [SerializeField, Tooltip("The noise texture created by the generator")] RenderTexture noiseTexture;
         /// <summary>
         /// The MeshRenderer the texture will optionally be displayed on
@@ -27,16 +33,23 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The seed that will be used in the pseudo-random number generation
         /// </summary>
+        public uint Seed { get => seed; set => seed = value; }
         [SerializeField,Tooltip("The seed that will be used in the pseudo-random number generation")] protected uint seed;
         /// <summary>
         /// The Width of the generated texture
         /// </summary>
-        public uint TexWidth { get => texWidth; }
+        public uint TexWidth { get => texWidth; set {
+                if (value == 0) { value++; }
+                texWidth = value;
+        }}
         [SerializeField,Tooltip("The Width of the generated texture")] protected uint texWidth;
         /// <summary>
         /// The height of the generated texture
         /// </summary>
-        public uint TexHeight { get => texHeight; }
+        public uint TexHeight { get => texHeight; set {
+                if (value == 0) { value++; }
+                texHeight = value;
+        }}
         [SerializeField, Tooltip("The height of the generated texture")] protected uint texHeight;
 
         // [SerializeField,Tooltip("increments the seed and regenerates the texture every frame to test generation speed and memory uses")] protected bool cycleTextureSeed;
