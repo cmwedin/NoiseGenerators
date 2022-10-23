@@ -1,6 +1,19 @@
 # Noise Generators
 This package is a collection of compute shaders that can generate various types of noise textures. This README is currently a placeholder and will be update as development continues
 
+# Using This Package
+There are multiple supported ways to use this package to generate a random noise texture. The first step is to determine what type of noise texture you want to generate. The different types of noise textures supported are discussed [bellow](#random-noise-texture). Once you have determined the appropriate noise texture for your purpose, you can use one of the following methods to create it
+
+## Using a generator object
+This method is recommended for creating a noise texture from a script. You can instantiate the generator object for the type of texture you want to generate using its constructor. You will provide arguments to the constructor to set parameters of the texture such as the random number seed and the texture size. Some types of textures may also require other parameters such as lattice cell size or number of control points. You can also modify other parameters of the texture such as wether it will be required to tile seamlessly through the properties of the generator object. Once you have the parameters set appropriately you can generate the texture using the `GenerateTexture()` method and access it from the `NoiseTexture` property. If you will not need to regenerate the texture you can at this point dispose of noise generator object using its `Dispose()` method, which will release any unmanaged resources the object uses (such as its compute shader buffers). Not that this will not release the unmanaged resources of the texture itself, which you will need to do yourself once done using it through the `RenderTexture.Release()` method. 
+
+## Using a monobehaviour component
+## Using a static method
+This method is planed to be supported in version 0.6.2
+
+## Creating the texture as an asset using editor tools
+This method is planed to be supported in version 1.1.0
+
 # Psuedo-Random Number generation approach
 
 This package uses a "permuted congruential generator" (more commonly known as PCG) algorithm  as it lies on the pareto-fronter of random quality vs preformance (see [Hash Functions for GPU Rendering](https://jcgt.org/published/0009/03/02/)). The particular PCG procedure this package uses is: 
