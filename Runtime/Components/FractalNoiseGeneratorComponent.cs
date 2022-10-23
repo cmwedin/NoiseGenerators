@@ -82,6 +82,7 @@ namespace SadSapphicGames.NoiseGenerators
             noiseTexture = new RenderTexture((int)texWidth, (int)texHeight, 24);
             noiseTexture.enableRandomWrite = true;
             noiseTexture.Create();
+            noiseTexture.wrapMode = TextureWrapMode.Repeat;
             minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
             minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
             SetShaderParameters();
