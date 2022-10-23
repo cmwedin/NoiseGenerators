@@ -8,15 +8,16 @@ There are multiple supported ways to use this package to generate a random noise
 This method is recommended for creating a noise texture from a script. You can instantiate the generator object for the type of texture you want to generate using its constructor. You will provide arguments to the constructor to set parameters of the texture such as the random number seed and the texture size. Some types of textures may also require other parameters such as lattice cell size or number of control points. You can also modify other parameters of the texture such as wether it will be required to tile seamlessly through the properties of the generator object. Once you have the parameters set appropriately you can generate the texture using the `GenerateTexture()` method and access it from the `NoiseTexture` property. If you will not need to regenerate the texture you can at this point dispose of noise generator object using its `Dispose()` method, which will release any unmanaged resources the object uses (such as its compute shader buffers). Not that this will not release the unmanaged resources of the texture itself, which you will need to do yourself once done using it through the `RenderTexture.Release()` method. 
 
 ## Using a monobehaviour component
+If would prefer to generate noise texture using monobehaviour components this is supported as well. To do so attach the component appropriate for the type of noise you want to generate to a game object. You can modify the parameters for the generated textures using the editor fields of this component. This parameters can be modified through code as well; however, because properties cannot be serialized for modification in the unity editor, when setting the properties in the editor you are modifying the backing field directly, and when modifying them from code you are using the public properties (this distinction isn't especially relevant as all of these parameters, regardless of where they where modified from, will eventually be passed into the generator object's public property fields, where the values will be validated). Once the texture is generated the component will create the appropriate generator object with the parameters provided, generate its texture, then dispose of it. This texture can be accessed through the `NoiseTexture` property, which will invoke the `GenerateTexture()` method itself if the backing noise texture has not been set yet. Once done with the texture you can invoke the components `Dispose()` method which will release the resources of the noise texture and set it back to null, as well as releasing the resources of the generator object as a precautionary measure, although it should have already been disposed of.
 ## Using a static method
-This method is planed to be supported in version 0.6.2
+This method is planed to be supported in version 0.6.3
 
 ## Creating the texture as an asset using editor tools
-This method is planed to be supported in version 1.1.0
+The editor tools supporting this method of generating noise texture are planed to be implemented in version 1.1.0
 
-# Psuedo-Random Number generation approach
+# Pseudo-Random Number generation approach
 
-This package uses a "permuted congruential generator" (more commonly known as PCG) algorithm  as it lies on the pareto-fronter of random quality vs preformance (see [Hash Functions for GPU Rendering](https://jcgt.org/published/0009/03/02/)). The particular PCG procedure this package uses is: 
+This package uses a "permuted congruential generator" (more commonly known as PCG) algorithm  as it lies on the pareto-fronter of random quality vs performance (see [Hash Functions for GPU Rendering](https://jcgt.org/published/0009/03/02/)). The particular PCG procedure this package uses is (as implemented in HLSL): 
 
     uint pcg_hash(uint seed) {
         seed = seed * 747796405u + 2891336453u;
