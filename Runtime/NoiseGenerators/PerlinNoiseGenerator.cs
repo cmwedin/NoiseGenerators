@@ -37,5 +37,25 @@ namespace SadSapphicGames.NoiseGenerators
             }
             NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
         }
+
+        public static RenderTexture GenerateTexture(
+            uint _texWidth,
+            uint _texHeight,
+            uint _seed,
+            Vector2Int _latticeCellSize,
+            bool _requireSeamlessTiling = true,
+            bool _allowPartialCells = false
+        ) {
+            if(_allowPartialCells && _requireSeamlessTiling) {
+                Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, setting seamless tiling to false");
+                _requireSeamlessTiling = false;
+            }
+            PerlinNoiseGenerator generator = new PerlinNoiseGenerator(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells);
+            generator.RequireSeamlessTiling = _requireSeamlessTiling;
+            generator.GenerateTexture();
+            RenderTexture output = generator.NoiseTexture;
+            generator.Dispose();
+            return output;
+        }
     }
 }
