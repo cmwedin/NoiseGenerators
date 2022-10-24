@@ -43,9 +43,8 @@ namespace SadSapphicGames.NoiseGenerators
             uint _texHeight,
             uint _seed,
             Vector2Int _latticeCellSize,
-            bool _requireSeamlessTiling = true,
-            bool _allowPartialCells = false
-        ) {
+            bool _allowPartialCells = false,
+            bool _requireSeamlessTiling = true        ) {
             if(_allowPartialCells && _requireSeamlessTiling) {
                 Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, setting seamless tiling to false");
                 _requireSeamlessTiling = false;
