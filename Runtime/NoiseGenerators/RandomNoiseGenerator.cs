@@ -22,5 +22,12 @@ namespace SadSapphicGames.NoiseGenerators
             // Debug.Log("Dispatching NoiseGen compute shader");
             NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
         }
+        public static RenderTexture GenerateTexture(uint _texWidth, uint _texHeight, uint _seed) {
+            RandomNoiseGenerator generator = new RandomNoiseGenerator(_texWidth, _texHeight, _seed);
+            generator.GenerateTexture();
+            RenderTexture output = generator.NoiseTexture;
+            generator.Dispose();
+            return output;
+        }
     }
 }
