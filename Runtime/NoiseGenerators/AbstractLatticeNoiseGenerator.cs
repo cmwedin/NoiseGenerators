@@ -68,8 +68,9 @@ namespace SadSapphicGames.NoiseGenerators
             get => allowPartialCells; 
             set {
                 if(RequireSeamlessTiling == true && value == true) {
-                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, set RequireSeamlessTiling to false first");
-                    allowPartialCells = false;
+                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, setting RequireSeamlessTiling to false");
+                    base.RequireSeamlessTiling = false;
+                    allowPartialCells = value;
                 } else {
                     allowPartialCells = value;
                 }
@@ -81,9 +82,10 @@ namespace SadSapphicGames.NoiseGenerators
         public override bool RequireSeamlessTiling { 
             get => base.RequireSeamlessTiling;
             set {
-                if(AllowPartialCells == true && value == true) {
-                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, set AllowPartialCells to false first");
-                    base.RequireSeamlessTiling = false;
+                if(AllowPartialCells && value) {
+                    Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, setting AllowPartialCells to false");
+                    AllowPartialCells = false;
+                    base.RequireSeamlessTiling = value;
                 } else {
                     base.RequireSeamlessTiling = value;
                 }
