@@ -182,6 +182,20 @@ namespace SadSapphicGames.NoiseGenerators {
             NoiseGenShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             minMaxBuffer.Dispose();
         }
+        public static RenderTexture GenerateTexture(
+            uint _octaves,
+            RenderTexture _inputTexture,
+            float _lacunarity = 2,
+            float _frequency = 1,
+            float _gain = 0.5f,
+            float _amplitude = 0.5f
+        ) {
+            FractalNoiseGenerator generator = new FractalNoiseGenerator(_octaves, _inputTexture, _lacunarity, _frequency, _gain, _amplitude);
+            generator.GenerateTexture();
+            RenderTexture output = generator.NoiseTexture;
+            generator.Dispose();
+            return output;
+        }
 
         protected override void Dispose(bool disposing)
         {
