@@ -22,6 +22,14 @@ namespace SadSapphicGames.NoiseGenerators
             // Debug.Log("Dispatching NoiseGen compute shader");
             NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
         }
+        /// <summary>
+        /// Generates a random noise texture using the provided parameters
+        /// </summary>
+        /// <param name="_texWidth">the width of the generated texture</param>
+        /// <param name="_texHeight">the height of the generated texture</param>
+        /// <param name="_seed">the seed of the pseudo-random number generation</param>
+        /// <param name="_requireSeamlessTiling">If the texture should tile seamlessly</param>
+        /// <returns>the generated texture</returns>
         public static RenderTexture GenerateTexture(uint _texWidth, uint _texHeight, uint _seed, bool _requireSeamlessTiling = true) {
             RandomNoiseGenerator generator = new RandomNoiseGenerator(_texWidth, _texHeight, _seed);
             generator.RequireSeamlessTiling = _requireSeamlessTiling;

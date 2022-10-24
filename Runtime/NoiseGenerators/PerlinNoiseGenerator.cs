@@ -38,6 +38,16 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
         }
 
+        /// <summary>
+        /// Generates a perlin noise texture using the given parameters
+        /// </summary>
+        /// <param name="_texWidth">the width of the texture</param>
+        /// <param name="_texHeight">the height of the texture</param>
+        /// <param name="_seed">the seed for the pseudo random number generator</param>
+        /// <param name="_latticeCellSize">the size in pixels of a single cell in the lattice</param>
+        /// <param name="_allowPartialCells">if the texture should be allowed to cut off lattice cells</param>
+        /// <param name="_requireSeamlessTiling">if the texture should tile seamlessly</param>
+        /// <returns>the generated noise texture</returns>
         public static RenderTexture GenerateTexture(
             uint _texWidth,
             uint _texHeight,

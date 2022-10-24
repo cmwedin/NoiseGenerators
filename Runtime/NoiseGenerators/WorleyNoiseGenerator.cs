@@ -137,6 +137,17 @@ namespace SadSapphicGames.NoiseGenerators
             pointsBuffer.Release();
             minMaxBuffer.Release();
         }
+        /// <summary>
+        /// Generates a Worley noise texture using the given parameters
+        /// </summary>
+        /// <param name="_texWidth">the width of the texture</param>
+        /// <param name="_texHeight">the height of the texture</param>
+        /// <param name="_seed">the seed of the pseudo-random number generation</param>
+        /// <param name="_cellCount">the number of cells to place a point in along each axis</param>
+        /// <param name="_activeChannel">the channel to store the texture in, if TextureChannel.All each channel will store a different texture</param>
+        /// <param name="_requireSeamlessTiling">if the texture should tile seamlessly</param>
+        /// <param name="_invertTexture">if the values of the texture should be inverted</param>
+        /// <returns></returns>
         public static RenderTexture GenerateTexture( 
             uint _texWidth,
             uint _texHeight,
