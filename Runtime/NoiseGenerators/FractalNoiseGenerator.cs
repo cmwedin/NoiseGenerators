@@ -182,6 +182,30 @@ namespace SadSapphicGames.NoiseGenerators {
             NoiseGenShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             minMaxBuffer.Dispose();
         }
+        /// <summary>
+        /// Generates a fractal noise texture using the given input texture and parameters
+        /// </summary>
+        /// <param name="_octaves">The number of times detail will be added onto the final texture</param>
+        /// <param name="_inputTexture">The input texture used to layer detail onto the final result</param>
+        /// <param name="_lacunarity">The factor by which the frequency should increase with each octave</param>
+        /// <param name="_frequency">The initial frequency in the first octave</param>
+        /// <param name="_gain">The factor by which the amplitude should decrease each octave</param>
+        /// <param name="_amplitude">The initial amplitude in the first octaves</param>
+        /// <returns>The generated noise texture</returns>
+        public static RenderTexture GenerateTexture(
+            uint _octaves,
+            RenderTexture _inputTexture,
+            float _lacunarity = 2,
+            float _frequency = 1,
+            float _gain = 0.5f,
+            float _amplitude = 0.5f
+        ) {
+            FractalNoiseGenerator generator = new FractalNoiseGenerator(_octaves, _inputTexture, _lacunarity, _frequency, _gain, _amplitude);
+            generator.GenerateTexture();
+            RenderTexture output = generator.NoiseTexture;
+            generator.Dispose();
+            return output;
+        }
 
         protected override void Dispose(bool disposing)
         {

@@ -37,5 +37,34 @@ namespace SadSapphicGames.NoiseGenerators
             }
             NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
         }
+
+        /// <summary>
+        /// Generates a perlin noise texture using the given parameters
+        /// </summary>
+        /// <param name="_texWidth">the width of the texture</param>
+        /// <param name="_texHeight">the height of the texture</param>
+        /// <param name="_seed">the seed for the pseudo random number generator</param>
+        /// <param name="_latticeCellSize">the size in pixels of a single cell in the lattice</param>
+        /// <param name="_allowPartialCells">if the texture should be allowed to cut off lattice cells</param>
+        /// <param name="_requireSeamlessTiling">if the texture should tile seamlessly</param>
+        /// <returns>the generated noise texture</returns>
+        public static RenderTexture GenerateTexture(
+            uint _texWidth,
+            uint _texHeight,
+            uint _seed,
+            Vector2Int _latticeCellSize,
+            bool _allowPartialCells = false,
+            bool _requireSeamlessTiling = true        ) {
+            if(_allowPartialCells && _requireSeamlessTiling) {
+                Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, setting seamless tiling to false");
+                _requireSeamlessTiling = false;
+            }
+            PerlinNoiseGenerator generator = new PerlinNoiseGenerator(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells);
+            generator.RequireSeamlessTiling = _requireSeamlessTiling;
+            generator.GenerateTexture();
+            RenderTexture output = generator.NoiseTexture;
+            generator.Dispose();
+            return output;
+        }
     }
 }
