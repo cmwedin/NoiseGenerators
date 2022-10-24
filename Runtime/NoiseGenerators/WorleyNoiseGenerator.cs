@@ -137,6 +137,23 @@ namespace SadSapphicGames.NoiseGenerators
             pointsBuffer.Release();
             minMaxBuffer.Release();
         }
+        public static RenderTexture GenerateTexture( 
+            uint _texWidth,
+            uint _texHeight,
+            uint _seed,
+            Vector2Int _cellCount,
+            TextureChannel _activeChannel,
+            bool _requireSeamlessTiling = false,
+            bool _invertTexture = false
+        ) {
+            WorleyNoiseGenerator generator = new WorleyNoiseGenerator(_texWidth, _texHeight, _seed, _cellCount, _activeChannel);
+            generator.RequireSeamlessTiling = _requireSeamlessTiling;
+            generator.InvertTexture = _invertTexture;
+            generator.GenerateTexture();
+            RenderTexture output = generator.NoiseTexture;
+            generator.Dispose();
+            return output;
+        }
 
         private bool disposedValue = false;
         protected override void Dispose(bool disposing)
