@@ -5,15 +5,20 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-    [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter)), ExecuteInEditMode]
     public class NoiseTextureDisplay : MonoBehaviour
     {
         [SerializeField] AbstractNoiseGeneratorComponent textureGenerator;
 
+        private void OnEnable() {
+            GetComponent<MeshRenderer>().material = new Material(Shader.Find("Unlit/Texture"));
+            var tmpGO = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            GetComponent<MeshFilter>().sharedMesh = tmpGO.GetComponent<MeshFilter>().sharedMesh;
+            DestroyImmediate(tmpGO);
+        }
         private void OnValidate() {
             if (textureGenerator != null)
             {
-                Debug.Log("Setting texture display event");
                 textureGenerator.GeneratedTexture += () =>
                 {
                     if (Application.isPlaying)
