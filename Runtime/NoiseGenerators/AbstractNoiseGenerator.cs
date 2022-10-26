@@ -136,6 +136,9 @@ namespace SadSapphicGames.NoiseGenerators
         public RenderTexture NoiseTexture { get => noiseTexture; }
         protected RenderTexture noiseTexture;
 
+//? Events
+        public event Action OnTextureGeneration;
+
 //? Methods
         /// <summary>
         /// Sets the parameters of the compute shader
@@ -158,6 +161,7 @@ namespace SadSapphicGames.NoiseGenerators
         public void GenerateTexture() {
             SetShaderParameters();
             InnerGenerateTexture();
+            OnTextureGeneration?.Invoke();
         }
 
 
