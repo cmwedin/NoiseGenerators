@@ -175,7 +175,7 @@ namespace SadSapphicGames.NoiseGenerators {
             NoiseGenShader.SetTexture(normalizeTextureKernel, "_OutNoiseTexture", noiseTexture);
         }
 
-        public override void GenerateTexture()
+        protected override void InnerGenerateTexture()
         {
             SetShaderParameters();
             NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);

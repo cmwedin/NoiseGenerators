@@ -17,8 +17,8 @@ namespace SadSapphicGames.NoiseGenerators
 
         protected override string ComputeShaderPath => "Compute/RandomNoise";
 
-        public override void GenerateTexture() {
-            SetShaderParameters();
+        protected override void InnerGenerateTexture() {
+            // SetShaderParameters();
             // Debug.Log("Dispatching NoiseGen compute shader");
             NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
         }
