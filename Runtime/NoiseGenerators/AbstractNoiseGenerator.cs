@@ -136,6 +136,7 @@ namespace SadSapphicGames.NoiseGenerators
         public RenderTexture NoiseTexture { get => noiseTexture; }
         protected RenderTexture noiseTexture;
 
+//? Methods
         /// <summary>
         /// Sets the parameters of the compute shader
         /// </summary>
@@ -148,9 +149,16 @@ namespace SadSapphicGames.NoiseGenerators
         }
 
         /// <summary>
-        /// Generates the texture
+        /// The inner implementation of generated the noise texture
         /// </summary>
-        public abstract void GenerateTexture();
+        protected abstract void InnerGenerateTexture();
+        /// <summary>
+        /// Generates the noise texture
+        /// </summary>
+        public void GenerateTexture() {
+            SetShaderParameters();
+            InnerGenerateTexture();
+        }
 
 
 //? IDisposable implementation

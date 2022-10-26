@@ -28,9 +28,9 @@ namespace SadSapphicGames.NoiseGenerators
 
         protected override string ComputeShaderPath => "Compute/PerlinNoise";
 
-        public override void GenerateTexture()
+        protected override void InnerGenerateTexture()
         {
-            SetShaderParameters();
+            // SetShaderParameters();
             NoiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             if(RequireSeamlessTiling) {
                 NoiseGenShader.Dispatch(wrapLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
