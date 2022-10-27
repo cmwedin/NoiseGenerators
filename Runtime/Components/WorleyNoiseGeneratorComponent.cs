@@ -6,13 +6,13 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class WorleyNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
-        private WorleyNoiseGenerator noiseGeneratorObject;
-        protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
-            if(noiseGeneratorObject == null) {
-                CreateGeneratorObject();
-            }
-            return noiseGeneratorObject;
-        }}
+        // private WorleyNoiseGenerator noiseGeneratorObject;
+        // protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
+        //     if(noiseGeneratorObject == null) {
+        //         CreateGeneratorObject();
+        //     }
+        //     return noiseGeneratorObject;
+        // }}
 
         /// <summary>
         /// The texture channel the generated noise will be stored in (if all each channel will contain a different texture)
@@ -40,14 +40,29 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Constructs a WorleyNoiseGenerator object and sets it's RequireSeamlessTiling and InvertTexture properties
         /// </summary>
-        protected override void CreateGeneratorObject() {
-            if(noiseGeneratorObject != null) {
-                noiseGeneratorObject.Dispose();
-            }
-            noiseGeneratorObject = new WorleyNoiseGenerator(TexWidth, TexHeight, seed, cellCounts, activeChannel);
+        protected override AbstractNoiseGenerator CreateGeneratorObject() {
+            var noiseGeneratorObject = new WorleyNoiseGenerator(TexWidth, TexHeight, seed, cellCounts, activeChannel);
             noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             noiseGeneratorObject.InvertTexture = invertTexture;
-            disposedValue = false;
+            return noiseGeneratorObject;
+        }
+        protected override void UpdateGeneratorSettings()
+        {
+            base.UpdateGeneratorSettings();
+            var GeneratorAsWorley = NoiseGeneratorObject as WorleyNoiseGenerator;
+            if(GeneratorAsWorley.InvertTexture != InvertTexture) {
+                GeneratorAsWorley.InvertTexture = InvertTexture;
+            }
+            if(GeneratorAsWorley.RequireSeamlessTiling != TileTexture) {
+                GeneratorAsWorley.RequireSeamlessTiling = TileTexture;
+            }
+            if(GeneratorAsWorley.CellCounts != CellCounts) {
+                GeneratorAsWorley.CellCounts = CellCounts;
+                CellCounts = GeneratorAsWorley.CellCounts;
+            }
+            if(GeneratorAsWorley.ActiveChannel != ActiveChannel) {
+                GeneratorAsWorley.ActiveChannel = ActiveChannel;
+            }
         }
     }
 }

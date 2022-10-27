@@ -5,13 +5,13 @@ using UnityEngine;
 namespace SadSapphicGames.NoiseGenerators
 {
     public class ValueNoiseGeneratorComponent : AbstractNoiseGeneratorComponent {
-        private ValueNoiseGenerator noiseGeneratorObject;
-        protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
-            if(noiseGeneratorObject == null) {
-                CreateGeneratorObject();
-            }
-            return noiseGeneratorObject;
-        }}
+        // private ValueNoiseGenerator noiseGeneratorObject;
+        // protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
+        //     if(noiseGeneratorObject == null) {
+        //         CreateGeneratorObject();
+        //     }
+        //     return noiseGeneratorObject;
+        // }}
         /// <summary>
         /// If the texture should be required to tile seamlessly
         /// </summary>
@@ -26,13 +26,22 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Creates a ValueNoiseGeneratorObject and sets its RequireSeamlessTiling property
         /// </summary>
-        protected override void CreateGeneratorObject() {
-            if(noiseGeneratorObject != null) {
-                noiseGeneratorObject.Dispose();
+        protected override AbstractNoiseGenerator CreateGeneratorObject() {
+            var noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
+            noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+            return noiseGeneratorObject;
+        }
+        protected override void UpdateGeneratorSettings()
+        {
+            base.UpdateGeneratorSettings();
+            var GeneratorAsValue = NoiseGeneratorObject as ValueNoiseGenerator;
+            if(GeneratorAsValue.LatticeCellSize != LatticeCellSize) {
+                GeneratorAsValue.LatticeCellSize = LatticeCellSize;
+                LatticeCellSize = GeneratorAsValue.LatticeCellSize;
             }
-            noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
-            NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-            disposedValue = false;
+            if(GeneratorAsValue.RequireSeamlessTiling != TileTexture) {
+                GeneratorAsValue.RequireSeamlessTiling = TileTexture;
+            }
         }
     }
 }

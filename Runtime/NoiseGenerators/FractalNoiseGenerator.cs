@@ -209,9 +209,11 @@ namespace SadSapphicGames.NoiseGenerators {
 
         protected override void Dispose(bool disposing)
         {
+            if(disposing) {
+                minMaxBuffer?.Dispose();
+                minMaxBuffer = null;
+            }
             baseNoiseGenerator?.Dispose();
-            minMaxBuffer?.Dispose();
-            minMaxBuffer = null;
             base.Dispose(disposing);
         }
     }

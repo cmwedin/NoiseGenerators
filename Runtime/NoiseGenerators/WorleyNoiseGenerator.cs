@@ -22,7 +22,7 @@ namespace SadSapphicGames.NoiseGenerators
             TextureChannel _activeChannel
         ) : base(_texWidth, _texHeight, _seed) {
             CellCounts = _cellCount;
-            activeChannel = _activeChannel;
+            ActiveChannel = _activeChannel;
             pointsBuffer = new ComputeBuffer(CellCounts.x*CellCounts.y, 2 * sizeof(float));
             minMaxBuffer = new ComputeBuffer(2, sizeof(uint));
             minMaxBuffer.SetData(new int[] { int.MaxValue, 0 });
@@ -59,6 +59,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The channel the noise is being stored in
         /// </summary>
+        public TextureChannel ActiveChannel { get => activeChannel; set => activeChannel = value; }
         private TextureChannel activeChannel;
 
         /// <summary>
@@ -66,10 +67,10 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         private Vector4 channelMask {
             get => new Vector4(
-                    activeChannel == TextureChannel.R ? 1 : 0, 
-                    activeChannel == TextureChannel.G ? 1 : 0, 
-                    activeChannel == TextureChannel.B ? 1 : 0, 
-                    activeChannel == TextureChannel.A ? 1 : 0
+                    ActiveChannel == TextureChannel.R ? 1 : 0, 
+                    ActiveChannel == TextureChannel.G ? 1 : 0, 
+                    ActiveChannel == TextureChannel.B ? 1 : 0, 
+                    ActiveChannel == TextureChannel.A ? 1 : 0
                 );
         }
         /// <summary>
@@ -95,6 +96,8 @@ namespace SadSapphicGames.NoiseGenerators
                 cellCounts = value;
             }
         }
+
+
         private Vector2Int cellCounts;
 
 
@@ -119,23 +122,23 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void InnerGenerateTexture()
         {
             // SetShaderParameters();
-            if(activeChannel == TextureChannel.All) {
+            if(ActiveChannel == TextureChannel.All) {
                 for (int i = 0; i < 4; i++)
                 {
-                    activeChannel = (TextureChannel)i;
+                    ActiveChannel = (TextureChannel)i;
                     SetShaderParameters();
                     NoiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
                     NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                     NoiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                 }
-                activeChannel = TextureChannel.All;
+                ActiveChannel = TextureChannel.All;
             } else {
                 NoiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
                 NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                 NoiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             }
-            pointsBuffer.Release();
-            minMaxBuffer.Release();
+            // pointsBuffer.Release();
+            // minMaxBuffer.Release();
         }
         /// <summary>
         /// Generates a Worley noise texture using the given parameters
@@ -173,18 +176,13 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state 
+                    pointsBuffer?.Release();
+                    pointsBuffer = null;
+                    minMaxBuffer?.Release();
+                    minMaxBuffer = null;
                 }
-
-                pointsBuffer?.Release();
-                pointsBuffer = null;
-                minMaxBuffer?.Release();
-                minMaxBuffer = null;
             }
             base.Dispose(disposing);
-        }
-        ~WorleyNoiseGenerator() {
-            Dispose(disposing: false);
         }
     }
 }

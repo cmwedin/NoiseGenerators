@@ -30,7 +30,7 @@ namespace SadSapphicGames.NoiseGenerators
 
         protected override void InnerGenerateTexture()
         {
-            // SetShaderParameters();
+            SetShaderParameters();
             NoiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             if(RequireSeamlessTiling) {
                 NoiseGenShader.Dispatch(wrapLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);

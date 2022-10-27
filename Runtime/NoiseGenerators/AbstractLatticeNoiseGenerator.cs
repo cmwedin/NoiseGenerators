@@ -153,17 +153,11 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    latticeBuffer?.Release();
+                    latticeBuffer = null;
                 }
-
-                latticeBuffer?.Release();
-                latticeBuffer = null;
             }
             base.Dispose(disposing);
         }
-        ~AbstractLatticeNoiseGenerator() {
-            Dispose(disposing: false);
-        }
-
     }
 }
