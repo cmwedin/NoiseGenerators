@@ -5,13 +5,13 @@ using UnityEngine;
 namespace SadSapphicGames.NoiseGenerators
 {
     public class ValueNoiseGeneratorComponent : AbstractNoiseGeneratorComponent {
-        private ValueNoiseGenerator noiseGeneratorObject;
-        protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
-            if(noiseGeneratorObject == null) {
-                CreateGeneratorObject();
-            }
-            return noiseGeneratorObject;
-        }}
+        // private ValueNoiseGenerator noiseGeneratorObject;
+        // protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
+        //     if(noiseGeneratorObject == null) {
+        //         CreateGeneratorObject();
+        //     }
+        //     return noiseGeneratorObject;
+        // }}
         /// <summary>
         /// If the texture should be required to tile seamlessly
         /// </summary>
@@ -26,13 +26,10 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Creates a ValueNoiseGeneratorObject and sets its RequireSeamlessTiling property
         /// </summary>
-        protected override void CreateGeneratorObject() {
-            if(noiseGeneratorObject != null) {
-                noiseGeneratorObject.Dispose();
-            }
-            noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
-            NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-            disposedValue = false;
+        protected override AbstractNoiseGenerator CreateGeneratorObject() {
+            var noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
+            noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+            return noiseGeneratorObject;
         }
     }
 }

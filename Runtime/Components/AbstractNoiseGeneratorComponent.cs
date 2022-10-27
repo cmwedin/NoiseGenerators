@@ -7,10 +7,10 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour, IDisposable
     {
-        /// <summary>
-        /// The object that generates the noise texture
-        /// </summary>
-        protected abstract AbstractNoiseGenerator NoiseGeneratorObject { get; }
+        // /// <summary>
+        // /// The object that generates the noise texture
+        // /// </summary>
+        // protected abstract AbstractNoiseGenerator NoiseGeneratorObject { get; }
         /// <summary>
         /// This event will be invoked when a new texture is generated
         /// </summary>
@@ -18,7 +18,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Constructs the generator object and sets its parameters
         /// </summary>
-        protected abstract void CreateGeneratorObject();
+        protected abstract AbstractNoiseGenerator CreateGeneratorObject();
         
         /// <summary>
         /// The noise texture created by the generator
@@ -66,12 +66,10 @@ namespace SadSapphicGames.NoiseGenerators
                 noiseTexture.Release();
                 noiseTexture = null;
             }
-            CreateGeneratorObject();
+            using var generator = CreateGeneratorObject();
 
-
-            NoiseGeneratorObject.GenerateTexture();
-            noiseTexture = NoiseGeneratorObject.NoiseTexture;
-            NoiseGeneratorObject.Dispose();
+            generator.GenerateTexture();
+            noiseTexture = generator.NoiseTexture;
             GeneratedTexture?.Invoke();
         }
 
@@ -82,7 +80,7 @@ namespace SadSapphicGames.NoiseGenerators
                 // Debug.Log("Disposing noise generator");
                 if (disposing)
                 {
-                    NoiseGeneratorObject.Dispose();
+                    // NoiseGeneratorObject.Dispose();
                 }
                 noiseTexture?.Release();
                 noiseTexture = null;

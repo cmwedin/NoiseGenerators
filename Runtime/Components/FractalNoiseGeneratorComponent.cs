@@ -11,11 +11,11 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         [SerializeField] private AbstractNoiseGeneratorComponent baseNoiseGenerator;
 
-        /// <summary>
-        /// The object that generates the fractal noise texture
-        /// </summary>
-        protected override AbstractNoiseGenerator NoiseGeneratorObject => noiseGeneratorObject;
-        private FractalNoiseGenerator noiseGeneratorObject;
+        // /// <summary>
+        // /// The object that generates the fractal noise texture
+        // /// </summary>
+        // protected override AbstractNoiseGenerator NoiseGeneratorObject => noiseGeneratorObject;
+        // private FractalNoiseGenerator noiseGeneratorObject;
 
         /// <summary>
         /// The number of times detail should be added onto the noise texture
@@ -43,14 +43,15 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         [SerializeField,Tooltip("If the affect of the initial amplitude should be normalized out of the final value")] private bool normalizeAmplitude = true;
 
-        protected override void CreateGeneratorObject()
+        protected override AbstractNoiseGenerator CreateGeneratorObject()
         {
             baseNoiseGenerator.TexHeight = TexHeight;
             baseNoiseGenerator.TexWidth = TexWidth;
             baseNoiseGenerator.Seed = seed;
             baseNoiseGenerator.GenerateTexture();
-            noiseGeneratorObject = new FractalNoiseGenerator(octaves, baseNoiseGenerator.NoiseTexture, lacunarity, frequency, gain, amplitude);
+            var noiseGeneratorObject = new FractalNoiseGenerator(octaves, baseNoiseGenerator.NoiseTexture, lacunarity, frequency, gain, amplitude);
             noiseGeneratorObject.NormalizeAmplitude = normalizeAmplitude;
+            return noiseGeneratorObject;
         }
     }
 }

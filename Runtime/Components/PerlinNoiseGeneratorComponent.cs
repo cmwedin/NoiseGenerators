@@ -6,18 +6,18 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public class PerlinNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
-        private PerlinNoiseGenerator noiseGeneratorObject;
-        protected override AbstractNoiseGenerator NoiseGeneratorObject
-        {
-            get
-            {
-                if (noiseGeneratorObject == null)
-                {
-                    CreateGeneratorObject();
-                }
-                return noiseGeneratorObject;
-            }
-        }
+        // private PerlinNoiseGenerator noiseGeneratorObject;
+        // protected override AbstractNoiseGenerator NoiseGeneratorObject
+        // {
+        //     get
+        //     {
+        //         if (noiseGeneratorObject == null)
+        //         {
+        //             CreateGeneratorObject();
+        //         }
+        //         return noiseGeneratorObject;
+        //     }
+        // }
 
         /// <summary>
         /// If the texture should be required to tile seamlessly
@@ -33,14 +33,11 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Constructs a PerlinNoiseGenerator and sets it's RequireSeamlessTiling property
         /// </summary>
-        protected override void CreateGeneratorObject()
+        protected override AbstractNoiseGenerator CreateGeneratorObject()
         {
-            if(noiseGeneratorObject != null) {
-                noiseGeneratorObject.Dispose();
-            }
-            noiseGeneratorObject = new PerlinNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
-            NoiseGeneratorObject.RequireSeamlessTiling = tileTexture;
-            disposedValue = false;
+            var noiseGeneratorObject = new PerlinNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
+            noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
+            return noiseGeneratorObject;
         }
     }
 }
