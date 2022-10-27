@@ -65,5 +65,28 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
             return noiseGeneratorObject;
         }
+        protected override void UpdateGeneratorSettings()
+        {
+            base.UpdateGeneratorSettings();
+            var GeneratorAsFractal = NoiseGeneratorObject as FractalNoiseGenerator;
+            if(GeneratorAsFractal.Octaves != Octaves) {
+                GeneratorAsFractal.Octaves = Octaves;
+            }
+            if(GeneratorAsFractal.Lacunarity != Lacunarity) {
+                GeneratorAsFractal.Lacunarity = Lacunarity;
+            }
+            if(GeneratorAsFractal.Frequency != Frequency) {
+                GeneratorAsFractal.Frequency = Frequency;
+            }
+            if(GeneratorAsFractal.Gain != Gain) {
+                GeneratorAsFractal.Gain = Gain;
+            }
+            if(GeneratorAsFractal.NormalizeAmplitude != NormalizeAmplitude) {
+                GeneratorAsFractal.NormalizeAmplitude = NormalizeAmplitude;
+            }
+            if(GeneratorAsFractal.Amplitude != Amplitude) {
+                GeneratorAsFractal.Amplitude = Amplitude;
+            }
+        }
     }
 }

@@ -31,5 +31,17 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             return noiseGeneratorObject;
         }
+        protected override void UpdateGeneratorSettings()
+        {
+            base.UpdateGeneratorSettings();
+            var GeneratorAsValue = NoiseGeneratorObject as ValueNoiseGenerator;
+            if(GeneratorAsValue.LatticeCellSize != LatticeCellSize) {
+                GeneratorAsValue.LatticeCellSize = LatticeCellSize;
+                LatticeCellSize = GeneratorAsValue.LatticeCellSize;
+            }
+            if(GeneratorAsValue.RequireSeamlessTiling != TileTexture) {
+                GeneratorAsValue.RequireSeamlessTiling = TileTexture;
+            }
+        }
     }
 }

@@ -46,5 +46,23 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGeneratorObject.InvertTexture = invertTexture;
             return noiseGeneratorObject;
         }
+        protected override void UpdateGeneratorSettings()
+        {
+            base.UpdateGeneratorSettings();
+            var GeneratorAsWorley = NoiseGeneratorObject as WorleyNoiseGenerator;
+            if(GeneratorAsWorley.InvertTexture != InvertTexture) {
+                GeneratorAsWorley.InvertTexture = InvertTexture;
+            }
+            if(GeneratorAsWorley.RequireSeamlessTiling != TileTexture) {
+                GeneratorAsWorley.RequireSeamlessTiling = TileTexture;
+            }
+            if(GeneratorAsWorley.CellCounts != CellCounts) {
+                GeneratorAsWorley.CellCounts = CellCounts;
+                CellCounts = GeneratorAsWorley.CellCounts;
+            }
+            if(GeneratorAsWorley.ActiveChannel != ActiveChannel) {
+                GeneratorAsWorley.ActiveChannel = ActiveChannel;
+            }
+        }
     }
 }

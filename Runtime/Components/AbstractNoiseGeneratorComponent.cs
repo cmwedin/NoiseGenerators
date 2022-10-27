@@ -7,10 +7,17 @@ namespace SadSapphicGames.NoiseGenerators
 {
     public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour, IDisposable
     {
-        // /// <summary>
-        // /// The object that generates the noise texture
-        // /// </summary>
-        // protected abstract AbstractNoiseGenerator NoiseGeneratorObject { get; }
+        private AbstractNoiseGenerator noiseGeneratorObject;
+        /// <summary>
+        /// The object that generates the noise texture
+        /// </summary>
+        protected AbstractNoiseGenerator NoiseGeneratorObject { get {
+            if(noiseGeneratorObject == null) {
+                noiseGeneratorObject = CreateGeneratorObject();
+            }    
+            return noiseGeneratorObject;
+        } }
+
         /// <summary>
         /// This event will be invoked when a new texture is generated
         /// </summary>
@@ -23,13 +30,10 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The noise texture created by the generator
         /// </summary>
-        public RenderTexture NoiseTexture  { get {
-                if( noiseTexture == null) {
-                    GenerateTexture();
-                }
-                return noiseTexture;
-            }
-        }
+        public RenderTexture NoiseTexture  { get => NoiseGeneratorObject.NoiseTexture;}
+        /// <summary>
+        /// Redundant field so the noise texture can be examined in the inspector, Unity does not serialize properties
+        /// </summary>
         [SerializeField, Tooltip("The noise texture created by the generator")] RenderTexture noiseTexture;
 
         /// <summary>
@@ -56,22 +60,36 @@ namespace SadSapphicGames.NoiseGenerators
         }}
         [SerializeField, Tooltip("The height of the generated texture")] protected uint texHeight;
 
-        protected bool disposedValue;
+        protected virtual void UpdateGeneratorSettings() {
+            //? If the values of the component are different than the values of the object, update the objects values
+            if(NoiseGeneratorObject.TexHeight != TexHeight) {
+                NoiseGeneratorObject.TexHeight = TexHeight;
+                //? Capture any changes that where made in validation
+                TexHeight = NoiseGeneratorObject.TexHeight;
+            }
+            if(NoiseGeneratorObject.TexWidth != TexWidth) {
+                NoiseGeneratorObject.TexWidth = TexWidth;
+                TexWidth = NoiseGeneratorObject.TexWidth;
+            }
+            if (NoiseGeneratorObject.Seed != Seed) {
+                NoiseGeneratorObject.Seed = Seed;
+                
+                //? Unneeded because the seed value does not require validation
+                // //Seed = NoiseGeneratorObject.Seed;
+            }
+        }
 
         /// <summary>
         /// Generates the noise texture
         /// </summary>
         public void GenerateTexture() {
-            if(noiseTexture != null) {
-                noiseTexture.Release();
-                noiseTexture = null;
-            }
-            using var generator = CreateGeneratorObject();
-
-            generator.GenerateTexture();
-            noiseTexture = generator.NoiseTexture;
+            UpdateGeneratorSettings();
+            NoiseGeneratorObject.GenerateTexture();
+            noiseTexture = NoiseTexture;
             GeneratedTexture?.Invoke();
         }
+
+        protected bool disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -80,7 +98,7 @@ namespace SadSapphicGames.NoiseGenerators
                 // Debug.Log("Disposing noise generator");
                 if (disposing)
                 {
-                    // NoiseGeneratorObject.Dispose();
+                    NoiseGeneratorObject.Dispose();
                 }
                 noiseTexture?.Release();
                 noiseTexture = null;
