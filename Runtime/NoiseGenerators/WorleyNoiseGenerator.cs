@@ -173,18 +173,13 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state 
+                    pointsBuffer?.Release();
+                    pointsBuffer = null;
+                    minMaxBuffer?.Release();
+                    minMaxBuffer = null;
                 }
-
-                pointsBuffer?.Release();
-                pointsBuffer = null;
-                minMaxBuffer?.Release();
-                minMaxBuffer = null;
             }
             base.Dispose(disposing);
-        }
-        ~WorleyNoiseGenerator() {
-            Dispose(disposing: false);
         }
     }
 }

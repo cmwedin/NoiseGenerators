@@ -62,8 +62,12 @@ namespace SadSapphicGames.NoiseGenerators
         /// Generates the noise texture
         /// </summary>
         public void GenerateTexture() {
-            noiseTexture?.Release();
+            if(noiseTexture != null) {
+                noiseTexture.Release();
+                noiseTexture = null;
+            }
             CreateGeneratorObject();
+
 
             NoiseGeneratorObject.GenerateTexture();
             noiseTexture = NoiseGeneratorObject.NoiseTexture;
@@ -78,10 +82,8 @@ namespace SadSapphicGames.NoiseGenerators
                 // Debug.Log("Disposing noise generator");
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    NoiseGeneratorObject.Dispose();
                 }
-
-                NoiseGeneratorObject.Dispose();
                 noiseTexture?.Release();
                 noiseTexture = null;
                 disposedValue = true;
@@ -91,7 +93,6 @@ namespace SadSapphicGames.NoiseGenerators
         // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
         ~AbstractNoiseGeneratorComponent()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: false);
         }
 // 
