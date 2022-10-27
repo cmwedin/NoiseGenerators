@@ -1,12 +1,14 @@
 {
-    "name": "Tests",
+    "name": "EditorTests",
     "rootNamespace": "",
     "references": [
-        "GUID:27619889b8ba8c24980f49ee34dbb44a",
-        "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:c8c0d52397a24cb40a54aa2bbc1c3633"
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "com.sadsapphicgames.noisegenerators"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
