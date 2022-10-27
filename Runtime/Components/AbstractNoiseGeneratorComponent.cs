@@ -85,13 +85,10 @@ namespace SadSapphicGames.NoiseGenerators
         /// Generates the noise texture
         /// </summary>
         public void GenerateTexture() {
-            Debug.Log("Setting generator parameters");
             UpdateGeneratorSettings();
-            Debug.Log("Generating Texture");
             NoiseGeneratorObject.GenerateTexture();
             noiseTexture = NoiseTexture;
             GeneratedTexture?.Invoke();
-            Debug.Log("Generation finished");
         }
 
         private void OnDisable() {
