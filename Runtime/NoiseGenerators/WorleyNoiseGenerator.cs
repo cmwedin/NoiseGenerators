@@ -137,8 +137,8 @@ namespace SadSapphicGames.NoiseGenerators
                 NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                 NoiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             }
-            pointsBuffer.Release();
-            minMaxBuffer.Release();
+            // pointsBuffer.Release();
+            // minMaxBuffer.Release();
         }
         /// <summary>
         /// Generates a Worley noise texture using the given parameters

@@ -8,7 +8,7 @@ namespace SadSapphicGames.NoiseGenerators.Testing
 {
     public class GeneratorComponentTests
     {
-        const int testSize = 5000;
+        const int testSize = 100000;
         // A Test behaves as an ordinary method
         [Test]
         public void RandomGeneratorComponentMemoryTest()

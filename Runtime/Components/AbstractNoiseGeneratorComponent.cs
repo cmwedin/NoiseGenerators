@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    [ExecuteInEditMode]
     public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour, IDisposable
     {
         private AbstractNoiseGenerator noiseGeneratorObject;
@@ -14,7 +15,8 @@ namespace SadSapphicGames.NoiseGenerators
         protected AbstractNoiseGenerator NoiseGeneratorObject { get {
             if(noiseGeneratorObject == null) {
                 noiseGeneratorObject = CreateGeneratorObject();
-            }    
+                    disposedValue = false;
+                }    
             return noiseGeneratorObject;
         } }
 
@@ -83,10 +85,17 @@ namespace SadSapphicGames.NoiseGenerators
         /// Generates the noise texture
         /// </summary>
         public void GenerateTexture() {
+            Debug.Log("Setting generator parameters");
             UpdateGeneratorSettings();
+            Debug.Log("Generating Texture");
             NoiseGeneratorObject.GenerateTexture();
             noiseTexture = NoiseTexture;
             GeneratedTexture?.Invoke();
+            Debug.Log("Generation finished");
+        }
+
+        private void OnDisable() {
+            this.Dispose();
         }
 
         protected bool disposedValue;
@@ -96,12 +105,14 @@ namespace SadSapphicGames.NoiseGenerators
             if (!disposedValue)
             {
                 // Debug.Log("Disposing noise generator");
+                NoiseTexture?.Release();
+                noiseTexture = null;
                 if (disposing)
                 {
                     NoiseGeneratorObject.Dispose();
+                    noiseGeneratorObject = null;
                 }
-                noiseTexture?.Release();
-                noiseTexture = null;
+
                 disposedValue = true;
             }
         }
