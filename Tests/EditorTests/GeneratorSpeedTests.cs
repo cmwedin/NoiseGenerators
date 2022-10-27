@@ -50,7 +50,7 @@ namespace SadSapphicGames.NoiseGenerators.Testing
         public void WorleyGeneratorSpedTest()
         {
             var generator = new WorleyNoiseGenerator(1920, 1920, 1,testCellCount,TextureChannel.R);
-            for (int i = 0; i < testSize; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 generator.GenerateTexture();
                 generator.Seed++;

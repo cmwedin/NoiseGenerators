@@ -106,7 +106,7 @@ namespace SadSapphicGames.NoiseGenerators
                 noiseTexture = null;
                 if (disposing)
                 {
-                    NoiseGeneratorObject.Dispose();
+                    NoiseGeneratorObject?.Dispose();
                     noiseGeneratorObject = null;
                 }
 
