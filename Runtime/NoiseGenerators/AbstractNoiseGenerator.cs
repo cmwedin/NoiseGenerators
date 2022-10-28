@@ -160,12 +160,20 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         public void GenerateTexture() {
             SetShaderParameters();
+            ResetNoiseTexture();
             InnerGenerateTexture();
             OnTextureGeneration?.Invoke();
         }
 
+        private void ResetNoiseTexture()
+        {
+            NoiseTexture.DiscardContents();
+            NoiseTexture.Release();
+            NoiseTexture.Create();
+        }
 
-//? IDisposable implementation
+
+        //? IDisposable implementation
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
