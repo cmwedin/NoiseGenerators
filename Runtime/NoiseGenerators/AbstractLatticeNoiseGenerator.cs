@@ -156,8 +156,9 @@ namespace SadSapphicGames.NoiseGenerators
                     latticeBuffer?.Release();
                     latticeBuffer = null;
                 }
+                base.Dispose(disposing);
+                disposedValue = true;
             }
-            base.Dispose(disposing);
         }
     }
 }

@@ -181,8 +181,9 @@ namespace SadSapphicGames.NoiseGenerators
                     minMaxBuffer?.Release();
                     minMaxBuffer = null;
                 }
+                base.Dispose(disposing);
+                disposedValue = true;
             }
-            base.Dispose(disposing);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace SadSapphicGames.NoiseGenerators.Testing
     {
         const int testSize = 100000;
         Vector2Int testLatticeCellSize = new Vector2Int(64, 64);
-        Vector2Int testWorleyPoinyCount = new Vector2Int(10, 10);
+        Vector2Int testWorleyPointCount = new Vector2Int(10, 10);
         // A Test behaves as an ordinary method
         [Test]
         public void RandomGeneratorComponentMemoryTest()
@@ -68,7 +68,7 @@ namespace SadSapphicGames.NoiseGenerators.Testing
             var generator = go.AddComponent<WorleyNoiseGeneratorComponent>();
             generator.TexWidth = 1920; generator.TexHeight = 1920;
             generator.Seed = 1;
-            generator.CellCounts = testWorleyPoinyCount;
+            generator.CellCounts = testWorleyPointCount;
             generator.TileTexture = true;
             generator.ActiveChannel = TextureChannel.R;
             for (int i = 0; i < 1000; i++)

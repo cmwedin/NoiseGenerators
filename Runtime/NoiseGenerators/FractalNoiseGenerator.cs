@@ -207,14 +207,20 @@ namespace SadSapphicGames.NoiseGenerators {
             return output;
         }
 
+        bool disposedValue;
         protected override void Dispose(bool disposing)
         {
-            if(disposing) {
-                minMaxBuffer?.Dispose();
-                minMaxBuffer = null;
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    minMaxBuffer?.Dispose();
+                    minMaxBuffer = null;
+                    baseNoiseGenerator?.Dispose();
+                }
+                base.Dispose(disposing);
+                disposedValue = true;
             }
-            baseNoiseGenerator?.Dispose();
-            base.Dispose(disposing);
         }
     }
 }

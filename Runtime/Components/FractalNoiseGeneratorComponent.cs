@@ -88,5 +88,16 @@ namespace SadSapphicGames.NoiseGenerators
                 GeneratorAsFractal.Amplitude = Amplitude;
             }
         }
+
+        private bool _disposedValue = false;
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                baseNoiseGenerator?.Dispose();
+                base.Dispose(disposing);
+            }
+            _disposedValue = true;
+        }
     }
 }

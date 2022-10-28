@@ -95,7 +95,7 @@ namespace SadSapphicGames.NoiseGenerators
             this.Dispose();
         }
 
-        protected bool disposedValue;
+        private bool disposedValue = true;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -106,7 +106,7 @@ namespace SadSapphicGames.NoiseGenerators
                 noiseTexture = null;
                 if (disposing)
                 {
-                    NoiseGeneratorObject?.Dispose();
+                    noiseGeneratorObject?.Dispose();
                     noiseGeneratorObject = null;
                 }
 
