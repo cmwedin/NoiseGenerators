@@ -68,7 +68,21 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void UpdateGeneratorSettings()
         {
             base.UpdateGeneratorSettings();
+            if(baseNoiseGenerator.TexHeight != TexHeight) {
+                baseNoiseGenerator.TexHeight = TexHeight;
+                TexHeight = baseNoiseGenerator.TexHeight;
+            }
+            if(baseNoiseGenerator.TexWidth != TexWidth) {
+                baseNoiseGenerator.TexWidth = TexWidth;
+                TexWidth = baseNoiseGenerator.TexWidth;
+            }
+            if(baseNoiseGenerator.Seed != Seed) {
+                baseNoiseGenerator.Seed = Seed;
+            }
+            baseNoiseGenerator.GenerateTexture();
+
             var GeneratorAsFractal = NoiseGeneratorObject as FractalNoiseGenerator;
+            GeneratorAsFractal.InputTexture = baseNoiseGenerator.NoiseTexture;
             if(GeneratorAsFractal.Octaves != Octaves) {
                 GeneratorAsFractal.Octaves = Octaves;
             }

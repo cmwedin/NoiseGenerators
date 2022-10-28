@@ -122,6 +122,7 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void InnerGenerateTexture()
         {
             // SetShaderParameters();
+            minMaxBuffer.SetData(new int[] { int.MaxValue, 0 });
             if(ActiveChannel == TextureChannel.All) {
                 for (int i = 0; i < 4; i++)
                 {

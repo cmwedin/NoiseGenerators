@@ -19,7 +19,7 @@ namespace SadSapphicGames.NoiseGenerators
         private void OnValidate() {
             if (textureGenerator != null)
             {
-                textureGenerator.GeneratedTexture += () =>
+                textureGenerator.OnTextureGeneration += () =>
                 {
                     if (Application.isPlaying)
                     {

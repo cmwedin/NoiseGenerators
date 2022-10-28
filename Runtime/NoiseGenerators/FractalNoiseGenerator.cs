@@ -40,7 +40,7 @@ namespace SadSapphicGames.NoiseGenerators {
         /// The input texture to use in the fractal noise generation process
         /// </summary>
         private RenderTexture inputTexture;
-        private RenderTexture InputTexture {
+        public RenderTexture InputTexture {
             get {
                 if(inputTexture == null) {
                     if (!usePreGeneratedTexture)
@@ -53,6 +53,10 @@ namespace SadSapphicGames.NoiseGenerators {
                 }
                 return inputTexture;
             } set {
+                if(!usePreGeneratedTexture) {
+                    Debug.LogWarning("This fractal noise generator generates its input texture itself and it cannot be set");
+                    return;
+                }
                 inputTexture = value;
             }
         }
@@ -178,9 +182,9 @@ namespace SadSapphicGames.NoiseGenerators {
         protected override void InnerGenerateTexture()
         {
             SetShaderParameters();
+            minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
             NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             NoiseGenShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
-            minMaxBuffer.Dispose();
         }
         /// <summary>
         /// Generates a fractal noise texture using the given input texture and parameters
@@ -212,6 +216,7 @@ namespace SadSapphicGames.NoiseGenerators {
         {
             if (!disposedValue)
             {
+                Debug.Log($"Disposing {this.ToString()}");
                 if (disposing)
                 {
                     minMaxBuffer?.Dispose();

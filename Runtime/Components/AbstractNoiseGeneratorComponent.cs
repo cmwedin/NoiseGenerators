@@ -23,7 +23,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// This event will be invoked when a new texture is generated
         /// </summary>
-        public event Action GeneratedTexture;
+        public event Action OnTextureGeneration;
         /// <summary>
         /// Constructs the generator object and sets its parameters
         /// </summary>
@@ -88,7 +88,7 @@ namespace SadSapphicGames.NoiseGenerators
             UpdateGeneratorSettings();
             NoiseGeneratorObject.GenerateTexture();
             noiseTexture = NoiseTexture;
-            GeneratedTexture?.Invoke();
+            OnTextureGeneration?.Invoke();
         }
 
         private void OnDisable() {
@@ -101,7 +101,7 @@ namespace SadSapphicGames.NoiseGenerators
         {
             if (!disposedValue)
             {
-                // Debug.Log("Disposing noise generator");
+                Debug.Log($"Disposing noise generator {this.name}");
                 NoiseTexture?.Release();
                 noiseTexture = null;
                 if (disposing)
