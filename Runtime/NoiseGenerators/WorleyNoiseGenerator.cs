@@ -3,7 +3,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
-
+    /// <summary>
+    /// A generator object used to create a worley noise texture
+    /// </summary>
     public class WorleyNoiseGenerator : AbstractNoiseGenerator
     {
         /// <summary>

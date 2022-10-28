@@ -4,18 +4,15 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A MonoBehaviour component wrapping a FractalNoiseGenerator object
+    /// </summary>
     public class FractalNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         /// <summary>
         /// The base noise generator for creating the input texture to the fractal noise generator
         /// </summary>
         [SerializeField] private AbstractNoiseGeneratorComponent baseNoiseGenerator;
-
-        // /// <summary>
-        // /// The object that generates the fractal noise texture
-        // /// </summary>
-        // protected override AbstractNoiseGenerator NoiseGeneratorObject => noiseGeneratorObject;
-        // private FractalNoiseGenerator noiseGeneratorObject;
 
         /// <summary>
         /// The number of times detail should be added onto the noise texture

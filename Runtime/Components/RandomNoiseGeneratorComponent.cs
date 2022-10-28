@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A MonoBehaviour component wrapping a RandomNoiseGenerator object
+    /// </summary>
     public class RandomNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         /// <summary>

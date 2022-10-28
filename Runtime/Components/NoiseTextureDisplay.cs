@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A monobehaviour for displaying the results of a AbstractNoiseGeneratorComponent in the scene
+    /// </summary>
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter)), ExecuteInEditMode]
     public class NoiseTextureDisplay : MonoBehaviour
     {

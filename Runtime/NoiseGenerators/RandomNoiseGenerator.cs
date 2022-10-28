@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A generator object used to create a purely random noise texture
+    /// </summary>
     public class RandomNoiseGenerator : AbstractNoiseGenerator
     {
         /// <summary>

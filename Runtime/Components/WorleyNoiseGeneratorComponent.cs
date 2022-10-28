@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A MonoBehaviour component wrapping a WorleyNoiseGenerator object
+    /// </summary>
     public class WorleyNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         // private WorleyNoiseGenerator noiseGeneratorObject;

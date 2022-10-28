@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A MonoBehaviour component wrapping a PerlinNoiseGenerator object
+    /// </summary>
     public class PerlinNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         /// <summary>

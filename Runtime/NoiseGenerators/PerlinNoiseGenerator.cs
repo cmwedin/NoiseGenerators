@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A generator object used to create perlin noise textures
+    /// </summary>
     public class PerlinNoiseGenerator : AbstractLatticeNoiseGenerator
     {
         /// <summary>

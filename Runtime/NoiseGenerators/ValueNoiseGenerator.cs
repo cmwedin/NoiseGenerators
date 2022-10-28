@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A generator object used to create a value noise texture
+    /// </summary>
     public class ValueNoiseGenerator : AbstractLatticeNoiseGenerator
     {
         /// <summary>

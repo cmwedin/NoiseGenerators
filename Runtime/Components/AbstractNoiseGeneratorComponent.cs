@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// The abstract bass class of all MonoBehaviour components wrapping an AbstractNoiseGenerator
+    /// </summary>
     [ExecuteInEditMode]
     public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour, IDisposable
     {
