@@ -102,4 +102,95 @@ The frequency and amplitude parameters will modify the initial settings of the g
 Lacunarity and gain (also called persistance) affect how quickly the values of frequency and amplitude change with each octave. Once the value on octave will contribute to the final texture is calculated the frequency is multiplied by the lacunarity to determine the frequency for the next octave, and the amplitude by the gain. The generally accepted values of these parameters to generate the best results are 2 and .5 respectively, or if nonstandard values are use that gain be the inverse of lacunarity and vice versa.
 
 # Extension Instructions
-While this package tries to provide as many types of noise textures as possible, you may find yourself wanting to build on them further to or even create custom generators of your own. The instructions below will explain how to extend the class provided in this package to accomplish that.
+While this package tries to provide as many types of noise textures as possible, you may find yourself wanting to build on them further to or even create custom generators of your own. This will require you to have some familiarity with compute shaders, but is supported by the package. The instructions below will explain how to extend the class provided in this package to accomplish that.
+
+## Creating your own noise generator ComputeShader
+This first step to implementing your own noise generators is to create its compute shader. While this section will not provide basic tutorials on how to use hlsl, it will provide information for how to implement your compute shader in a manner that is compatible with the expectations of the [AbstractNoiseGenerator](Runtime/NoiseGenerators/AbstractNoiseGenerator.cs) class. 
+First, your compute shader must be located in a folder named "Resources," as this is needed for the dispatcher class to be able to reference it. In addition, your compute shader must include at minimum the following properties, named as listed:
+- `RWTexture2D<float4> _NoiseTexture;`
+- `uint _Seed;`
+- `uint _TexWidth;`
+- `uint _TexHeight`
+
+The kernel to generate the texture is also recommended to be named `CSMain`. If you don't name it that be sure to override the AbstractNoiseGenerators `GenerateTextureKernel` to find whatever you changed the name of the kernel too. Any additional properties or kernel needed for your purpose can be implemented and named as you wish; however, the AbstractNoiseGenerator base class will be expecting at a minimum the compute shader to comply with the above.
+
+It is also recommended to add the following line at the top of your compute shader
+
+    #include "Packages/com.sadsapphicgames.noisegenerators/Runtime/Resources/Compute/Includes/PRNG.cginc"
+as this will allow use to use the pseudo-random number generation methods discussed [above](#pseudo-random-number-generation-approach). You do not need to include this but if you don't you will need to implement your own method to hash the seed of the shader. For convenience the following is a template you can build off of when implementing a compute shader to extend the functionality of this package:
+
+    #pragma kernel CSMain
+    #include "Packages/com.sadsapphicgames.noisegenerators/Runtime/Resources/Compute/Includes/PRNG.cginc"
+    #define UINTMAXVALUE 4294967295.0 
+
+    RWTexture2D<float4> _NoiseTexture;
+    uint _Seed; //? the value used to generate the random hash
+    uint _TexWidth; //? the width of the generated texture in pixels
+    uint _TexHeight; //? the height of the generated texture in pixels
+
+    [numthreads(8,8,1)]
+    void CSMain (uint3 id : SV_DispatchThreadID)
+    {
+        if(id.x < 0 || id.x >= _TexWidth || id.y < 0 || id.y >= _TexHeight) {return;}
+
+    }
+The definition for `UINTMAXVALUE` is not needed but can be useful for converting the hash of a seed into a random float between 0 and 1. In addition you can change the number of threads if you wish; however, if you do be sure to override the `ThreadGroupSize` of the base AbstractNoiseGenerator within you C# class to dispatch this shader, which brings us to what you should be aware of when implementing this dispatcher class. 
+
+## Implementing your compute shaders dispatcher
+### Mandatory overrides
+When implementing the dispatcher for you compute shader first create a class that inherits from the `AbstractNoiseGenerator` class. There are three mandatory features of this class that you must implement:
+- The `ComputeShaderPath` property
+- The `InnerGenerateTexture` method
+- A constructor of the base class of the from `base(uint _texWidth, uint _texHeight, uint _seed)`
+
+The constructor of your class can differ from the constructor of the base abstract generator, however it must invoke the base constructor of the form listed above. The `ComputeShaderPath` is the simplest to implement as it is simple a string of the path to the compute shader you which to dispatch from the resource folder, excluding the .compute extension (this is to say that if the full path of your compute shader is "Assets/Resources/Compute/MyComputeShader.compute" your implementation of this property should be `protected override string ComputeShaderPath => "Compute/MyComputeShader"`). The InnerGenerateTexture() is where you will dispatch the kernel to generate the texture and any other kernels that need to be run for the generator to function properly. This function is wrapped by the following public function, AbstractNoiseGenerator.GenerateTexture:
+
+    public virtual void GenerateTexture() {
+        SetShaderParameters();
+        ResetNoiseTexture();
+        InnerGenerateTexture();
+        OnTextureGeneration?.Invoke();
+    }
+In other words, you don't need to worry about setting the shader parameters within `InnerGenerateTexture`, just dispatching the relevant kernels. If your compute shader only uses the CSMain (or your shaders equivalent) kernel to generate its texture fully than your implementation of `InnerGenerateTexture` could be as simple as the following:
+    
+    protected override void InnerGenerateTexture() {
+        NoiseGenShader.Dispatch(GenerateTextureKernel,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
+    }
+
+### Optional overrides
+While these overrides are not required to implement the AbstractNoiseGenerator class they can be just as important as the mandatory overrides. As mentioned above, if you change the name of the kernel to generate the noise texture in your compute shader, you will need to override the `GenerateTextureKernel` property to find whatever kernel you changed the name to, as its default implementation will assume the name of this kernel is `CSMain`. Additionally if you changes the number of thread's in a thread group you will need to override the `ThreadGroupSize` property as its default implementation will assume a thread group size of `[numthreads(8,8,1)]`. The package supports overriding the public `GenerateTexture` method; however, it is not recommended that you do this. Instead place the necessary code with overrides for `InnerGenerateTexture` and `SetShaderParameters`.
+
+`SetShaderParameters` is the most important of the overrides that are not explicitly required by implementers of AbstractNoiseGenerators. The base class will handle setting the mandator properties of the compute shader discussed [above](#creating-your-own-noise-generator-computeshader)(thus it is highly recommend you start your override by invoking base.SetShaderParameters), but if you have any properties beyond those mandatory properties you will need to set them here.
+
+### Implementing a disposal method
+All AbstractTextureGenerator implement the IDisposable interface. If your generator uses any compute buffers, you will need to implement an override to the `protected virtual void Dispose(bool disposing)` method to dispose of those buffers. The general pattern for implementing this will be something like 
+
+    private bool disposedValue = false;
+    protected override void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                myBuffer?.Release(); //? equivalent to myBuffer.Dispose();
+                myBuffer = null; 
+            }
+            base.Dispose(disposing);
+            disposedValue = true;
+        }
+    }
+
+Not that even though RenderTextures have unmanaged resources, disposing a generator object does not dispose of its generated texture. This is for two reasons
+- It allows the generating object to be disposed of as soon as the texture is generated will still allowing the generated texture to be used
+- The above is essential for supporting static texture generation methods as the object generating the texture returned by those methods must be disposed of within the static methods scope (meaning if textures where disposed of with their generating object the texture would have already been disposed when it was returned by the static method)
+
+Therefore we assume that the consumers of noise texture generated by these objects will use them responsibly and dispose of them when they are done. If this proves not to be the case support for static generation methods will be removed and noise textures will be disposed of with their generating object.    
+### Implementing a Static texture generation method
+This is not required of classes implementing AbstractNoiseGenerator, but if you wish to use the generator you implemented through a static method you will need to implement one yourself. The general pattern for implementing this method is for it to take all possible texture parameters as an argument (some of these may be optional), and construct an instance of the generator class the method belongs to using those parameters. That instance will then be used to generate a texture, disposed of, and the texture returned to the caller. 
+
+## Implementing a generator component
+If you don't plan to use a MonoBehaviour component to generate your noise texture this is entirely optional; however if you do you will need to create another class in addition to your extension of `AbstractNoiseGenerator` which extends `AbstractNoiseGeneratorComponent`. 
+
+The only mandatory requirement to implement this class is to implement the method `CreateNoiseGenerator` method, which will be used to construct your custom noise generator using the parameters set in the editor fields of the component (the base class implements the tex width, tex height, and seed fields, your extension will need to implement any additional parameters added by your custom generator). It is important to not the generator will only be constructed once and reused until the components `Dispose()` method is invoked (unlike with the generator object this will also dispose of the noise texture), which is automatically invoked in the components OnDisable method. 
+
+While it is not explicitly required, similar to overriding `SetShaderParameters` in your custom generator object you will also need to override the `UpdateGeneratorSettings` method to pass any changes properties from the editor fields onto the inner generator object, otherwise these parameters will not be changed after the generator object is constructed.
