@@ -38,8 +38,8 @@ namespace SadSapphicGames.NoiseGenerators
         protected Vector3Int latticeThreadGroupCount
         {
             get => new Vector3Int(
-                Mathf.CeilToInt(latticeWidth / (float)threadGroupSize.x),
-                Mathf.CeilToInt(latticeHeight / (float)threadGroupSize.y),
+                Mathf.CeilToInt(latticeWidth / (float)ThreadGroupSize.x),
+                Mathf.CeilToInt(latticeHeight / (float)ThreadGroupSize.y),
                 1
             );
         }
@@ -141,7 +141,7 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGenShader.SetInt("_LatticeTexWidth", latticeWidth);
             NoiseGenShader.SetInt("_LatticeTexHeight", latticeHeight);
             NoiseGenShader.SetBuffer(generateLatticeKernel, "_LatticeBuffer", latticeBuffer);
-            NoiseGenShader.SetBuffer(generateTextureKernel, "_LatticeBuffer", latticeBuffer);
+            NoiseGenShader.SetBuffer(GenerateTextureKernel, "_LatticeBuffer", latticeBuffer);
             NoiseGenShader.SetBuffer(wrapLatticeKernel, "_LatticeBuffer", latticeBuffer);
         }
 

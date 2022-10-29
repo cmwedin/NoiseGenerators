@@ -174,18 +174,17 @@ namespace SadSapphicGames.NoiseGenerators {
             NoiseGenShader.SetFloat("_Gain",gain);
             NoiseGenShader.SetFloat("_Amplitude", amplitude);
             NoiseGenShader.SetBool("_NormalizeAmplitude", NormalizeAmplitude);
-            NoiseGenShader.SetBuffer(generateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
-            NoiseGenShader.SetTexture(generateTextureKernel, "_InNoiseTexture", InputTexture);
-            NoiseGenShader.SetTexture(generateTextureKernel, "_OutNoiseTexture", noiseTexture);
+            NoiseGenShader.SetBuffer(GenerateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
+            NoiseGenShader.SetTexture(GenerateTextureKernel, "_InNoiseTexture", InputTexture);
+            NoiseGenShader.SetTexture(GenerateTextureKernel, "_OutNoiseTexture", noiseTexture);
             NoiseGenShader.SetBuffer(normalizeTextureKernel,"_MinMaxBuffer", minMaxBuffer);
             NoiseGenShader.SetTexture(normalizeTextureKernel, "_OutNoiseTexture", noiseTexture);
         }
 
         protected override void InnerGenerateTexture()
         {
-            SetShaderParameters();
             minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
-            NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            NoiseGenShader.Dispatch(GenerateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             NoiseGenShader.Dispatch(normalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
         }
         /// <summary>

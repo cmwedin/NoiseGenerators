@@ -39,8 +39,8 @@ namespace SadSapphicGames.NoiseGenerators
         /// The number of thread groups to use when placing the points
         /// </summary>
         private Vector3Int PointThreadGroupCount { get => new Vector3Int(
-            Mathf.CeilToInt((float)CellCounts.x/threadGroupSize.x),
-            Mathf.CeilToInt((float)CellCounts.y/threadGroupSize.y),
+            Mathf.CeilToInt((float)CellCounts.x/ThreadGroupSize.x),
+            Mathf.CeilToInt((float)CellCounts.y/ThreadGroupSize.y),
             1
         );}
 
@@ -114,9 +114,9 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGenShader.SetVector("_ChannelMask", channelMask);
             NoiseGenShader.SetBool("_Tiling", RequireSeamlessTiling);
             NoiseGenShader.SetBool("_Invert", InvertTexture);
-            NoiseGenShader.SetBuffer(generateTextureKernel, "_PointsBuffer", pointsBuffer);
+            NoiseGenShader.SetBuffer(GenerateTextureKernel, "_PointsBuffer", pointsBuffer);
             NoiseGenShader.SetBuffer(GeneratePointsKernel, "_PointsBuffer", pointsBuffer);
-            NoiseGenShader.SetBuffer(generateTextureKernel, "_MinMaxBuffer", minMaxBuffer);
+            NoiseGenShader.SetBuffer(GenerateTextureKernel, "_MinMaxBuffer", minMaxBuffer);
             NoiseGenShader.SetBuffer(NormalizeTextureKernel, "_MinMaxBuffer", minMaxBuffer);
             NoiseGenShader.SetTexture(NormalizeTextureKernel, "_NoiseTexture", noiseTexture);
         }
@@ -131,13 +131,13 @@ namespace SadSapphicGames.NoiseGenerators
                     ActiveChannel = (TextureChannel)i;
                     SetShaderParameters();
                     NoiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
-                    NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                    NoiseGenShader.Dispatch(GenerateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                     NoiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                 }
                 ActiveChannel = TextureChannel.All;
             } else {
                 NoiseGenShader.Dispatch(GeneratePointsKernel, PointThreadGroupCount.x, PointThreadGroupCount.y, PointThreadGroupCount.z);
-                NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+                NoiseGenShader.Dispatch(GenerateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
                 NoiseGenShader.Dispatch(NormalizeTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
             }
             // pointsBuffer.Release();
