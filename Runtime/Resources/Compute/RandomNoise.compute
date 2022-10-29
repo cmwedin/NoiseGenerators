@@ -1,6 +1,6 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
-#include "/Includes/PRNG.compute"
+#include "/Includes/PRNG.cginc"
 #define UINTMAXVALUE 4294967295.0 
 
 RWTexture2D<float4> _NoiseTexture;

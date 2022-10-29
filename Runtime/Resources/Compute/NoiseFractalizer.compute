@@ -1,4 +1,4 @@
-#include "/Includes/PRNG.compute"
+#include "/Includes/PRNG.cginc"
 #define UINTMAXVALUE 4294967295.0 
 #define TAU 6.283185307179586
 

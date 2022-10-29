@@ -1,5 +1,5 @@
 // Each #kernel tells which function to compile; you can have many kernels
-#include "/Includes/PRNG.compute"
+#include "/Includes/PRNG.cginc"
 #define UINTMAXVALUE 4294967295.0 
 
 #pragma kernel CSMain
