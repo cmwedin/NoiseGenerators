@@ -42,7 +42,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     );
     float4 fragCol = lerp(colA,colB,localLatticePos.y);
     _NoiseTexture[id.xy] = fragCol ;
-    // _NoiseTexture[id.xy] = _LatticeTexture[latticeIndex+1];
 }
 
 [numthreads(8,8,1)]
