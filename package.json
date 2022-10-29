@@ -7,5 +7,10 @@
     "name" : "Chris Wedin",
     "email" : "cmwedin@gmail.com",
     "url" : "https://github.com/cmwedin"
-  }
+  },
+  "samples" : [{
+    "displayName" : "Noise Demo",
+    "description" : "This demo contains a scene with a display to show what the various types of noise textures look like and enable experimentation with different parameters for noise textures",
+    "path" : "Samples~/NoiseDemo"
+  }]
 }
