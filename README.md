@@ -1,5 +1,37 @@
 # Noise Generators
-This package is a collection of compute shaders that can generate various types of noise textures. This README is currently a placeholder and will be update as development continues
+This package is a collection of compute shaders that can generate various types of noise textures. 
+
+## Installation
+### Through GitHub (Recommended)
+#### Stable Installation
+To install this package in your Unity project, select the "window/Package Manager" entry in the Unity Inspector toolbar. Then, select the "+" icon in the upper left corner of the opened window, and select "Add package from git url." Paste the following:
+
+    https://github.com/cmwedin/NoiseGenerators.git
+
+Once you see this package show up in the Package Manager window, it has been successfully installed. 
+
+You can automatically update the package by clicking the "update," button in the bottom right corner of the package manager window. This will retrieve any changes on main branch on this repository since installation or your last update.
+
+#### Bleeding-Edge Installation
+You can install the experimental version of this package instead by adding #Development-Branch to the end of the Github url above. This will make your installation use the most up to date version possible, even before changes are merged onto the main branch. 
+
+### Through Itch.io
+When installing this package through Itch.io you will need to update the package manually. There are two methods to download the package through Itch, you can either install it with the rest of your packages, leaving your asset folder less cluttered, but preventing modifications to the packages files; or you can install it as an asset, placing all of the scripts within your asset folder and allowing you to modify them. Modifications to this packages scripts are recommended only for user very confident in what they are doing.   
+
+#### Installing as a Package
+Download this package's archive from its <a href="https://sadsapphic.itch.io/noise-generators" target="_blank">Itch.io page</a>. Once downloaded, extract the "NoiseGenerators" folder contained within to your desired installation location. Note that deleting this folder will break your package installation, even after adding the package to a Unity project.
+
+After you have downloaded and unzipped the package, open the Unity project you wish to add this package too. Open the package manager window, and select the "+" icon in the upper left corner. Then, select the "Add package from disk" option. Navigate to your installation location and select the "package.json" file. Once you see this package show up in the Package Manager window, it has been successfully installed.
+
+#### Installing as an Asset
+Download the .unitypackage file from this packages <a href="https://sadsapphic.itch.io/noise-generators" target="_blank">Itch.io page</a>. Once downloaded, open the Unity project you wish to add this package to. Select "Assets" from the Unity Editor's toolbar, an  from the "Import Package" menu select "Custom Package". In the window that pops up navigate to the .unitypackage file you downloaded and select it. The package will be added to your assets folder in the "/Packages/CommandPattern/" directory. 
+
+### Updating the Package
+If you installed the package through GitHub, you can automatically update it to its newest version by clicking the "update" button in the bottom right corner of its entry in the package manager window. If not, you will need to update it manually. In addition, there may be steps needed to migrate your code to the newer version of the package. If there are, these will be added to this section when the update has been released.
+#### Manual Updating as a package
+If you installed the package using the local package installation through the Unity package manager to update it you will need to download the archive for the updated version from the packages Itch.io page. Once you've done this, remove the old package in the package manager, delete the old installation and extract the inner folder from the new archive. If you plan to install the updated package with the same path, you may be able to skip removing the old package, but it is recommended you do so regardless. Once you have completed this, add the updated version of the package through the same installation progress you followed above.
+#### Manual Updating as an Asset
+If you installed the package as an asset using the .unitypackage file, simply download the updated .unitypackage file, delete you old installation in your assets folder, and follow the installation process above using the new .unitypackage file.  
 
 # Using This Package
 There are multiple supported ways to use this package to generate a random noise texture. The first step is to determine what type of noise texture you want to generate. The different types of noise textures supported are discussed [bellow](#random-noise-texture). Once you have determined the appropriate noise texture for your purpose, you can use one of the following methods to create it
@@ -18,7 +50,8 @@ The editor tools supporting this method of generating noise texture are planed t
 ## Displaying the Noise Textures
 While experimenting with different types of textures and texture parameters you may find it helpful to display the generated texture in the scene to better see the effect. Using [noise generator components](#using-a-monobehaviour-component) is recommended for this purpose. While you can see the generated texture by control clicking on the "Noise Texture" field in the editor, it can be difficult to distinguish changes after modifying the parameters, regenerating the texture, and re-opening the preview window. To alleviate this, we provide a "NoiseTextureDisplay" component that can show the texture in the scene and update the display whenever its regenerated. To use this, simply add the `NoiseTextureDisplay` component to an empty game object, the component will handle setting up the other components needed to display the texture for you (although for completeness it is recommended you set the mesh to the default quad and the material to an unlit texture), and resize the game object as desired. Once the size and position of the object is set up appropriately, add the generator component you wish to display the texture of to the `Texture Generator` editor field of the `NoiseTextureDisplay` component. Then, whenever the texture of that generator component is recreated, the object displaying it in the scene will be updated accordingly         
 
-# Pseudo-Random Number generation approach
+# Package Implementation Details
+## Pseudo-Random Number generation approach
 
 This package uses a "permuted congruential generator" (more commonly known as PCG) algorithm  as it lies on the pareto-fronter of random quality vs performance (see [Hash Functions for GPU Rendering](https://jcgt.org/published/0009/03/02/)). The particular PCG procedure this package uses is (as implemented in HLSL): 
 
@@ -48,22 +81,25 @@ we also include the following 3 -> 3 and 4 -> 4 hash methods, respectively:
 a 2d hash can be generated by discarding the z component of the 3d hash.
 
 
-# Random Noise Texture
+## Random Noise Texture
 The is the simplest approach to generating a random noise texture in that it simply uses random values for the color of each pixel without any additional computation. This packages methodology for preforming this is to take the x and y position of each pixel, the hash of a seed, and the hash of that hash, and combine them into the argument of the pcg4d_hash method. The result of this hash is then normalized against the maximum value of uint and used as the color of the pixel in the output texture. This results in a 4d random noise texture. Each of the rgba channels can be used for   
 
 
-# Value Noises Texture
+## Value Noises Texture
 This is a lattice based algorithm that generates noise textures with smoother transitions in local areas (also called a coherent noise texture). This algorithm functions by first generating a small random colors on each point of a lattice. The size of each cell in the lattice can be modified; however, to ensure tiling the size of a individual lattice cell must be a factor of the size of the total texture (so that an integer number of cells can be fit in the entire texture). Each pixel in the value noise texture then interpolates between the colors of each of the 4 lattice points surrounding it. The values being interpolated between are the same within each cell, the only difference being the "t" value of the interpolation. This results in a blocky final texture which is the primary drawback of this noise generation methods, although this can be alleviated by passing the final texture into a fractal noise generator, which require the value noise generator to be set to tile.     
 
-# Perlin Noise Texture
+## Perlin Noise Texture
 This is a similar lattice based algorithm that generates coherent noise texture that have a smoother, less blocky appearance than value noise textures. It again first generates a smaller random noise texture that serves as a the base for the random values use on the lattice. The size of each cell in this lattice must be a factor of the total texture size. If it is not, the value will be adjusted automatically to the closest factor. The rgba values of each pixel on this image are use to rotate a vector by a random radian between 0 and 2pi. Then for each pixel on the canvas a color is associated with each point on the lattice by taking the dot product of the offest vector from that point to the pixel and each of the four vectors generated for that lattice point. These colors are then interpolated to create the final color for the pixel. The texture can be tiled seamlessly if using the "tile texture" setting, which is needed if using the texture as a base for fractal noise discussed below. 
 
-# Worley Noise Texture
+## Worley Noise Texture
 This type of noise texture, also called Cellular or Voronoi noise, works by scattering points randomly across the texture and setting the values of each pixel based on how far it is from the closest point. The closer the pixel is to a control point the darker it will be, although this can be inverted using the "invert texture" setting. The texture values are then normalized between the maximum and minimum values generated by the algorithm to ensure the full range of 0 to 1 us used.  For the implementation in this project the scattering of the control points isn't purely random but rather the texture is divided into cells with one point placed in each cell. This is to optimize the calculation of the closest point as only the points in adjacent cells need to be checked. Due to poor quality texture when the number of control points is set to a prime number, the number of points cannot be set directly. Instead the number of divisions within which to place a point can be set along each axis. For example, if the x axis is set to be divided into 10 cells, and the y axis into 5, the resulting texture will be generated from 50 control points. The channel the generated noise is stored in can be adjusted by changing the active channel enum. If it is set to all then a separate noise texture will be stored in each channel of the final texture.  
 Optionally, the texture generator can be required to generate a texture that will tile seamlessly. When this option is set to true the generator will along the edges wrap the point on the other side of the texture so that it is adjacent to the cell of the pixel the value is being calculated for, and that point will be included in the determination of the closest point. Effectively, surround the texture with a copy of the collection of points along all sides so that the generated texture can be tiled seamlessly.  
 
-# Fractal Noise
+## Fractal Noise
 Rather than being a method of generating noise in its own right fractal noise is a method to add detail to an existing noise texture by adding onto itself with increasing frequency and decreasing amplitude. In order for the fractal noise generator component to work a separate noise generator is needed to create the texture id will add detail too. For best results it is important that the underlying texture detail is added to be able to tile seamlessly, otherwise there will be visible seems on the result of the fractal noise generator. 
 There are a variety of parameters that can be modified to tweak how detail is added. The octaves setting will affect how many times detail will be added onto the texture, note that as with each iteration the amplitude of the added noise is decreased the final texture will typically converge as the number of octaves is increased. 
 The frequency and amplitude parameters will modify the initial settings of the generator. At high frequencies the value of a given pixel will be affected by the value of pixels far away from it, and at low frequencies by pixels nearby it. Amplitude affects how much each octave contributes to the final result, as each value added to the final value for a given pixel is multiplied by the amplitude for that octave. Note that by default the affects of amplitude are normalized out of the final texture (this is due to the restriction on the range of values that can be represented using colors, all values outside the 0-1 range are identical on the final texture), meaning that changing the amplitude visually doesn't affect the final result. This can be disabled through the "normalize amplitude" setting, although this is only recommended for very small amplitudes due to the aforementioned restrictions on the range of values that can be represented by a color. 
-Lacunarity and gain (also called persistance) affect how quickly the values of frequency and amplitude change with each octave. Once the value on octave will contribute to the final texture is calculated the frequency is multiplied by the lacunarity to determine the frequency for the next octave, and the amplitude by the gain. The generally accepted values of these parameters to generate the best results are 2 and .5 respectively, or if nonstandard values are use that gain be the inverse of lacunarity and vice versa.     
+Lacunarity and gain (also called persistance) affect how quickly the values of frequency and amplitude change with each octave. Once the value on octave will contribute to the final texture is calculated the frequency is multiplied by the lacunarity to determine the frequency for the next octave, and the amplitude by the gain. The generally accepted values of these parameters to generate the best results are 2 and .5 respectively, or if nonstandard values are use that gain be the inverse of lacunarity and vice versa.
+
+# Extension Instructions
+While this package tries to provide as many types of noise textures as possible, you may find yourself wanting to build on them further to or even create custom generators of your own. The instructions below will explain how to extend the class provided in this package to accomplish that.
