@@ -83,5 +83,14 @@ namespace SadSapphicGames.NoiseGenerators
             renderTexture.height = newTexHeight;
             renderTexture.Create();
         }
+
+        public static RenderTexture Copy(this RenderTexture src) {
+            var output = new RenderTexture(src.width, src.height, src.depth);
+            output.enableRandomWrite = true;
+            output.Create();
+            output.wrapMode = TextureWrapMode.Repeat;
+            Graphics.CopyTexture(src, output);
+            return output;
+        }
     }
 }

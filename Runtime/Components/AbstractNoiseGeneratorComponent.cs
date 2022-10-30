@@ -104,12 +104,12 @@ namespace SadSapphicGames.NoiseGenerators
         {
             if (!disposedValue)
             {
-                Debug.Log($"Disposing noise generator {this.name}");
-                NoiseTexture?.Release();
+                // Debug.Log($"Disposing noise generator {this.name}");
+                noiseTexture?.Release();
                 noiseTexture = null;
                 if (disposing)
                 {
-                    noiseGeneratorObject?.Dispose();
+                    noiseGeneratorObject.Dispose();
                     noiseGeneratorObject = null;
                 }
 
@@ -117,12 +117,6 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
-        // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        ~AbstractNoiseGeneratorComponent()
-        {
-            Dispose(disposing: false);
-        }
-// 
         /// <summary>
         /// Disposes the NoiseGeneratorObject used to create the noise texture and the texture itself. Do not invoke this until done using the texture
         /// </summary>

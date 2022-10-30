@@ -58,6 +58,7 @@ namespace SadSapphicGames.NoiseGenerators
             baseNoiseGenerator.TexWidth = TexWidth;
             baseNoiseGenerator.Seed = seed;
             baseNoiseGenerator.GenerateTexture();
+            _disposedValue = false;
             var noiseGeneratorObject = new FractalNoiseGenerator(Octaves, baseNoiseGenerator.NoiseTexture, Lacunarity, Frequency, Gain, Amplitude);
             noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
             return noiseGeneratorObject;
@@ -102,13 +103,13 @@ namespace SadSapphicGames.NoiseGenerators
 
         private bool _disposedValue = false;
         protected override void Dispose(bool disposing)
-        {
+        {   
             if (!_disposedValue)
             {
                 baseNoiseGenerator?.Dispose();
-                base.Dispose(disposing);
+                _disposedValue = true;
             }
-            _disposedValue = true;
+            base.Dispose(disposing);
         }
     }
 }

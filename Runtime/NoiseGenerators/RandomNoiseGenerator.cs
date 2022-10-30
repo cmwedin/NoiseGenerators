@@ -32,10 +32,10 @@ namespace SadSapphicGames.NoiseGenerators
         /// <param name="_requireSeamlessTiling">If the texture should tile seamlessly</param>
         /// <returns>the generated texture</returns>
         public static RenderTexture GenerateTexture(uint _texWidth, uint _texHeight, uint _seed, bool _requireSeamlessTiling = true) {
-            RandomNoiseGenerator generator = new RandomNoiseGenerator(_texWidth, _texHeight, _seed);
+            using RandomNoiseGenerator generator = new RandomNoiseGenerator(_texWidth, _texHeight, _seed);
             generator.RequireSeamlessTiling = _requireSeamlessTiling;
             generator.GenerateTexture();
-            RenderTexture output = generator.NoiseTexture;
+            RenderTexture output = generator.NoiseTexture.Copy();
             generator.Dispose();
             return output;
         }

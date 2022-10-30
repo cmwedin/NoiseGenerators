@@ -167,8 +167,8 @@ namespace SadSapphicGames.NoiseGenerators
             generator.RequireSeamlessTiling = _requireSeamlessTiling;
             generator.InvertTexture = _invertTexture;
             generator.GenerateTexture();
-            RenderTexture output = generator.NoiseTexture;
-            generator.Dispose();
+            RenderTexture output = generator.NoiseTexture.Copy();
+            generator.Dispose(); //?should be redundant
             return output;
         }
 
