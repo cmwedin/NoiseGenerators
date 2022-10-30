@@ -195,6 +195,11 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
+        ~AbstractNoiseGenerator(){
+            Debug.LogWarning($"Garbage collector disposing noise generator {this.ToString()}, remember to invoke the Dispose() method of your noise generator when done using its noise texture ");
+            Dispose(disposing: false);
+        }
+
         /// <summary>
         /// Disposes the resources used to generate the texture, but not the texture itself. Remember to dispose of that through its Release() method when finished using it
         /// </summary>
