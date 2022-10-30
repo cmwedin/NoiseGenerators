@@ -4,18 +4,15 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A MonoBehaviour component wrapping a FractalNoiseGenerator object
+    /// </summary>
     public class FractalNoiseGeneratorComponent : AbstractNoiseGeneratorComponent
     {
         /// <summary>
         /// The base noise generator for creating the input texture to the fractal noise generator
         /// </summary>
         [SerializeField] private AbstractNoiseGeneratorComponent baseNoiseGenerator;
-
-        // /// <summary>
-        // /// The object that generates the fractal noise texture
-        // /// </summary>
-        // protected override AbstractNoiseGenerator NoiseGeneratorObject => noiseGeneratorObject;
-        // private FractalNoiseGenerator noiseGeneratorObject;
 
         /// <summary>
         /// The number of times detail should be added onto the noise texture
@@ -68,7 +65,21 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void UpdateGeneratorSettings()
         {
             base.UpdateGeneratorSettings();
+            if(baseNoiseGenerator.TexHeight != TexHeight) {
+                baseNoiseGenerator.TexHeight = TexHeight;
+                TexHeight = baseNoiseGenerator.TexHeight;
+            }
+            if(baseNoiseGenerator.TexWidth != TexWidth) {
+                baseNoiseGenerator.TexWidth = TexWidth;
+                TexWidth = baseNoiseGenerator.TexWidth;
+            }
+            if(baseNoiseGenerator.Seed != Seed) {
+                baseNoiseGenerator.Seed = Seed;
+            }
+            baseNoiseGenerator.GenerateTexture();
+
             var GeneratorAsFractal = NoiseGeneratorObject as FractalNoiseGenerator;
+            GeneratorAsFractal.InputTexture = baseNoiseGenerator.NoiseTexture;
             if(GeneratorAsFractal.Octaves != Octaves) {
                 GeneratorAsFractal.Octaves = Octaves;
             }
@@ -87,6 +98,17 @@ namespace SadSapphicGames.NoiseGenerators
             if(GeneratorAsFractal.Amplitude != Amplitude) {
                 GeneratorAsFractal.Amplitude = Amplitude;
             }
+        }
+
+        private bool _disposedValue = false;
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                baseNoiseGenerator?.Dispose();
+                base.Dispose(disposing);
+            }
+            _disposedValue = true;
         }
     }
 }

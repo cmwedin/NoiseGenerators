@@ -3,6 +3,7 @@ using SadSapphicGames.NoiseGenerators;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    internal enum NoiseType {Random,Value,Perlin,Worley}
     public class StaticGeneratorTester : MonoBehaviour {
         [SerializeField] uint texWidth;
         [SerializeField] uint texHeight;

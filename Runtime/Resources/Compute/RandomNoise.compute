@@ -1,6 +1,6 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
-#include "/Includes/PRNG.compute"
+#include "/Includes/PRNG.cginc"
 #define UINTMAXVALUE 4294967295.0 
 
 RWTexture2D<float4> _NoiseTexture;
@@ -16,8 +16,4 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     uint hash = pcg_hash(_Seed);
     uint4 hash4d = pcg4d_hash(uint4(id.x,id.y,hash,pcg_hash(hash)));
     _NoiseTexture[id.xy] = hash4d / UINTMAXVALUE;
-    //? alternate coloration used to verify the hash method doesnt have patterns or repitions at large scales (each pixel becomes a sequental input into the hash function)
-    // int pixelIndex = id.y * _TexHeight + id.x;
-    // uint althash = pcg_hash(pixelIndex);
-    // _NoiseTexture[id.xy] = althash / 4294967295.0;
 }

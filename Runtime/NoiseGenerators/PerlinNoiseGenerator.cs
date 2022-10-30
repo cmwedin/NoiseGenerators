@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A generator object used to create perlin noise textures
+    /// </summary>
     public class PerlinNoiseGenerator : AbstractLatticeNoiseGenerator
     {
         /// <summary>
@@ -30,12 +33,11 @@ namespace SadSapphicGames.NoiseGenerators
 
         protected override void InnerGenerateTexture()
         {
-            SetShaderParameters();
             NoiseGenShader.Dispatch(generateLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             if(RequireSeamlessTiling) {
                 NoiseGenShader.Dispatch(wrapLatticeKernel, latticeThreadGroupCount.x, latticeThreadGroupCount.y, latticeThreadGroupCount.z);
             }
-            NoiseGenShader.Dispatch(generateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
+            NoiseGenShader.Dispatch(GenerateTextureKernel, texThreadGroupCount.x, texThreadGroupCount.y, texThreadGroupCount.z);
         }
 
         /// <summary>

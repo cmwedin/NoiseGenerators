@@ -47,19 +47,22 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The kernel of the method to generate the texture in the compute shader
         /// </summary>
-        protected int generateTextureKernel { get => NoiseGenShader.FindKernel("CSMain"); }
+        protected virtual int GenerateTextureKernel { get => NoiseGenShader.FindKernel("CSMain"); }
+        
+        private Vector3Int defaultThreadGroupSize = new Vector3Int(8, 8, 1);
         /// <summary>
         /// The number of threads per group in the compute shader
         /// </summary>
-        protected Vector3Int threadGroupSize = new Vector3Int(8, 8, 1);
+        protected virtual Vector3Int ThreadGroupSize { get => defaultThreadGroupSize; }
+        
         /// <summary>
         /// The number of thread groups used to generate the noise texture
         /// </summary>
         protected Vector3Int texThreadGroupCount
         {
             get => new Vector3Int(
-                Mathf.CeilToInt((float)texWidth / (float)threadGroupSize.x),
-                Mathf.CeilToInt((float)texHeight / (float)threadGroupSize.x),
+                Mathf.CeilToInt((float)texWidth / (float)ThreadGroupSize.x),
+                Mathf.CeilToInt((float)texHeight / (float)ThreadGroupSize.x),
                 1
             );
         }
@@ -148,7 +151,7 @@ namespace SadSapphicGames.NoiseGenerators
             NoiseGenShader.SetInt("_Seed", (int)Seed);
             NoiseGenShader.SetInt("_TexWidth", (int)TexWidth);
             NoiseGenShader.SetInt("_TexHeight", (int)TexHeight);
-            NoiseGenShader.SetTexture(generateTextureKernel, "_NoiseTexture", noiseTexture);
+            NoiseGenShader.SetTexture(GenerateTextureKernel, "_NoiseTexture", noiseTexture);
         }
 
         /// <summary>
@@ -158,14 +161,22 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Generates the noise texture
         /// </summary>
-        public void GenerateTexture() {
+        public virtual void GenerateTexture() {
             SetShaderParameters();
+            ResetNoiseTexture();
             InnerGenerateTexture();
             OnTextureGeneration?.Invoke();
         }
 
+        private void ResetNoiseTexture()
+        {
+            NoiseTexture.DiscardContents();
+            NoiseTexture.Release();
+            NoiseTexture.Create();
+        }
 
-//? IDisposable implementation
+
+        //? IDisposable implementation
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
@@ -174,9 +185,11 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    //? No managed disposables in base class 
                 }
-
+                //? If in the future the decision is made to remove the static generation methods and dispose of noise textures with the generator objects uncomment this line
+                //? This is incompatible with static generator methods however as the generating object must be disposed of as soon as the static methods scope ends
+                //? Meaning as soon as the generated texture is returned to the caller it would already be dispoed
                 // noiseTexture?.Release();
                 disposedValue = true;
             }

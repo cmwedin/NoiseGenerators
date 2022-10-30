@@ -1,12 +1,10 @@
-#include "/Includes/PRNG.compute"
+#include "/Includes/PRNG.cginc"
 #define UINTMAXVALUE 4294967295.0 
 #define TAU 6.283185307179586
 
 #pragma kernel CSMain
 #pragma kernel NormalizeTexture
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
 RWTexture2D<float4> _InNoiseTexture;
 RWTexture2D<float4> _OutNoiseTexture;
 RWStructuredBuffer<uint> _MinMaxBuffer;

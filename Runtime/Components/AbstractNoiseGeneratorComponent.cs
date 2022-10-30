@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// The abstract bass class of all MonoBehaviour components wrapping an AbstractNoiseGenerator
+    /// </summary>
     [ExecuteInEditMode]
     public abstract class AbstractNoiseGeneratorComponent : MonoBehaviour, IDisposable
     {
@@ -23,7 +26,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// This event will be invoked when a new texture is generated
         /// </summary>
-        public event Action GeneratedTexture;
+        public event Action OnTextureGeneration;
         /// <summary>
         /// Constructs the generator object and sets its parameters
         /// </summary>
@@ -88,25 +91,25 @@ namespace SadSapphicGames.NoiseGenerators
             UpdateGeneratorSettings();
             NoiseGeneratorObject.GenerateTexture();
             noiseTexture = NoiseTexture;
-            GeneratedTexture?.Invoke();
+            OnTextureGeneration?.Invoke();
         }
 
         private void OnDisable() {
             this.Dispose();
         }
 
-        protected bool disposedValue;
+        private bool disposedValue = true;
 
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                // Debug.Log("Disposing noise generator");
+                Debug.Log($"Disposing noise generator {this.name}");
                 NoiseTexture?.Release();
                 noiseTexture = null;
                 if (disposing)
                 {
-                    NoiseGeneratorObject?.Dispose();
+                    noiseGeneratorObject?.Dispose();
                     noiseGeneratorObject = null;
                 }
 

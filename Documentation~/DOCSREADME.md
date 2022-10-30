@@ -1,0 +1,2 @@
+# Documentation Note
+The PDF in this folder is intended to provide offline documentation in cases where the online documentation is unavailable. It is recommended if possible to refer to the online documentation [here](https://cmwedin.github.io/NoiseGeneratorsDocumentation/namespaces.html)

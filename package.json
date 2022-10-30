@@ -1,11 +1,21 @@
 {
   "name" : "com.sadsapphicgames.noisegenerators",
-  "version" : "0.6.5",
+  "version" : "1.0.0",
   "displayName" : "Noise Generators",
   "description" : "This is a package of compute shaders to generate random noise textures of various types",
+  "documentationUrl" : "https://cmwedin.github.io/NoiseGeneratorsDocumentation/namespaces.html",
   "author" : {
     "name" : "Chris Wedin",
     "email" : "cmwedin@gmail.com",
     "url" : "https://github.com/cmwedin"
-  }
+  },
+  "samples" : [{
+    "displayName" : "Noise Demo",
+    "description" : "This demo contains a scene with a display to show what the various types of noise textures look like and enable experimentation with different parameters for noise textures",
+    "path" : "Samples~/NoiseDemo"
+  }],
+  "keywords": [
+    "Noise",
+    "HLSL"
+  ]
 }

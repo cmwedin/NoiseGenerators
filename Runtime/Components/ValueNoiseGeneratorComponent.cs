@@ -4,14 +4,10 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A MonoBehaviour component wrapping a ValueNoiseGenerator object
+    /// </summary>
     public class ValueNoiseGeneratorComponent : AbstractNoiseGeneratorComponent {
-        // private ValueNoiseGenerator noiseGeneratorObject;
-        // protected override AbstractNoiseGenerator NoiseGeneratorObject { get {
-        //     if(noiseGeneratorObject == null) {
-        //         CreateGeneratorObject();
-        //     }
-        //     return noiseGeneratorObject;
-        // }}
         /// <summary>
         /// If the texture should be required to tile seamlessly
         /// </summary>

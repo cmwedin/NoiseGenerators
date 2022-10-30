@@ -1,4 +1,4 @@
-#include "/Includes/PRNG.compute"
+#include "/Includes/PRNG.cginc"
 #define UINTMAXVALUE 4294967295.0 
 #define TAU 6.283185307179586
 
@@ -21,12 +21,6 @@ bool _Tiling; //? if the texture should be required to tile seamlessly
 bool _Invert; //? if the values of the texture should be inverted
 float4 _ChannelMask; //? the channel to store the generated noise in
 
-float4 MaskValue(float invalue) {
-    return (1-_ChannelMask)+invalue*_ChannelMask;
-}
-float4 MaskValue(float4 invalue) {
-    return (1-_ChannelMask)+invalue*_ChannelMask;
-}
 uint CellToBufferIndex(uint2 CellIndex) {
     return CellIndex.x + CellIndex.y*_CellXCount; 
 }
@@ -91,7 +85,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     InterlockedMax(_MinMaxBuffer[1],val);
 
     //? Records the result on the texture
-    // _NoiseTexture[id.xy] = MaskValue(result);
     _NoiseTexture[id.xy] = _NoiseTexture[id.xy] * (1-_ChannelMask) + result * _ChannelMask;
 }
 
@@ -116,6 +109,5 @@ void NormalizeTexture(uint3 id : SV_DISPATCHTHREADID) {
     float minVal = float(_MinMaxBuffer[0]/float(minMaxAccuracy));
     float maxVal = float(_MinMaxBuffer[1]/float(minMaxAccuracy));
     float4 normalizedCol = (_NoiseTexture[id.xy] - minVal)/(maxVal - minVal);
-    // _NoiseTexture[id.xy] = MaskValue(normalizedCol);
     _NoiseTexture[id.xy] = _NoiseTexture[id.xy] * (1-_ChannelMask) + normalizedCol * _ChannelMask;
 }

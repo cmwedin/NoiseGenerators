@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
 {
+    /// <summary>
+    /// A generator object used to create a purely random noise texture
+    /// </summary>
     public class RandomNoiseGenerator : AbstractNoiseGenerator
     {
         /// <summary>
@@ -18,9 +21,7 @@ namespace SadSapphicGames.NoiseGenerators
         protected override string ComputeShaderPath => "Compute/RandomNoise";
 
         protected override void InnerGenerateTexture() {
-            // SetShaderParameters();
-            // Debug.Log("Dispatching NoiseGen compute shader");
-            NoiseGenShader.Dispatch(0,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
+            NoiseGenShader.Dispatch(GenerateTextureKernel,texThreadGroupCount.x,texThreadGroupCount.y,texThreadGroupCount.z);
         }
         /// <summary>
         /// Generates a random noise texture using the provided parameters

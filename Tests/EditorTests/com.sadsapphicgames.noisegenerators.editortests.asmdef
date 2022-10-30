@@ -1,5 +1,5 @@
 {
-    "name": "EditorTests",
+    "name": "com.sadsapphicgames.noisegenerators.editortests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
