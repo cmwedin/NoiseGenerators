@@ -99,7 +99,6 @@ namespace SadSapphicGames.NoiseGenerators
             if(GeneratorAsFractal.Amplitude != Amplitude) {
                 GeneratorAsFractal.Amplitude = Amplitude;
             }
-            Debug.Log(_disposedValue);
         }
 
         private bool _disposedValue = false;
