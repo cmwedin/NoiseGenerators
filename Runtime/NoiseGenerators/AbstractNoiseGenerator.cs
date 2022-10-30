@@ -190,9 +190,14 @@ namespace SadSapphicGames.NoiseGenerators
                 //? If in the future the decision is made to remove the static generation methods and dispose of noise textures with the generator objects uncomment this line
                 //? This is incompatible with static generator methods however as the generating object must be disposed of as soon as the static methods scope ends
                 //? Meaning as soon as the generated texture is returned to the caller it would already be dispoed
-                // noiseTexture?.Release();
+                noiseTexture?.Release();
                 disposedValue = true;
             }
+        }
+
+        ~AbstractNoiseGenerator(){
+            Debug.LogWarning($"Garbage collector disposing noise generator {this.ToString()}, remember to invoke the Dispose() method of your noise generator when done using its noise texture ");
+            Dispose(disposing: false);
         }
 
         /// <summary>
