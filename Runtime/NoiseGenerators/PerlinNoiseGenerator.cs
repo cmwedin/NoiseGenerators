@@ -61,11 +61,11 @@ namespace SadSapphicGames.NoiseGenerators
                 Debug.LogWarning("Cannot both allow partial cells and require seamless tiling, setting seamless tiling to false");
                 _requireSeamlessTiling = false;
             }
-            PerlinNoiseGenerator generator = new PerlinNoiseGenerator(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells);
+            using PerlinNoiseGenerator generator = new PerlinNoiseGenerator(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells);
             generator.RequireSeamlessTiling = _requireSeamlessTiling;
             generator.GenerateTexture();
-            RenderTexture output = generator.NoiseTexture;
-            generator.Dispose();
+            RenderTexture output = generator.NoiseTexture.Copy();
+            generator.Dispose(); //?should be redundant
             return output;
         }
     }

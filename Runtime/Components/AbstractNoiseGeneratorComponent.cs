@@ -104,7 +104,7 @@ namespace SadSapphicGames.NoiseGenerators
         {
             if (!disposedValue)
             {
-                Debug.Log($"Disposing noise generator {this.name}");
+                // Debug.Log($"Disposing noise generator {this.name}");
                 NoiseTexture?.Release();
                 noiseTexture = null;
                 if (disposing)

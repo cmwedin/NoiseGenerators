@@ -205,10 +205,10 @@ namespace SadSapphicGames.NoiseGenerators {
             float _gain = 0.5f,
             float _amplitude = 0.5f
         ) {
-            FractalNoiseGenerator generator = new FractalNoiseGenerator(_octaves, _inputTexture, _lacunarity, _frequency, _gain, _amplitude);
+            using FractalNoiseGenerator generator = new FractalNoiseGenerator(_octaves, _inputTexture, _lacunarity, _frequency, _gain, _amplitude);
             generator.GenerateTexture();
-            RenderTexture output = generator.NoiseTexture;
-            generator.Dispose();
+            RenderTexture output = generator.NoiseTexture.Copy();
+            generator.Dispose(); //?should be redundant
             return output;
         }
 
@@ -217,7 +217,6 @@ namespace SadSapphicGames.NoiseGenerators {
         {
             if (!disposedValue)
             {
-                Debug.Log($"Disposing {this.ToString()}");
                 if (disposing)
                 {
                     minMaxBuffer.Dispose();

@@ -66,8 +66,8 @@ namespace SadSapphicGames.NoiseGenerators
             ValueNoiseGenerator generator = new ValueNoiseGenerator(_texWidth, _texHeight, _seed, _latticeCellSize, _allowPartialCells);
             generator.RequireSeamlessTiling = _requireSeamlessTiling;
             generator.GenerateTexture();
-            RenderTexture output = generator.NoiseTexture;
-            generator.Dispose();
+            RenderTexture output = generator.NoiseTexture.Copy();
+            generator.Dispose(); //?should be redundant
             return output;
         }
     }
