@@ -1,5 +1,5 @@
 # Noise Generators
-This package is a collection of compute shaders that can generate various types of noise textures.  It supports generating Perlin noise, Worley noise (aka Voroni or cellular noise), value noise, and pure random noise. The generators are implemented in HLSL compute shaders allowing the textures to quickly be created (the speed varies based on the type of texture but is generally under 1ms).
+This package is a collection of compute shaders that can generate various types of noise textures.  It supports generating Perlin noise, Worley noise (aka Voroni or cellular noise), value noise, and pure random noise. The generators are implemented in HLSL compute shaders allowing the textures to quickly be created (the speed varies based on the type of texture but is generally under 1ms). Full documentation of the included classes is available [here](https://cmwedin.github.io/NoiseGeneratorsDocumentation/namespaces.html)
 
 ## Installation
 ### Through GitHub (Recommended)
