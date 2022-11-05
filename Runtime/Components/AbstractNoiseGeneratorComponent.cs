@@ -44,10 +44,12 @@ namespace SadSapphicGames.NoiseGenerators
                 return NoiseGeneratorObject.NoiseTexture; 
             } 
         }
-        /// <summary>
-        /// Redundant field so the noise texture can be examined in the inspector, Unity does not serialize properties
-        /// </summary>
-        [SerializeField, Tooltip("The noise texture created by the generator")] RenderTexture noiseTexture;
+
+        //? removed as of v1.0.1
+        // /// <summary>
+        // /// Redundant field so the noise texture can be examined in the inspector, Unity does not serialize properties
+        // /// </summary>
+        // [SerializeField, Tooltip("The noise texture created by the generator")] RenderTexture noiseTexture;
 
         /// <summary>
         /// The seed that will be used in the pseudo-random number generation
@@ -99,7 +101,6 @@ namespace SadSapphicGames.NoiseGenerators
             UpdateGeneratorSettings();
             NoiseGeneratorObject.GenerateTexture();
             TextureGenerated = true;
-            noiseTexture = NoiseTexture;
             OnTextureGeneration?.Invoke();
         }
 
@@ -114,8 +115,6 @@ namespace SadSapphicGames.NoiseGenerators
             if (!disposedValue)
             {
                 // Debug.Log($"Disposing noise generator {this.name}");
-                // noiseTexture?.Release();
-                noiseTexture = null;
                 disposedValue = true;
                 if (disposing)
                 {
