@@ -24,12 +24,22 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                 GUILayout.Label("Texture Preview Size:");
                 previewSize = EditorGUILayout.IntSlider(previewSize,0,Mathf.Min(targetGenerator.NoiseTexture.width,Screen.width-20));
                 EditorGUILayout.EndHorizontal();
-                using (var l = new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-                    GUILayout.Label(targetGenerator.NoiseTexture, new GUILayoutOption[2] { GUILayout.Width(previewSize), GUILayout.Height(previewSize) });
-                    GUILayout.FlexibleSpace();
-                }
+                // using (var l = new EditorGUILayout.HorizontalScope())
+                // {
+                //     GUILayout.FlexibleSpace();
+                //     GUILayout.Label(targetGenerator.NoiseTexture, new GUILayoutOption[2] { GUILayout.Width(previewSize), GUILayout.Height(previewSize) });
+                //     GUILayout.FlexibleSpace();
+                // }
+                int bufferSize = 5;
+                EditorGUI.DrawPreviewTexture(
+                    new Rect(
+                        (Screen.width - previewSize) / 2,
+                        bufferSize +GUILayoutUtility.GetLastRect().y + GUILayoutUtility.GetLastRect().height,
+                        previewSize,
+                        previewSize
+                    ), targetGenerator.NoiseTexture
+                );
+                GUILayout.Space(previewSize + bufferSize);
                 EditorGUILayout.EndVertical();
             }
             base.OnInspectorGUI();
