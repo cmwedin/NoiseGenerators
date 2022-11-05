@@ -28,6 +28,10 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         public event Action OnTextureGeneration;
         /// <summary>
+        /// A boolean to indicate if the texture has been generated yet
+        /// </summary>
+        public bool TextureGenerated { get; private set; } = false;
+        /// <summary>
         /// Constructs the generator object and sets its parameters
         /// </summary>
         protected abstract AbstractNoiseGenerator CreateGeneratorObject();
@@ -35,7 +39,11 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The noise texture created by the generator
         /// </summary>
-        public RenderTexture NoiseTexture  { get => NoiseGeneratorObject.NoiseTexture;}
+        public RenderTexture NoiseTexture  { get {
+                if (!TextureGenerated) { return null; }
+                return NoiseGeneratorObject.NoiseTexture; 
+            } 
+        }
         /// <summary>
         /// Redundant field so the noise texture can be examined in the inspector, Unity does not serialize properties
         /// </summary>
@@ -90,6 +98,7 @@ namespace SadSapphicGames.NoiseGenerators
         public void GenerateTexture() {
             UpdateGeneratorSettings();
             NoiseGeneratorObject.GenerateTexture();
+            TextureGenerated = true;
             noiseTexture = NoiseTexture;
             OnTextureGeneration?.Invoke();
         }
@@ -105,15 +114,15 @@ namespace SadSapphicGames.NoiseGenerators
             if (!disposedValue)
             {
                 // Debug.Log($"Disposing noise generator {this.name}");
-                noiseTexture?.Release();
+                // noiseTexture?.Release();
                 noiseTexture = null;
+                disposedValue = true;
                 if (disposing)
                 {
-                    noiseGeneratorObject.Dispose();
+                    noiseGeneratorObject?.Dispose();
                     noiseGeneratorObject = null;
                 }
-
-                disposedValue = true;
+                TextureGenerated = false;
             }
         }
 
