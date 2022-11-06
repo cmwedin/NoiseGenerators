@@ -43,6 +43,16 @@ namespace SadSapphicGames.NoiseGenerators {
         /// The input texture to use in the fractal noise generation process
         /// </summary>
         private RenderTexture inputTexture;
+        private RenderTexture inputTextureArray;
+        public RenderTexture InputTextureArray { get
+            {
+                if (inputTextureArray == null) {
+                    CreateInputArray();
+                }
+                return inputTextureArray;
+            }
+            private set => inputTextureArray = value; }
+
         public RenderTexture InputTexture {
             get {
                 if(inputTexture == null) {
@@ -51,7 +61,7 @@ namespace SadSapphicGames.NoiseGenerators {
                         baseNoiseGenerator.GenerateTexture();
                         inputTexture = baseNoiseGenerator.NoiseTexture;
                     } else {
-                        throw new MissingReferenceException("This generator is supposed to be using a pregenerated texture however its input texture is null");
+                        throw new MissingReferenceException("This generator is supposed to be using a pre-generated texture however its input texture is null");
                     }
                 }
                 return inputTexture;
@@ -165,6 +175,19 @@ namespace SadSapphicGames.NoiseGenerators {
                 Amplitude = _amplitude;
             }
         }
+        private void CreateInputArray() {
+            inputTextureArray?.Release();
+            inputTextureArray = null;
+            inputTextureArray = new RenderTexture((int)TexWidth, (int)TexHeight,24);
+            inputTextureArray.dimension = UnityEngine.Rendering.TextureDimension.Tex2DArray;
+            inputTextureArray.volumeDepth = (int)Octaves;
+            inputTextureArray.enableRandomWrite = true;
+            inputTextureArray.Create();
+            for (int i = 0; i < Octaves; i++)
+            {
+                Graphics.CopyTexture(InputTexture,0,0, inputTextureArray,i,0);
+            }
+        }
 
         protected override void SetShaderParameters()
         {
@@ -176,7 +199,8 @@ namespace SadSapphicGames.NoiseGenerators {
             NoiseGenShader.SetFloat("_Amplitude", amplitude);
             NoiseGenShader.SetBool("_NormalizeAmplitude", NormalizeAmplitude);
             NoiseGenShader.SetBuffer(GenerateTextureKernel,"_MinMaxBuffer", minMaxBuffer);
-            NoiseGenShader.SetTexture(GenerateTextureKernel, "_InNoiseTexture", InputTexture);
+            CreateInputArray();
+            NoiseGenShader.SetTexture(GenerateTextureKernel, "_InNoiseTextureArray", InputTextureArray);
             NoiseGenShader.SetTexture(GenerateTextureKernel, "_OutNoiseTexture", noiseTexture);
             NoiseGenShader.SetBuffer(normalizeTextureKernel,"_MinMaxBuffer", minMaxBuffer);
             NoiseGenShader.SetTexture(normalizeTextureKernel, "_OutNoiseTexture", noiseTexture);
@@ -224,6 +248,7 @@ namespace SadSapphicGames.NoiseGenerators {
                     minMaxBuffer = null;
                     baseNoiseGenerator?.Dispose();
                 }
+                inputTextureArray?.Release();
                 base.Dispose(disposing);
                 disposedValue = true;
             }

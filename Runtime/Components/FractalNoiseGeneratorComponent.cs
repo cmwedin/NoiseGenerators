@@ -50,6 +50,8 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         public bool NormalizeAmplitude { get => normalizeAmplitude; set => normalizeAmplitude = value; }
         [SerializeField,Tooltip("If the affect of the initial amplitude should be normalized out of the final value")] private bool normalizeAmplitude = true;
+        [SerializeField] private RenderTexture inputArray;
+        
 
 
         protected override AbstractNoiseGenerator CreateGeneratorObject()
@@ -61,6 +63,7 @@ namespace SadSapphicGames.NoiseGenerators
             _disposedValue = false;
             var noiseGeneratorObject = new FractalNoiseGenerator(Octaves, baseNoiseGenerator.NoiseTexture, Lacunarity, Frequency, Gain, Amplitude);
             noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
+            noiseGeneratorObject.OnTextureGeneration += () => { inputArray = noiseGeneratorObject.InputTextureArray; };
             return noiseGeneratorObject;
         }
         protected override void UpdateGeneratorSettings()
@@ -108,6 +111,8 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 baseNoiseGenerator?.Dispose();
                 _disposedValue = true;
+                inputArray?.Release();
+                inputArray = null;
             }
             base.Dispose(disposing);
         }
