@@ -66,6 +66,23 @@ namespace SadSapphicGames.NoiseGenerators
             noiseGeneratorObject.OnTextureGeneration += () => { inputArray = noiseGeneratorObject.InputTextureArray; };
             return noiseGeneratorObject;
         }
+
+        [SerializeField]private bool useMultipleInputsTextures;
+        private void CreateInputTextures() {
+            if(!useMultipleInputsTextures) {
+                baseNoiseGenerator.GenerateTexture();
+                ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(baseNoiseGenerator.NoiseTexture);
+            } else {
+                var input = new List<RenderTexture>();
+                for (int i = 0; i < Octaves; i++)
+                {
+                    baseNoiseGenerator.GenerateTexture();
+                    input.Add(baseNoiseGenerator.NoiseTexture.Copy());
+                    baseNoiseGenerator.Seed++;
+                }
+                ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(input);
+            }
+        }
         protected override void UpdateGeneratorSettings()
         {
             base.UpdateGeneratorSettings();
@@ -81,9 +98,9 @@ namespace SadSapphicGames.NoiseGenerators
                 baseNoiseGenerator.Seed = Seed;
             }
             baseNoiseGenerator.GenerateTexture();
+            CreateInputTextures();
 
             var GeneratorAsFractal = NoiseGeneratorObject as FractalNoiseGenerator;
-            GeneratorAsFractal.SetInputTextures( baseNoiseGenerator.NoiseTexture);
             if(GeneratorAsFractal.Octaves != Octaves) {
                 GeneratorAsFractal.Octaves = Octaves;
             }

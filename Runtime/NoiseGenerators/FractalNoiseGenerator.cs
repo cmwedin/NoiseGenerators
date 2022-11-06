@@ -270,6 +270,13 @@ namespace SadSapphicGames.NoiseGenerators {
                     baseNoiseGenerator?.Dispose();
                 }
                 inputTextureArray?.Release();
+                if (inputTextures != null && inputTextures.Count != 0)
+                {
+                    foreach (var tex in inputTextures)
+                    {
+                        tex.Release();
+                    }
+                }
                 base.Dispose(disposing);
                 disposedValue = true;
             }
