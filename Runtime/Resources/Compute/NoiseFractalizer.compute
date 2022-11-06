@@ -26,6 +26,7 @@ float4 SampleScaledPosition(uint2 coords,float frequency,uint slice) {
     return _InNoiseTextureArray[uint3(intCoords,slice)];
 }
 
+
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
@@ -36,7 +37,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     
     for(uint i = 0; i < _Octaves; i++) {
-        value += amplitude * SampleScaledPosition(id.xy,frequency,0);
+        value += amplitude * SampleScaledPosition(id.xy,frequency,i);
         normalizeFactor +=  amplitude;
         amplitude *= _Gain;
         frequency *= _Lacunarity;
