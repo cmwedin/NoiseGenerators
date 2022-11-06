@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators {
@@ -42,7 +43,7 @@ namespace SadSapphicGames.NoiseGenerators {
         /// <summary>
         /// The input texture to use in the fractal noise generation process
         /// </summary>
-        private RenderTexture inputTexture;
+        private List<RenderTexture> inputTextures;
         private RenderTexture inputTextureArray;
         public RenderTexture InputTextureArray { get
             {
@@ -53,25 +54,19 @@ namespace SadSapphicGames.NoiseGenerators {
             }
             private set => inputTextureArray = value; }
 
-        public RenderTexture InputTexture {
+        public ReadOnlyCollection<RenderTexture> InputTextures {
             get {
-                if(inputTexture == null) {
+                if(inputTextures == null || inputTextures.Count == 0) {
                     if (!usePreGeneratedTexture)
                     {
                         baseNoiseGenerator.GenerateTexture();
-                        inputTexture = baseNoiseGenerator.NoiseTexture;
+                        SetInputTextures(baseNoiseGenerator.NoiseTexture);
                     } else {
                         throw new MissingReferenceException("This generator is supposed to be using a pre-generated texture however its input texture is null");
                     }
                 }
-                return inputTexture;
-            } set {
-                if(!usePreGeneratedTexture) {
-                    Debug.LogWarning("This fractal noise generator generates its input texture itself and it cannot be set");
-                    return;
-                }
-                inputTexture = value;
-            }
+                return inputTextures.AsReadOnly();
+            } 
         }
         /// <summary>
         /// The number of times to layer detail from the input texture onto the final result
@@ -160,7 +155,7 @@ namespace SadSapphicGames.NoiseGenerators {
             float _amplitude = .5f
         ) : base((uint)_inputTexture.width, (uint)_inputTexture.height,0) {
             usePreGeneratedTexture = true;
-            InputTexture = _inputTexture;
+            SetInputTextures(_inputTexture);
             RequireSeamlessTiling = true;
             minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
             minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
@@ -185,8 +180,34 @@ namespace SadSapphicGames.NoiseGenerators {
             inputTextureArray.Create();
             for (int i = 0; i < Octaves; i++)
             {
-                Graphics.CopyTexture(InputTexture,0,0, inputTextureArray,i,0);
+                if (i < inputTextures.Count) {
+                    Graphics.CopyTexture(inputTextures[i], 0, 0, inputTextureArray, i, 0);
+                } else {
+                    Graphics.CopyTexture(inputTextures[^1], 0, 0, inputTextureArray, i, 0);
+                }
             }
+        }
+        public void SetInputTextures(RenderTexture texture,bool disposeOldTextures = true){
+            if(disposeOldTextures && inputTextures != null) {
+                foreach (var renderTex in inputTextures) {
+                    if (renderTex != texture)
+                    {
+                        renderTex.Release();
+                    }
+                }
+            }
+            inputTextures = new List<RenderTexture> { texture };
+        }
+        public void SetInputTextures(List<RenderTexture> textures,bool disposeOldTextures = true){
+            if(disposeOldTextures && inputTextures != null) {
+                foreach (var renderTex in inputTextures) {
+                    if (!textures.Contains(renderTex))
+                    {
+                        renderTex.Release();
+                    }
+                }
+            }
+            inputTextures = textures;
         }
 
         protected override void SetShaderParameters()

@@ -83,7 +83,7 @@ namespace SadSapphicGames.NoiseGenerators
             baseNoiseGenerator.GenerateTexture();
 
             var GeneratorAsFractal = NoiseGeneratorObject as FractalNoiseGenerator;
-            GeneratorAsFractal.InputTexture = baseNoiseGenerator.NoiseTexture;
+            GeneratorAsFractal.SetInputTextures( baseNoiseGenerator.NoiseTexture);
             if(GeneratorAsFractal.Octaves != Octaves) {
                 GeneratorAsFractal.Octaves = Octaves;
             }
@@ -111,8 +111,11 @@ namespace SadSapphicGames.NoiseGenerators
             {
                 baseNoiseGenerator?.Dispose();
                 _disposedValue = true;
-                inputArray?.Release();
-                inputArray = null;
+                if (inputArray != null)
+                {
+                    inputArray.Release();
+                    inputArray = null;
+                }
             }
             base.Dispose(disposing);
         }
