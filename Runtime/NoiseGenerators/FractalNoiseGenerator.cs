@@ -41,11 +41,10 @@ namespace SadSapphicGames.NoiseGenerators {
         }
 
         //? fractal noise parameters
+
         /// <summary>
-        /// The input texture to use in the fractal noise generation process
+        /// The Tex2DArray used by the compute shader for input
         /// </summary>
-        private List<RenderTexture> inputTextures;
-        private RenderTexture inputTextureArray;
         public RenderTexture InputTextureArray { get
             {
                 if (inputTextureArray == null) {
@@ -53,8 +52,34 @@ namespace SadSapphicGames.NoiseGenerators {
                 }
                 return inputTextureArray;
             }
-            private set => inputTextureArray = value; }
+            private set => inputTextureArray = value; 
+        }
+        private RenderTexture inputTextureArray;
+        private void CreateInputArray() {
+            if(disposedValue) {
+                throw new System.ObjectDisposedException(this.ToString());
+            }
+            inputTextureArray?.Release();
+            inputTextureArray = null;
+            inputTextureArray = new RenderTexture((int)TexWidth, (int)TexHeight,24);
+            inputTextureArray.dimension = UnityEngine.Rendering.TextureDimension.Tex2DArray;
+            inputTextureArray.volumeDepth = (int)Octaves;
+            inputTextureArray.enableRandomWrite = true;
+            inputTextureArray.Create();
+            for (int i = 0; i < Octaves; i++)
+            {
+                if (i < inputTextures.Count) {
+                    Graphics.CopyTexture(inputTextures[i], 0, 0, inputTextureArray, i, 0);
+                } else {
+                    Graphics.CopyTexture(inputTextures[^1], 0, 0, inputTextureArray, i, 0);
+                }
+            }
+        }
 
+
+        /// <summary>
+        /// The input textures to use in the fractal noise generation process, if multiple textures are used any in excess of the number of octaves will be ignored
+        /// </summary>
         public ReadOnlyCollection<RenderTexture> InputTextures {
             get {
                 if(inputTextures == null || inputTextures.Count == 0) {
@@ -72,7 +97,18 @@ namespace SadSapphicGames.NoiseGenerators {
                 return inputTextures.AsReadOnly();
             } 
         }
+        private List<RenderTexture> inputTextures;
+
+        /// <summary>
+        /// Set an input texture for the FractalNoiseGenerator
+        /// </summary>
+        /// <param name="texture">the input texture to use</param>
+        /// <param name="disposeOldTextures">If the previously used input textures will be disposed</param>
+        /// <exception cref="System.ObjectDisposedException">Throw if you attempt to set a disposed generator's noise textures</exception>
         public void SetInputTextures(RenderTexture texture,bool disposeOldTextures = true){
+            if(disposedValue) {
+                throw new System.ObjectDisposedException(this.ToString());
+            }
             if(disposeOldTextures && inputTextures != null) {
                 foreach (var renderTex in inputTextures) {
                     if (renderTex != texture)
@@ -83,7 +119,17 @@ namespace SadSapphicGames.NoiseGenerators {
             }
             inputTextures = new List<RenderTexture> { texture };
         }
+
+        /// <summary>
+        /// Set the input textures for the FractalNoiseGenerator
+        /// </summary>
+        /// <param name="textures">the input textures to use</param>
+        /// <param name="disposeOldTextures">If the previously used input textures will be disposed</param>
+        /// <exception cref="System.ObjectDisposedException">Throw if you attempt to set a disposed generator's noise textures</exception>
         public void SetInputTextures(List<RenderTexture> textures,bool disposeOldTextures = true){
+            if(disposedValue) {
+                throw new System.ObjectDisposedException(this.ToString());
+            }
             if(disposeOldTextures && inputTextures != null) {
                 foreach (var renderTex in inputTextures) {
                     if (!textures.Contains(renderTex))
@@ -94,7 +140,15 @@ namespace SadSapphicGames.NoiseGenerators {
             }
             inputTextures = textures;
         }
+        /// <summary>
+        /// Adds a texture to the FractalNoiseGenerator's collection of inputs
+        /// </summary>
+        /// <param name="texture">The texture to add</param>
+        /// <exception cref="System.ObjectDisposedException">Thrown if you attempt to add a texture to the inputs of a disposed fractal noise generator</exception>
         public void AddInputTexture(RenderTexture texture) {
+            if(disposedValue) {
+                throw new System.ObjectDisposedException(this.ToString());
+            }
             if(inputTextures.Contains(texture)) {
                 Debug.Log("Inputs for this fractal noise generator already contain that texture");
             } else {
@@ -202,23 +256,6 @@ namespace SadSapphicGames.NoiseGenerators {
             } else {
                 NormalizeAmplitude = false;
                 Amplitude = _amplitude;
-            }
-        }
-        private void CreateInputArray() {
-            inputTextureArray?.Release();
-            inputTextureArray = null;
-            inputTextureArray = new RenderTexture((int)TexWidth, (int)TexHeight,24);
-            inputTextureArray.dimension = UnityEngine.Rendering.TextureDimension.Tex2DArray;
-            inputTextureArray.volumeDepth = (int)Octaves;
-            inputTextureArray.enableRandomWrite = true;
-            inputTextureArray.Create();
-            for (int i = 0; i < Octaves; i++)
-            {
-                if (i < inputTextures.Count) {
-                    Graphics.CopyTexture(inputTextures[i], 0, 0, inputTextureArray, i, 0);
-                } else {
-                    Graphics.CopyTexture(inputTextures[^1], 0, 0, inputTextureArray, i, 0);
-                }
             }
         }
 
