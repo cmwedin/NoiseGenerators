@@ -13,6 +13,7 @@ namespace SadSapphicGames.NoiseGenerators {
 //? Shader Parameters
         protected override string ComputeShaderPath => "Compute/NoiseFractalizer";
         /// <summary>
+        /// This field is being sunset and will be removed in the 1.1.0 update. Please transition to always using pre-generated input textures for fractal noise generators
         /// The generator that creates the input texture if not using a pre-generated one
         /// </summary>
         private AbstractNoiseGenerator baseNoiseGenerator;
@@ -59,6 +60,9 @@ namespace SadSapphicGames.NoiseGenerators {
                 if(inputTextures == null || inputTextures.Count == 0) {
                     if (!usePreGeneratedTexture)
                     {
+                        Debug.LogWarning(
+                            "Support for fractal noise generators that don't use pre-generated textures is being depreciated. Please transition to providing input textures to this object constructor, or using the \"SetInputTextures\" method."
+                            );
                         baseNoiseGenerator.GenerateTexture();
                         SetInputTextures(baseNoiseGenerator.NoiseTexture);
                     } else {
@@ -67,6 +71,35 @@ namespace SadSapphicGames.NoiseGenerators {
                 }
                 return inputTextures.AsReadOnly();
             } 
+        }
+        public void SetInputTextures(RenderTexture texture,bool disposeOldTextures = true){
+            if(disposeOldTextures && inputTextures != null) {
+                foreach (var renderTex in inputTextures) {
+                    if (renderTex != texture)
+                    {
+                        renderTex.Release();
+                    }
+                }
+            }
+            inputTextures = new List<RenderTexture> { texture };
+        }
+        public void SetInputTextures(List<RenderTexture> textures,bool disposeOldTextures = true){
+            if(disposeOldTextures && inputTextures != null) {
+                foreach (var renderTex in inputTextures) {
+                    if (!textures.Contains(renderTex))
+                    {
+                        renderTex.Release();
+                    }
+                }
+            }
+            inputTextures = textures;
+        }
+        public void AddInputTexture(RenderTexture texture) {
+            if(inputTextures.Contains(texture)) {
+                Debug.Log("Inputs for this fractal noise generator already contain that texture");
+            } else {
+                inputTextures.Add(texture);
+            }
         }
         /// <summary>
         /// The number of times to layer detail from the input texture onto the final result
@@ -123,6 +156,7 @@ namespace SadSapphicGames.NoiseGenerators {
             float _amplitude = .5f
         ) : base(_baseNoiseGenerator.TexWidth,_baseNoiseGenerator.TexHeight,_baseNoiseGenerator.Seed) {
             baseNoiseGenerator = _baseNoiseGenerator;
+            Debug.LogWarning("Support for creating a fractal noise generator that doesn't use pre-generated input textures is being sunset and will be removed in version 1.1.0, please transition to using pre-generated textures");
             RequireSeamlessTiling = true;
             minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
             minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
@@ -186,28 +220,6 @@ namespace SadSapphicGames.NoiseGenerators {
                     Graphics.CopyTexture(inputTextures[^1], 0, 0, inputTextureArray, i, 0);
                 }
             }
-        }
-        public void SetInputTextures(RenderTexture texture,bool disposeOldTextures = true){
-            if(disposeOldTextures && inputTextures != null) {
-                foreach (var renderTex in inputTextures) {
-                    if (renderTex != texture)
-                    {
-                        renderTex.Release();
-                    }
-                }
-            }
-            inputTextures = new List<RenderTexture> { texture };
-        }
-        public void SetInputTextures(List<RenderTexture> textures,bool disposeOldTextures = true){
-            if(disposeOldTextures && inputTextures != null) {
-                foreach (var renderTex in inputTextures) {
-                    if (!textures.Contains(renderTex))
-                    {
-                        renderTex.Release();
-                    }
-                }
-            }
-            inputTextures = textures;
         }
 
         protected override void SetShaderParameters()
