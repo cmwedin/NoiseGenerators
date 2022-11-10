@@ -162,7 +162,15 @@ namespace SadSapphicGames.NoiseGenerators
         /// Generates the noise texture
         /// </summary>
         public virtual void GenerateTexture() {
-            SetShaderParameters();
+            try
+            {
+                SetShaderParameters();
+            } catch(NoInputSetException ex) {
+                Debug.LogWarning(ex);
+                return;
+            } catch(Exception ex) {
+                throw ex;
+            }
             ResetNoiseTexture();
             InnerGenerateTexture();
             OnTextureGeneration?.Invoke();
