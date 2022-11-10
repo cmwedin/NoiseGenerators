@@ -73,7 +73,7 @@ namespace SadSapphicGames.NoiseGenerators
                 baseNoiseGenerator.GenerateTexture();
                 ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(baseNoiseGenerator.NoiseTexture);
             } else {
-                var input = new List<RenderTexture>();
+                var input = new List<Texture>();
                 for (int i = 0; i < Octaves; i++)
                 {
                     baseNoiseGenerator.GenerateTexture();

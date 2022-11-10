@@ -90,7 +90,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The pixel width of the texture
         /// </summary>
-        public uint TexWidth { 
+        public virtual uint TexWidth { 
             get => texWidth; 
             set {
                 if(value == 0) {value++;}
@@ -106,7 +106,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The pixel height of the texture
         /// </summary>
-        public uint TexHeight { 
+        public virtual uint TexHeight { 
             get => texHeight; 
             set { 
                 if(value == 0) {value++;}

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators {
@@ -39,6 +40,15 @@ namespace SadSapphicGames.NoiseGenerators {
                 base.RequireSeamlessTiling = value; 
             }
         }
+        public override uint TexHeight { get => base.TexHeight;
+            set {
+                RegenerateTextureOnParamChange = false;
+                inputTextures = new List<Texture>();
+                base.TexHeight = value; 
+            }
+        }
+        public override uint TexWidth { get => base.TexWidth; 
+            set => base.TexWidth = value; }
 
         //? fractal noise parameters
 
@@ -80,7 +90,7 @@ namespace SadSapphicGames.NoiseGenerators {
         /// <summary>
         /// The input textures to use in the fractal noise generation process, if multiple textures are used any in excess of the number of octaves will be ignored
         /// </summary>
-        public ReadOnlyCollection<RenderTexture> InputTextures {
+        public ReadOnlyCollection<Texture> InputTextures {
             get {
                 if(inputTextures == null || inputTextures.Count == 0) {
                     if (!usePreGeneratedTexture)
@@ -97,46 +107,48 @@ namespace SadSapphicGames.NoiseGenerators {
                 return inputTextures.AsReadOnly();
             } 
         }
-        private List<RenderTexture> inputTextures;
+        private void ReleaseInputRenderTextures() {
+                var disposables =
+                    from input in inputTextures
+                    where input is RenderTexture
+                    select input as RenderTexture;
+                foreach (var tex in disposables) {
+                    tex.Release();
+                }
+        }
+        private List<Texture> inputTextures;
 
         /// <summary>
         /// Set an input texture for the FractalNoiseGenerator
         /// </summary>
         /// <param name="texture">the input texture to use</param>
-        /// <param name="disposeOldTextures">If the previously used input textures will be disposed</param>
+        /// <param name="releaseOldTextures">If the previously used input textures should be released or not</param>
         /// <exception cref="System.ObjectDisposedException">Throw if you attempt to set a disposed generator's noise textures</exception>
-        public void SetInputTextures(RenderTexture texture,bool disposeOldTextures = true){
+        public void SetInputTextures(Texture texture, bool releaseOldTextures = true){
             if(disposedValue) {
                 throw new System.ObjectDisposedException(this.ToString());
             }
-            if(disposeOldTextures && inputTextures != null) {
-                foreach (var renderTex in inputTextures) {
-                    if (renderTex != texture)
-                    {
-                        renderTex.Release();
-                    }
-                }
+            if(releaseOldTextures && inputTextures != null) {
+                ReleaseInputRenderTextures();
+            } 
+            if (texture.width != TexWidth || texture.height != TexHeight) {
+                
             }
-            inputTextures = new List<RenderTexture> { texture };
+            inputTextures = new List<Texture> { texture };
         }
 
         /// <summary>
         /// Set the input textures for the FractalNoiseGenerator
         /// </summary>
         /// <param name="textures">the input textures to use</param>
-        /// <param name="disposeOldTextures">If the previously used input textures will be disposed</param>
+        /// <param name="releaseOldTextures">If the previously used input textures should be released or not</param>
         /// <exception cref="System.ObjectDisposedException">Throw if you attempt to set a disposed generator's noise textures</exception>
-        public void SetInputTextures(List<RenderTexture> textures,bool disposeOldTextures = true){
+        public void SetInputTextures(List<Texture> textures,bool releaseOldTextures = true){
             if(disposedValue) {
                 throw new System.ObjectDisposedException(this.ToString());
             }
-            if(disposeOldTextures && inputTextures != null) {
-                foreach (var renderTex in inputTextures) {
-                    if (!textures.Contains(renderTex))
-                    {
-                        renderTex.Release();
-                    }
-                }
+            if(releaseOldTextures && inputTextures != null) {
+                ReleaseInputRenderTextures();
             }
             inputTextures = textures;
         }
@@ -145,7 +157,7 @@ namespace SadSapphicGames.NoiseGenerators {
         /// </summary>
         /// <param name="texture">The texture to add</param>
         /// <exception cref="System.ObjectDisposedException">Thrown if you attempt to add a texture to the inputs of a disposed fractal noise generator</exception>
-        public void AddInputTexture(RenderTexture texture) {
+        public void AddInputTexture(Texture texture) {
             if(disposedValue) {
                 throw new System.ObjectDisposedException(this.ToString());
             }
@@ -225,6 +237,29 @@ namespace SadSapphicGames.NoiseGenerators {
                 Amplitude = _amplitude;
             }
         }
+        public FractalNoiseGenerator(
+            uint _texWidth,
+            uint _texHeight,
+            uint _octaves,
+            float _lacunarity = 2,
+            float _frequency = 1,
+            float _gain = .5f,
+            float _amplitude = .5f
+        ) : base(_texWidth,_texHeight,1) {
+            RequireSeamlessTiling = true;
+            minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
+            minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
+            Octaves = _octaves;
+            Lacunarity = _lacunarity;
+            Frequency = _frequency;
+            Gain = _gain;
+            if(_amplitude != .5f) { //? if they want to use a non-standard amplitude set NormalizeAmplitude to false so its affect is apparent;
+                amplitude = _amplitude;
+            } else {
+                NormalizeAmplitude = false;
+                Amplitude = _amplitude;
+            }
+        }
         /// <summary>
         /// Constructs a fractal noise texture that uses a pre-generated input texture
         /// </summary>
@@ -236,7 +271,7 @@ namespace SadSapphicGames.NoiseGenerators {
         /// <param name="_amplitude">The initial amplitude in the first octaves</param>
         public FractalNoiseGenerator(
             uint _octaves,
-            RenderTexture _inputTexture,
+            Texture _inputTexture,
             float _lacunarity = 2,
             float _frequency = 1,
             float _gain = .5f,
@@ -321,10 +356,7 @@ namespace SadSapphicGames.NoiseGenerators {
                 inputTextureArray?.Release();
                 if (inputTextures != null && inputTextures.Count != 0)
                 {
-                    foreach (var tex in inputTextures)
-                    {
-                        tex.Release();
-                    }
+                    ReleaseInputRenderTextures();
                 }
                 base.Dispose(disposing);
                 disposedValue = true;
