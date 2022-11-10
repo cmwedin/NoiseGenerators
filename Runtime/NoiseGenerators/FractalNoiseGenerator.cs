@@ -293,6 +293,39 @@ namespace SadSapphicGames.NoiseGenerators {
                 Amplitude = _amplitude;
             }
         }
+        /// <summary>
+        /// Constructs a fractal noise texture that uses a pre-generated input texture
+        /// </summary>
+        /// <param name="_octaves">The number of times detail will be added onto the final texture </param>
+        /// <param name="_inputTextures">The input texture used to layer detail onto the final result</param>
+        /// <param name="_lacunarity">The factor by which the frequency should increase with each octave</param>
+        /// <param name="_frequency">The initial frequency in the first octave</param>
+        /// <param name="_gain">The factor by which the amplitude should decrease each octave</param>
+        /// <param name="_amplitude">The initial amplitude in the first octaves</param>
+        public FractalNoiseGenerator(
+            uint _octaves,
+            List<Texture> _inputTextures,
+            float _lacunarity = 2,
+            float _frequency = 1,
+            float _gain = .5f,
+            float _amplitude = .5f
+        ) : base((uint)_inputTextures[0].width, (uint)_inputTextures[0].height,0) {
+            usePreGeneratedTexture = true;
+            SetInputTextures(_inputTextures);
+            RequireSeamlessTiling = true;
+            minMaxBuffer = new ComputeBuffer(8, sizeof(uint));
+            minMaxBuffer.SetData(new int[] { int.MaxValue, int.MaxValue,int.MaxValue,int.MaxValue,0,0,0,0 });
+            Octaves = _octaves;
+            Lacunarity = _lacunarity;
+            Frequency = _frequency;
+            Gain = _gain;
+            if(_amplitude != .5f) { //? if they want to use a non-standard amplitude set NormalizeAmplitude to false so its affect is apparent;
+                amplitude = _amplitude;
+            } else {
+                NormalizeAmplitude = false;
+                Amplitude = _amplitude;
+            }
+        }
 
         protected override void SetShaderParameters()
         {
