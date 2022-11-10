@@ -1,12 +1,18 @@
 # Changelog
 ## 1.0.2 - in development
-- Added support for multiple textures as input to a fractal noise generator
-  - Methods have been added to set a list of textures as the input for a fractal noise generator, as well as methods to add individual textures as additional inputs
-  - A new input texture will be used for each octave of noise.
+- Added support for multiple textures as input to a fractal noise generator as well as input textures which as not RenderTextures
+  - A new input texture will be used for each octave of noise if possible.
     - if fewer input textures than the number of octaves are provided, the final input texture will be reused for all the subsequent octaves. 
+  - Methods have been added to set a list of textures as the input for a fractal noise generator, as well as methods to add individual textures as additional inputs
+  - An additional constructor for FractalNoiseGenerators has been added using a list of textures as an input.
+  - An additional constructor for FractalNoiseGenerators has been added that only sets initial texture width and height, without an input initialized
+  - Controls have been added to prevent input textures from having a different size than each other or the final noise texture
+    - If texture size is changed after construction the current input will be discarded
+  - Controls have been added to prevent a fractal noise generator from running with inputs set unless its constructor used an additional object for generating textures
   - Due to the increasing number of ways to use the fractal noise generator object (with a separate generator to create its input, with a single input texture, with multiple input textures) support for using fractal noise generators without pre-generating an input texture will be sunset in 1.1.0
     - If you use fractal noise generators that don't use pre-generated textures, you will need to migrate to ones that do before 1.1.0 (this should be after one more minor update, 1.0.3)
-    - You can do this by replacing the additional noise generator object you where using in the fractal noise generator's constructor with a list of textures, or an individual texture, generated separately.  
+    - You can do this by replacing the additional noise generator object you where using in the fractal noise generator's constructor with a list of textures, or an individual texture, generated separately.
+    - Alternatively you could replace the generator object with the size of the final noise texture and set the inputs post-construction   
 ## 1.0.1 - 11/5/22
 ### Noise Generator Components
 - Added `TextureGenerated` bool to indicate if the component currently has a generated texture
