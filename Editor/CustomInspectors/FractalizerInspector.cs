@@ -12,7 +12,9 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         FractalNoiseGeneratorComponent targetGenerator { get => (FractalNoiseGeneratorComponent)target; }
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            DrawGenerateTextureButton();
+            DrawTexturePreview(5);
+            DrawDefaultInspector();
         }
     }
 }

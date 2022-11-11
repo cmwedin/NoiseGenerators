@@ -14,35 +14,38 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
 
         public override void OnInspectorGUI()
         {
+            DrawGenerateTextureButton();
+            DrawTexturePreview(5);
+            DrawDefaultInspector();
+        }
+        protected void DrawGenerateTextureButton() {
             if(GUILayout.Button("Generate Texture")){
                 targetGenerator.GenerateTexture();
             }
-            if (targetGenerator.TextureGenerated)
-            {
-                EditorGUILayout.BeginVertical();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label("Texture Preview Size:");
-                previewSize = EditorGUILayout.IntSlider(previewSize,0,Mathf.Min(targetGenerator.NoiseTexture.width,Screen.width-20));
-                EditorGUILayout.EndHorizontal();
-                // using (var l = new EditorGUILayout.HorizontalScope())
-                // {
-                //     GUILayout.FlexibleSpace();
-                //     GUILayout.Label(targetGenerator.NoiseTexture, new GUILayoutOption[2] { GUILayout.Width(previewSize), GUILayout.Height(previewSize) });
-                //     GUILayout.FlexibleSpace();
-                // }
-                int bufferSize = 5;
-                EditorGUI.DrawPreviewTexture(
-                    new Rect(
-                        (Screen.width - previewSize) / 2,
-                        bufferSize +GUILayoutUtility.GetLastRect().y + GUILayoutUtility.GetLastRect().height,
-                        previewSize,
-                        previewSize
-                    ), targetGenerator.NoiseTexture
-                );
-                GUILayout.Space(previewSize + bufferSize);
-                EditorGUILayout.EndVertical();
-            }
-            base.OnInspectorGUI();
         }
+
+        protected void DrawTexturePreview(int bufferSize) {
+            if (!targetGenerator.TextureGenerated) { return; }
+            EditorGUILayout.BeginVertical();
+                
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Texture Preview Size:");
+            previewSize = EditorGUILayout.IntSlider(previewSize,0,Mathf.Min(targetGenerator.NoiseTexture.width,Screen.width-20));
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.DrawPreviewTexture(
+                new Rect(
+                    (Screen.width - previewSize) / 2,
+                    bufferSize +GUILayoutUtility.GetLastRect().y + GUILayoutUtility.GetLastRect().height,
+                    previewSize,
+                    previewSize
+                ), targetGenerator.NoiseTexture
+            );
+            GUILayout.Space(previewSize + bufferSize);
+            
+            EditorGUILayout.EndVertical();
+        }
+
     }
+
 }
