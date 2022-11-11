@@ -12,7 +12,11 @@
   - Due to the increasing number of ways to use the fractal noise generator object (with a separate generator to create its input, with a single input texture, with multiple input textures) support for using fractal noise generators without pre-generating an input texture will be sunset in 1.1.0
     - If you use fractal noise generators that don't use pre-generated textures, you will need to migrate to ones that do before 1.1.0 (this should be after one more minor update, 1.0.3)
     - You can do this by replacing the additional noise generator object you where using in the fractal noise generator's constructor with a list of textures, or an individual texture, generated separately.
-    - Alternatively you could replace the generator object with the size of the final noise texture and set the inputs post-construction   
+    - Alternatively you could replace the generator object with the size of the final noise texture and set the inputs post-construction
+- Added the ability to use Texture2D assets as input to a fractal noise generator component, do so disables using a separate generator component
+  - Unlike with the underlying generator objects, fractal noise components will maintain support for using a separate component to generate the input texture
+    - this is due to the greater control its inspector gives over how it is used and the more predicable lifecycle bounds
+      
 ## 1.0.1 - 11/5/22
 ### Noise Generator Components
 - Added `TextureGenerated` bool to indicate if the component currently has a generated texture

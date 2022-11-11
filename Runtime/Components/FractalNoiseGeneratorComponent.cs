@@ -51,20 +51,40 @@ namespace SadSapphicGames.NoiseGenerators
         public bool NormalizeAmplitude { get => normalizeAmplitude; set => normalizeAmplitude = value; }
         [SerializeField,Tooltip("If the affect of the initial amplitude should be normalized out of the final value")] private bool normalizeAmplitude = true;
         [SerializeField] private RenderTexture inputArray;
-        
 
+        private bool UseTextureAssets = false;
+        private List<Texture2D> inputTextureAssets;
+        /// <summary>
+        /// Switches the component from generating textures using a different noise generator component to using textures set from the asset folder
+        /// </summary>
+        public void DisableInputTextureGeneration() {
+            UseTextureAssets = true;
+        }
+        public void AddInputTexture(Texture2D texture) {
+            if(!UseTextureAssets) {
+                Debug.Log("Disable input texture generation before adding input texture assets");
+            }
+            inputTextureAssets.Add(texture);
+        }
+        public void ClearInputTextures() {
+            inputTextureAssets = new List<Texture2D>();
+        }
 
         protected override AbstractNoiseGenerator CreateGeneratorObject()
         {
-            baseNoiseGenerator.TexHeight = TexHeight;
-            baseNoiseGenerator.TexWidth = TexWidth;
-            baseNoiseGenerator.Seed = seed;
-            baseNoiseGenerator.GenerateTexture();
-            _disposedValue = false;
-            var noiseGeneratorObject = new FractalNoiseGenerator(Octaves, baseNoiseGenerator.NoiseTexture, Lacunarity, Frequency, Gain, Amplitude);
-            noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
-            noiseGeneratorObject.OnTextureGeneration += () => { inputArray = noiseGeneratorObject.InputTextureArray; };
-            return noiseGeneratorObject;
+            if(UseTextureAssets) {
+                throw new System.NotImplementedException();
+            } else {
+                baseNoiseGenerator.TexHeight = TexHeight;
+                baseNoiseGenerator.TexWidth = TexWidth;
+                baseNoiseGenerator.Seed = seed;
+                baseNoiseGenerator.GenerateTexture();
+                _disposedValue = false;
+                var noiseGeneratorObject = new FractalNoiseGenerator(Octaves, baseNoiseGenerator.NoiseTexture, Lacunarity, Frequency, Gain, Amplitude);
+                noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
+                noiseGeneratorObject.OnTextureGeneration += () => { inputArray = noiseGeneratorObject.InputTextureArray; };
+                return noiseGeneratorObject;
+            }
         }
 
         [SerializeField]private bool useMultipleInputsTextures;
