@@ -123,15 +123,18 @@ namespace SadSapphicGames.NoiseGenerators {
         /// Set an input texture for the FractalNoiseGenerator
         /// </summary>
         /// <param name="texture">the input texture to use</param>
-        /// <param name="releaseOldTextures">If the previously used input textures should be released or not</param>
+        /// <param name="releaseOldTextures">If the previously used input textures should be released or not, do not set this to false unless you are not using render textures or know what you are doing</param>
         /// <exception cref="System.ObjectDisposedException">Throw if you attempt to set a disposed generator's noise textures</exception>
         public void SetInputTextures(Texture texture, bool releaseOldTextures = true){
             if(disposedValue) {
                 throw new System.ObjectDisposedException(this.ToString());
             }
-            if(releaseOldTextures && inputsSet) {
-                ReleaseInputRenderTextures();
-            } 
+            if(inputsSet) {
+                if(releaseOldTextures) {
+                    ReleaseInputRenderTextures();
+                }
+                inputsSet = false;
+            }
             AddInputTexture(texture);
         }
 
@@ -145,9 +148,13 @@ namespace SadSapphicGames.NoiseGenerators {
             if(disposedValue) {
                 throw new System.ObjectDisposedException(this.ToString());
             }
-            if(releaseOldTextures && inputsSet) {
-                ReleaseInputRenderTextures();
+            if(inputsSet) {
+                if(releaseOldTextures) {
+                    ReleaseInputRenderTextures();
+                }
+                inputsSet = false;
             }
+
             foreach (var texture in textures) {
                 AddInputTexture(texture);
             }
