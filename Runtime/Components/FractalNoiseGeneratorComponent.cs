@@ -49,16 +49,26 @@ namespace SadSapphicGames.NoiseGenerators
         /// If the affect of the initial amplitude should be normalized out of the final value
         /// </summary>
         public bool NormalizeAmplitude { get => normalizeAmplitude; set => normalizeAmplitude = value; }
+
         [SerializeField,Tooltip("If the affect of the initial amplitude should be normalized out of the final value")] private bool normalizeAmplitude = true;
         [SerializeField] private RenderTexture inputArray;
 
-        private bool UseTextureAssets = false;
+        private bool useTextureAssets = false;
+        public bool UseTextureAssets { get => useTextureAssets;
+            set { 
+                useTextureAssets = value; 
+            }
+        }
+
         private List<Texture2D> inputTextureAssets;
         /// <summary>
         /// Switches the component from generating textures using a different noise generator component to using textures set from the asset folder
         /// </summary>
         public void DisableInputTextureGeneration() {
             UseTextureAssets = true;
+        }
+        public void EnableInputTextureGeneration() {
+            UseTextureAssets = false;
         }
         public void AddInputTexture(Texture2D texture) {
             if(!UseTextureAssets) {
