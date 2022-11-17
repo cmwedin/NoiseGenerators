@@ -81,8 +81,26 @@ namespace SadSapphicGames.NoiseGenerators
             if(!UseTextureAssets) {
                 Debug.Log("Disable input texture generation before adding input texture assets");
             }
-            inputTextureAssets.Add(texture);
+            if(VerifyInputSize(texture)) {
+                inputTextureAssets.Add(texture);
+            } else {
+                Debug.Log("texture does not match size of other inputs");
+            }
         }
+        public bool VerifyInputSize(Texture2D texture) {
+            if(inputTextureAssets.Count == 0) {
+                TexHeight = (uint)texture.height;
+                TexWidth = (uint)texture.width;
+                return true;
+            } else {
+                if(texHeight != (uint)texture.height || texWidth != (uint)texture.width) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
         public void ClearInputTextures() {
             inputTextureAssets = new List<Texture2D>();
         }
