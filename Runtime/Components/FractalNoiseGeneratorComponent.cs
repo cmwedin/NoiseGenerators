@@ -72,7 +72,7 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
-        private List<Texture2D> inputTextureAssets;
+        private List<Texture> inputTextureAssets;
         /// <summary>
         /// Switches the component from generating textures using a different noise generator component to using textures set from the asset folder
         /// </summary>
@@ -123,14 +123,25 @@ namespace SadSapphicGames.NoiseGenerators
 
         public void ClearInputTextures()
         {
-            inputTextureAssets = new List<Texture2D>();
+            inputTextureAssets = new List<Texture>();
         }
 
         protected override AbstractNoiseGenerator CreateGeneratorObject()
         {
             if (UseTextureAssets)
             {
-                throw new System.NotImplementedException();
+                if (inputTextureAssets.Count != 0)
+                {
+                    var noiseGeneratorObject = new FractalNoiseGenerator(Octaves, inputTextureAssets, Lacunarity, Frequency, Gain, Amplitude);
+                    noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
+                    noiseGeneratorObject.OnTextureGeneration += () => { inputArray = noiseGeneratorObject.InputTextureArray; };
+                    return noiseGeneratorObject;
+                } else {
+                    var noiseGeneratorObject = new FractalNoiseGenerator(TexWidth, TexHeight, Octaves, Lacunarity, Frequency, Gain, Amplitude);
+                    noiseGeneratorObject.NormalizeAmplitude = NormalizeAmplitude;
+                    noiseGeneratorObject.OnTextureGeneration += () => { inputArray = noiseGeneratorObject.InputTextureArray; };
+                    return noiseGeneratorObject;
+                }
             }
             else
             {
@@ -175,22 +186,29 @@ namespace SadSapphicGames.NoiseGenerators
         protected override void UpdateGeneratorSettings()
         {
             base.UpdateGeneratorSettings();
-            if (baseNoiseGenerator.TexHeight != TexHeight)
-            {
-                baseNoiseGenerator.TexHeight = TexHeight;
-                TexHeight = baseNoiseGenerator.TexHeight;
+            if(useTextureAssets){
+                if(inputTextureAssets.Count != inputTextureCount) {
+                    throw new System.ArgumentException($"Number of input textures selected does not match desired number of inputs, {inputTextureAssets.Count} vs {inputTextureCount}");
+                }
+                ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(inputTextureAssets);
+            } else {
+                if (baseNoiseGenerator.TexHeight != TexHeight)
+                {
+                    baseNoiseGenerator.TexHeight = TexHeight;
+                    TexHeight = baseNoiseGenerator.TexHeight;
+                }
+                if (baseNoiseGenerator.TexWidth != TexWidth)
+                {
+                    baseNoiseGenerator.TexWidth = TexWidth;
+                    TexWidth = baseNoiseGenerator.TexWidth;
+                }
+                if (baseNoiseGenerator.Seed != Seed)
+                {
+                    baseNoiseGenerator.Seed = Seed;
+                }
+                baseNoiseGenerator.GenerateTexture();
+                CreateInputTextures();
             }
-            if (baseNoiseGenerator.TexWidth != TexWidth)
-            {
-                baseNoiseGenerator.TexWidth = TexWidth;
-                TexWidth = baseNoiseGenerator.TexWidth;
-            }
-            if (baseNoiseGenerator.Seed != Seed)
-            {
-                baseNoiseGenerator.Seed = Seed;
-            }
-            baseNoiseGenerator.GenerateTexture();
-            CreateInputTextures();
 
             var GeneratorAsFractal = NoiseGeneratorObject as FractalNoiseGenerator;
             if (GeneratorAsFractal.Octaves != Octaves)
