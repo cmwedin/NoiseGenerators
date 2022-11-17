@@ -7,7 +7,7 @@ using SadSapphicGames.NoiseGenerators;
 namespace SadSapphicGames.NoiseGeneratorsEditor
 {
     [CustomEditor(typeof(FractalNoiseGeneratorComponent))]
-    public class FractalizerInspector : NoiseGenInspector
+    public class FractalGenInspector : NoiseGenInspector
     {
         FractalNoiseGeneratorComponent targetGenerator { get => (FractalNoiseGeneratorComponent)target; }
         public override void OnInspectorGUI()
