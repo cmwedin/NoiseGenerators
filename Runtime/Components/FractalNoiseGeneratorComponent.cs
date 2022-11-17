@@ -157,16 +157,14 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
-        [SerializeField] private bool useMultipleInputsTextures;
-        public int TextureCount { get { 
-                if(inputTextureCount > Octaves) inputTextureCount = (int)Octaves;
+        public int InputTextureCount { get { 
                 return inputTextureCount; 
             } set => inputTextureCount = Mathf.Clamp(1,value,(int)Octaves); }
-        [SerializeField]private int inputTextureCount = 1;
+        private int inputTextureCount = 1;
 
         private void CreateInputTextures()
         {
-            if (TextureCount == 1)
+            if (InputTextureCount == 1)
             {
                 baseNoiseGenerator.GenerateTexture();
                 ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(baseNoiseGenerator.NoiseTexture.Copy());
@@ -174,7 +172,7 @@ namespace SadSapphicGames.NoiseGenerators
             else
             {
                 var input = new List<Texture>();
-                for (int i = 0; i < TextureCount; i++)
+                for (int i = 0; i < InputTextureCount; i++)
                 {
                     baseNoiseGenerator.GenerateTexture();
                     input.Add(baseNoiseGenerator.NoiseTexture.Copy());
@@ -187,8 +185,8 @@ namespace SadSapphicGames.NoiseGenerators
         {
             base.UpdateGeneratorSettings();
             if(useTextureAssets){
-                if(inputTextureAssets.Count != inputTextureCount) {
-                    throw new System.ArgumentException($"Number of input textures selected does not match desired number of inputs, {inputTextureAssets.Count} vs {inputTextureCount}");
+                if(inputTextureAssets.Count != InputTextureCount) {
+                    throw new System.ArgumentException($"Number of input textures selected does not match desired number of inputs, {inputTextureAssets.Count} vs {InputTextureCount}");
                 }
                 ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(inputTextureAssets);
             } else {

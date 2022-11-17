@@ -14,10 +14,19 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         {
             DrawGenerateTextureButton();
             DrawTexturePreview(5);
+            DrawInputCountSlider();
             DrawTextureAssetSwitch();
             DrawDefaultInspector();
         }
-        public void DrawTextureAssetSwitch() {
+        protected void DrawInputCountSlider(){
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Input Texture Count");
+            targetGenerator.InputTextureCount = EditorGUILayout.IntSlider(targetGenerator.InputTextureCount, 1, (int)targetGenerator.Octaves);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+        }
+        protected void DrawTextureAssetSwitch() {
             EditorGUILayout.BeginVertical();
             int selection = targetGenerator.UseTextureAssets ? 1 : 0;
             selection = GUILayout.Toolbar(selection, new string[] { "Generate Textures for Input","Use Texture Assets for Input" });
