@@ -19,7 +19,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         }
         public void DrawTextureAssetSwitch() {
             EditorGUILayout.BeginVertical();
-            int selection = targetGenerator.UseTextureAssets? 1:0;
+            int selection = targetGenerator.UseTextureAssets ? 1 : 0;
             selection = GUILayout.Toolbar(selection, new string[] { "Generate Textures for Input","Use Texture Assets for Input" });
             switch (selection)
             {
@@ -28,10 +28,15 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     {
                         targetGenerator.UseTextureAssets = false;
                     }
+                    GUILayout.Label("Generating Input Texture");
+                    // targetGenerator.UseTextureAssets = false;
                     break;
                 case 1:
-                if (!targetGenerator.UseTextureAssets)
+                    if (!targetGenerator.UseTextureAssets)
+                    {
                         targetGenerator.UseTextureAssets = true;
+                    }
+                    GUILayout.Label("Using assets as Input Texture");
                     break;
                 default:
                     throw new System.Exception($"Invalid setting for input texture mode in {target.ToString()}");

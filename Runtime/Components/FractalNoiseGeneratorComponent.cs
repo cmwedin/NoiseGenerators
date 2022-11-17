@@ -55,8 +55,14 @@ namespace SadSapphicGames.NoiseGenerators
 
         private bool useTextureAssets = false;
         public bool UseTextureAssets { get => useTextureAssets;
-            set { 
-                useTextureAssets = value; 
+            set {
+                if(value == false) {
+                    if (useTextureAssets == false) { return; }
+                    EnableInputTextureGeneration();
+                } else if(value == true) {
+                    if (useTextureAssets == true) { return; }
+                    DisableInputTextureGeneration();
+                }
             }
         }
 
@@ -64,11 +70,12 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// Switches the component from generating textures using a different noise generator component to using textures set from the asset folder
         /// </summary>
-        public void DisableInputTextureGeneration() {
-            UseTextureAssets = true;
+        private void DisableInputTextureGeneration() {
+            
+            useTextureAssets = true;
         }
-        public void EnableInputTextureGeneration() {
-            UseTextureAssets = false;
+        private void EnableInputTextureGeneration() {
+            useTextureAssets = false;
         }
         public void AddInputTexture(Texture2D texture) {
             if(!UseTextureAssets) {
