@@ -17,6 +17,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             DrawInputCountSlider();
             DrawTextureAssetSwitch();
             DrawDefaultInspector();
+            serializedObject.ApplyModifiedProperties();
         }
         protected void DrawInputCountSlider(){
             EditorGUILayout.BeginVertical();
@@ -37,6 +38,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     {
                         targetGenerator.UseTextureAssets = false;
                     }
+                    DrawGeneratorSelection();
                     GUILayout.Label("Generating Input Texture");
                     // targetGenerator.UseTextureAssets = false;
                     break;
@@ -56,15 +58,27 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         protected void DrawInputTextureSelection() {
             int selectedInputsCount = targetGenerator.InputTextureAssets.Count;
             EditorGUILayout.BeginHorizontal();
+            if(GUILayout.Button("Clear Inputs")){
+                targetGenerator.ClearInputTextures();
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUI.BeginDisabledGroup(true);
             for (int i = 0; i < selectedInputsCount; i++)
             {
                 EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
-            } for (int j = selectedInputsCount; j < targetGenerator.InputTextureCount; j++) {
+            }
+            EditorGUI.EndDisabledGroup();
+            for (int j = selectedInputsCount; j < targetGenerator.InputTextureCount; j++) {
                 Texture2D selection = null;
                 selection = (Texture2D)EditorGUILayout.ObjectField(selection, typeof(Texture2D), false);
                 if (selection != null) { targetGenerator.AddInputTexture(selection); }
             }
-                EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndHorizontal();
+        }
+        protected void DrawGeneratorSelection(){
+            
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("baseNoiseGenerator"));
         }
     }
 }
