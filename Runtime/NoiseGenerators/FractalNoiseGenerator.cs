@@ -89,9 +89,11 @@ namespace SadSapphicGames.NoiseGenerators {
             for (int i = 0; i < Octaves; i++)
             {
                 if (i < inputTextures.Count) {
-                    Graphics.CopyTexture(inputTextures[i], 0, 0, inputTextureArray, i, 0);
+                    // Graphics.CopyTexture(inputTextures[i], 0, 0, inputTextureArray, i, 0);
+                    Graphics.Blit(inputTextures[i], inputTextureArray, 0, i);
                 } else {
-                    Graphics.CopyTexture(inputTextures[^1], 0, 0, inputTextureArray, i, 0);
+                    Graphics.Blit(inputTextures[^1], inputTextureArray, 0, i);
+
                 }
             }
         }

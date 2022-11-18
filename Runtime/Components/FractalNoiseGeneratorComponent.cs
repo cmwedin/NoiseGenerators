@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace SadSapphicGames.NoiseGenerators
@@ -72,6 +73,7 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
+        public ReadOnlyCollection<Texture> InputTextureAssets {get => inputTextureAssets.AsReadOnly(); }
         private List<Texture> inputTextureAssets;
         /// <summary>
         /// Switches the component from generating textures using a different noise generator component to using textures set from the asset folder
@@ -83,6 +85,7 @@ namespace SadSapphicGames.NoiseGenerators
         }
         private void EnableInputTextureGeneration()
         {
+            if (inputTextureAssets.Count != 0) { ClearInputTextures(); }
             useTextureAssets = false;
         }
         public void AddInputTexture(Texture2D texture)

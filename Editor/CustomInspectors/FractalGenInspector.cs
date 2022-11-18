@@ -45,12 +45,26 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     {
                         targetGenerator.UseTextureAssets = true;
                     }
+                    DrawInputTextureSelection();
                     GUILayout.Label("Using assets as Input Texture");
                     break;
                 default:
                     throw new System.Exception($"Invalid setting for input texture mode in {target.ToString()}");
             }
             EditorGUILayout.EndVertical();
+        }
+        protected void DrawInputTextureSelection() {
+            int selectedInputsCount = targetGenerator.InputTextureAssets.Count;
+            EditorGUILayout.BeginHorizontal();
+            for (int i = 0; i < selectedInputsCount; i++)
+            {
+                EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
+            } for (int j = selectedInputsCount; j < targetGenerator.InputTextureCount; j++) {
+                Texture2D selection = null;
+                selection = (Texture2D)EditorGUILayout.ObjectField(selection, typeof(Texture2D), false);
+                if (selection != null) { targetGenerator.AddInputTexture(selection); }
+            }
+                EditorGUILayout.EndHorizontal();
         }
     }
 }
