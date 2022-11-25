@@ -39,8 +39,6 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                         targetGenerator.UseTextureAssets = false;
                     }
                     DrawGeneratorSelection();
-                    GUILayout.Label("Generating Input Texture");
-                    // targetGenerator.UseTextureAssets = false;
                     break;
                 case 1:
                     if (!targetGenerator.UseTextureAssets)
@@ -48,7 +46,6 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                         targetGenerator.UseTextureAssets = true;
                     }
                     DrawInputTextureSelection();
-                    GUILayout.Label("Using assets as Input Texture");
                     break;
                 default:
                     throw new System.Exception($"Invalid setting for input texture mode in {target.ToString()}");
@@ -56,23 +53,34 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             EditorGUILayout.EndVertical();
         }
         protected void DrawInputTextureSelection() {
-            int selectedInputsCount = targetGenerator.InputTextureAssets.Count;
+            int selectedInputsCount = targetGenerator.InputTextureAssets != null ? targetGenerator.InputTextureAssets.Count : 0;
+            int maxTexPerRow = 5;
             EditorGUILayout.BeginHorizontal();
             if(GUILayout.Button("Clear Inputs")){
                 targetGenerator.ClearInputTextures();
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
+            //? Selected Textures
             EditorGUI.BeginDisabledGroup(true);
-            for (int i = 0; i < selectedInputsCount; i++)
-            {
-                EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
+            if(selectedInputsCount > maxTexPerRow) {
+
+            } else {
+                for (int i = 0; i < selectedInputsCount; i++)
+                {
+                
+                    EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
+                }
             }
             EditorGUI.EndDisabledGroup();
             for (int j = selectedInputsCount; j < targetGenerator.InputTextureCount; j++) {
                 Texture2D selection = null;
                 selection = (Texture2D)EditorGUILayout.ObjectField(selection, typeof(Texture2D), false);
                 if (selection != null) { targetGenerator.AddInputTexture(selection); }
+                if((j + 1) % maxTexPerRow == 0){
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                } 
             }
             EditorGUILayout.EndHorizontal();
         }

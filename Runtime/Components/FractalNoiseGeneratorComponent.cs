@@ -73,7 +73,11 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
-        public ReadOnlyCollection<Texture> InputTextureAssets {get => inputTextureAssets.AsReadOnly(); }
+        public ReadOnlyCollection<Texture> InputTextureAssets {get {
+                if (inputTextureAssets == null || inputTextureAssets.Count == 0) { return null; }
+                else return inputTextureAssets.AsReadOnly(); 
+        } }
+
         private List<Texture> inputTextureAssets;
         /// <summary>
         /// Switches the component from generating textures using a different noise generator component to using textures set from the asset folder
