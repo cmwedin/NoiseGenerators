@@ -164,14 +164,26 @@ namespace SadSapphicGames.NoiseGenerators
             }
         }
 
-        public int InputTextureCount { get { 
-                return inputTextureCount; 
-            } set => inputTextureCount = Mathf.Clamp(1,value,(int)Octaves); }
-        private int inputTextureCount = 1;
+        public int DesiredInputTextureCount {
+            get
+            {
+                return desiredInputTextureCount;
+            }
+            set { 
+                desiredInputTextureCount = Mathf.Clamp(1, value, (int)Octaves);
+                if(InputTextureAssets.Count > desiredInputTextureCount) {
+                    for (int i = 1; i <= InputTextureAssets.Count - desiredInputTextureCount; i++)
+                    {
+                        inputTextureAssets.Remove(inputTextureAssets[i]);
+                    }
+                } 
+            }
+        }
+        private int desiredInputTextureCount = 1;
 
         private void CreateInputTextures()
         {
-            if (InputTextureCount == 1)
+            if (DesiredInputTextureCount == 1)
             {
                 baseNoiseGenerator.GenerateTexture();
                 ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(baseNoiseGenerator.NoiseTexture.Copy());
@@ -179,7 +191,7 @@ namespace SadSapphicGames.NoiseGenerators
             else
             {
                 var input = new List<Texture>();
-                for (int i = 0; i < InputTextureCount; i++)
+                for (int i = 0; i < DesiredInputTextureCount; i++)
                 {
                     baseNoiseGenerator.GenerateTexture();
                     input.Add(baseNoiseGenerator.NoiseTexture.Copy());
@@ -192,8 +204,8 @@ namespace SadSapphicGames.NoiseGenerators
         {
             base.UpdateGeneratorSettings();
             if(useTextureAssets){
-                if(inputTextureAssets.Count != InputTextureCount) {
-                    throw new System.ArgumentException($"Number of input textures selected does not match desired number of inputs, {inputTextureAssets.Count} vs {InputTextureCount}");
+                if(inputTextureAssets.Count != DesiredInputTextureCount) {
+                    throw new System.ArgumentException($"Number of input textures selected does not match desired number of inputs, {inputTextureAssets.Count} vs {DesiredInputTextureCount}");
                 }
                 ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(inputTextureAssets);
             } else {

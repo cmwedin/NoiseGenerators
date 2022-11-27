@@ -23,7 +23,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             EditorGUILayout.BeginVertical();
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Input Texture Count");
-            targetGenerator.InputTextureCount = EditorGUILayout.IntSlider(targetGenerator.InputTextureCount, 1, (int)targetGenerator.Octaves);
+            targetGenerator.DesiredInputTextureCount = EditorGUILayout.IntSlider(targetGenerator.DesiredInputTextureCount, 1, (int)targetGenerator.Octaves);
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
@@ -65,7 +65,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             //? Selected Textures
             EditorGUI.BeginDisabledGroup(true);
             if(selectedInputsCount >= maxTexPerRow) {
-                for (int i = 0; i < selectedInputsCount; i++)
+                for (int i = 0; i < selectedInputsCount && i  < targetGenerator.DesiredInputTextureCount; i++)
                 {
                     EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
                     if((i + 1) % maxTexPerRow == 0){
@@ -74,7 +74,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     } 
                 }
             } else {
-                for (int i = 0; i < selectedInputsCount; i++)
+                for (int i = 0; i < selectedInputsCount && i  < targetGenerator.DesiredInputTextureCount; i++)
                 {
                     EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
                 }
@@ -82,7 +82,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             EditorGUI.EndDisabledGroup();
             
             //? Unselected Textures
-            for (int j = selectedInputsCount; j < targetGenerator.InputTextureCount; j++) {
+            for (int j = selectedInputsCount; j < targetGenerator.DesiredInputTextureCount; j++) {
                 Texture2D selection = null;
                 selection = (Texture2D)EditorGUILayout.ObjectField(selection, typeof(Texture2D), false);
                 if (selection != null) { targetGenerator.AddInputTexture(selection); }
