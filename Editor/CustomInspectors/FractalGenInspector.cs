@@ -45,6 +45,11 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     {
                         targetGenerator.UseTextureAssets = true;
                     }
+                                EditorGUILayout.BeginHorizontal();
+                    if(GUILayout.Button("Clear Inputs")){
+                        targetGenerator.ClearInputTextures();
+                    }
+                    EditorGUILayout.EndHorizontal();
                     DrawInputTextureSelection();
                     break;
                 default:
@@ -56,11 +61,6 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             int selectedInputsCount = targetGenerator.InputTextureAssets != null ? targetGenerator.InputTextureAssets.Count : 0;
             int maxTexPerRow = 5;
             EditorGUILayout.BeginHorizontal();
-            if(GUILayout.Button("Clear Inputs")){
-                targetGenerator.ClearInputTextures();
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
             //? Selected Textures
             EditorGUI.BeginDisabledGroup(true);
             if(selectedInputsCount > maxTexPerRow) {
@@ -68,7 +68,6 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             } else {
                 for (int i = 0; i < selectedInputsCount; i++)
                 {
-                
                     EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
                 }
             }
