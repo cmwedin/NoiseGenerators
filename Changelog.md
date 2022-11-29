@@ -22,6 +22,7 @@
   - added a slider to set the desired number of input textures to use, up to the number of octaves
   - added the ability to switch between using a separate generator component and Texture2D assets
     - added a field to add texture assets as input if that mode is selected 
+    - currently to change the selected texture assets the list of assets must be first cleared 
       
 ## 1.0.1 - 11/5/22
 ### Noise Generator Components
