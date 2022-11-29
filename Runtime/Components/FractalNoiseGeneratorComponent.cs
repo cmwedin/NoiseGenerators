@@ -171,10 +171,10 @@ namespace SadSapphicGames.NoiseGenerators
             }
             set { 
                 desiredInputTextureCount = Mathf.Clamp(1, value, (int)Octaves);
-                if(InputTextureAssets.Count > desiredInputTextureCount) {
-                    for (int i = 1; i <= InputTextureAssets.Count - desiredInputTextureCount; i++)
+                if(useTextureAssets && inputTextureAssets.Count > desiredInputTextureCount) {
+                    for (int i = 1; i <= inputTextureAssets.Count - desiredInputTextureCount; i++)
                     {
-                        inputTextureAssets.Remove(inputTextureAssets[i]);
+                        inputTextureAssets.Remove(inputTextureAssets[^i]);
                     }
                 } 
             }
@@ -200,6 +200,7 @@ namespace SadSapphicGames.NoiseGenerators
                 ((FractalNoiseGenerator)NoiseGeneratorObject).SetInputTextures(input);
             }
         }
+
         protected override void UpdateGeneratorSettings()
         {
             base.UpdateGeneratorSettings();

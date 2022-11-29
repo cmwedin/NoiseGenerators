@@ -22,7 +22,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         protected void DrawInputCountSlider(){
             EditorGUILayout.BeginVertical();
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Input Texture Count");
+            GUILayout.Label("Desired Input Texture Count");
             targetGenerator.DesiredInputTextureCount = EditorGUILayout.IntSlider(targetGenerator.DesiredInputTextureCount, 1, (int)targetGenerator.Octaves);
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
@@ -63,11 +63,11 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             EditorGUILayout.BeginHorizontal();
             
             //? Selected Textures
-            EditorGUI.BeginDisabledGroup(true);
+            // EditorGUI.BeginDisabledGroup(true);
             if(selectedInputsCount >= maxTexPerRow) {
                 for (int i = 0; i < selectedInputsCount && i  < targetGenerator.DesiredInputTextureCount; i++)
                 {
-                    EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
+                EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
                     if((i + 1) % maxTexPerRow == 0){
                         EditorGUILayout.EndHorizontal();
                         EditorGUILayout.BeginHorizontal();
@@ -79,7 +79,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     EditorGUILayout.ObjectField(targetGenerator.InputTextureAssets[i], typeof(Texture2D),false);
                 }
             }
-            EditorGUI.EndDisabledGroup();
+            // EditorGUI.EndDisabledGroup();
             
             //? Unselected Textures
             for (int j = selectedInputsCount; j < targetGenerator.DesiredInputTextureCount; j++) {
