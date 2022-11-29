@@ -16,7 +16,9 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         {
             DrawGenerateTextureButton();
             DrawTexturePreview(5);
+            // DrawBaseGeneratorInfo();
             DrawDefaultInspector();
+            serializedObject.ApplyModifiedProperties();
         }
         protected void DrawGenerateTextureButton() {
             if(GUILayout.Button("Generate Texture")){
@@ -44,6 +46,11 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             GUILayout.Space(previewSize + bufferSize);
             
             EditorGUILayout.EndVertical();
+        }
+        protected void DrawBaseGeneratorInfo(){
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("texWidth"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("texHeight"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("seed"));
         }
 
     }
