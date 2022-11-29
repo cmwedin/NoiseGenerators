@@ -47,7 +47,7 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             
             EditorGUILayout.EndVertical();
         }
-        protected void DrawBaseGeneratorInfo(){
+        protected void DrawBasicGeneratorInfo(){
             EditorGUILayout.PropertyField(serializedObject.FindProperty("texWidth"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("texHeight"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("seed"));

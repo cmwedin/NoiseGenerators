@@ -16,7 +16,9 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
             DrawTexturePreview(5);
             DrawInputCountSlider();
             DrawTextureAssetSwitch();
-            DrawDefaultInspector();
+            // DrawDefaultInspector();
+            DrawBasicGeneratorInfo();
+            DrawFractalGeneratorInfo();
             serializedObject.ApplyModifiedProperties();
         }
         protected void DrawInputCountSlider(){
@@ -96,6 +98,17 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         protected void DrawGeneratorSelection(){
             
             EditorGUILayout.PropertyField(serializedObject.FindProperty("baseNoiseGenerator"));
+        }
+        protected void DrawFractalGeneratorInfo() {
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("octaves"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("lacunarity"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("frequency"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("gain"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("normalizeAmplitude"));
+            if (!targetGenerator.NormalizeAmplitude)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("amplitude"));
+            }
         }
     }
 }
