@@ -14,8 +14,18 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
         {
             DrawGenerateTextureButton();
             DrawTexturePreview(5);
-            DrawInputCountSlider();
             DrawTextureAssetSwitch();
+            DrawInputCountSlider();
+            if(targetGenerator.UseTextureAssets) {
+                EditorGUILayout.BeginHorizontal();      
+                if(GUILayout.Button("Clear Inputs")){
+                    targetGenerator.ClearInputTextures();
+                }
+                EditorGUILayout.EndHorizontal();
+                DrawInputTextureSelection();
+            } else {
+                DrawGeneratorSelection();
+            }
             // DrawDefaultInspector();
             DrawBasicGeneratorInfo();
             DrawFractalGeneratorInfo();
@@ -40,19 +50,12 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                     {
                         targetGenerator.UseTextureAssets = false;
                     }
-                    DrawGeneratorSelection();
                     break;
                 case 1:
                     if (!targetGenerator.UseTextureAssets)
                     {
                         targetGenerator.UseTextureAssets = true;
                     }
-                                EditorGUILayout.BeginHorizontal();
-                    if(GUILayout.Button("Clear Inputs")){
-                        targetGenerator.ClearInputTextures();
-                    }
-                    EditorGUILayout.EndHorizontal();
-                    DrawInputTextureSelection();
                     break;
                 default:
                     throw new System.Exception($"Invalid setting for input texture mode in {target.ToString()}");
