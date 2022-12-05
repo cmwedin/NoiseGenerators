@@ -1,5 +1,5 @@
 # Changelog
-## 1.0.2 - in development
+## 1.0.2 - 12/5/22
 - Added support for multiple textures as input to a fractal noise generator as well as input textures which are not RenderTextures
   - A new input texture will be used for each octave of noise if possible.
     - if fewer input textures than the number of octaves are provided, the final input texture will be reused for all the subsequent octaves. 
@@ -17,6 +17,7 @@
   - Unlike with the underlying generator objects, fractal noise components will maintain support for using a separate component to generate the input texture
     - this is due to the greater control its inspector gives over how it is used and the more predicable lifecycle bounds
   - Currently all texture assets must be the same size
+  - The full collection of texture assets must be emptied to change them once selected
 - added various features to the inspector for fractal generator components
   - added the texture preview feature introduced to other generator components in 1.0.1
   - added a slider to set the desired number of input textures to use, up to the number of octaves
