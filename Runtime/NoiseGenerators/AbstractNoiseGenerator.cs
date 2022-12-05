@@ -90,7 +90,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The pixel width of the texture
         /// </summary>
-        public uint TexWidth { 
+        public virtual uint TexWidth { 
             get => texWidth; 
             set {
                 if(value == 0) {value++;}
@@ -106,7 +106,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// <summary>
         /// The pixel height of the texture
         /// </summary>
-        public uint TexHeight { 
+        public virtual uint TexHeight { 
             get => texHeight; 
             set { 
                 if(value == 0) {value++;}
@@ -162,7 +162,15 @@ namespace SadSapphicGames.NoiseGenerators
         /// Generates the noise texture
         /// </summary>
         public virtual void GenerateTexture() {
-            SetShaderParameters();
+            try
+            {
+                SetShaderParameters();
+            } catch(NoInputSetException ex) {
+                Debug.LogWarning(ex);
+                return;
+            } catch(Exception ex) {
+                throw ex;
+            }
             ResetNoiseTexture();
             InnerGenerateTexture();
             OnTextureGeneration?.Invoke();
@@ -187,9 +195,6 @@ namespace SadSapphicGames.NoiseGenerators
                 {
                     //? No managed disposables in base class 
                 }
-                //? If in the future the decision is made to remove the static generation methods and dispose of noise textures with the generator objects uncomment this line
-                //? This is incompatible with static generator methods however as the generating object must be disposed of as soon as the static methods scope ends
-                //? Meaning as soon as the generated texture is returned to the caller it would already be dispoed
                 noiseTexture?.Release();
                 disposedValue = true;
             }

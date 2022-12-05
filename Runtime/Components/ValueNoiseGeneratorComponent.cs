@@ -23,7 +23,7 @@ namespace SadSapphicGames.NoiseGenerators
         /// Creates a ValueNoiseGeneratorObject and sets its RequireSeamlessTiling property
         /// </summary>
         protected override AbstractNoiseGenerator CreateGeneratorObject() {
-            var noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, latticeCellSize);
+            var noiseGeneratorObject = new ValueNoiseGenerator(TexWidth, TexHeight, seed, LatticeCellSize);
             noiseGeneratorObject.RequireSeamlessTiling = tileTexture;
             return noiseGeneratorObject;
         }
