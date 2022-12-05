@@ -27,7 +27,16 @@ namespace SadSapphicGames.NoiseGeneratorsEditor
                 DrawGeneratorSelection();
             }
             // DrawDefaultInspector();
-            DrawBasicGeneratorInfo();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("seed"));
+            if(targetGenerator.UseTextureAssets) {
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("texWidth"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("texWidth"));
+                EditorGUI.EndDisabledGroup();
+            } else {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("texWidth"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("texWidth"));
+            }
             DrawFractalGeneratorInfo();
             serializedObject.ApplyModifiedProperties();
         }
