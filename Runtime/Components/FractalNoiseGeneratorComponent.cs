@@ -88,7 +88,9 @@ namespace SadSapphicGames.NoiseGenerators
         /// </summary>
         private void DisableInputTextureGeneration()
         {
-
+            if(inputTextureAssets == null) {
+                inputTextureAssets = new List<Texture>();
+            }
             useTextureAssets = true;
         }
         private void EnableInputTextureGeneration()
